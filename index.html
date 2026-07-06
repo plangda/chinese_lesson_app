@@ -6,6 +6,7 @@
   <title>HanPath - Daily Chinese Learning App</title>
   <meta name="description" content="Assess your level, learn Chinese in structured 1-hour daily lessons, and build consistency.">
   <link rel="stylesheet" href="style.css">
+  <script src="hanzi-writer.min.js"></script>
 </head>
 <body>
 
@@ -249,41 +250,76 @@
           </p>
           
           <div class="vocab-stage">
-            <!-- Flipping Flashcard -->
-            <div class="flashcard-container">
-              <div id="vocab-flashcard" class="flashcard">
-                <div class="flashcard-face flashcard-front">
-                  <div id="vocab-char" class="card-hanzi">你</div>
-                  <div class="card-hint">Tap Card to Flip</div>
-                </div>
-                <div class="flashcard-face flashcard-back">
-                  <div id="vocab-meaning" class="card-meaning">you</div>
-                  <div id="vocab-pinyin" class="card-pinyin">nǐ</div>
-                  <div class="card-hint">Tap to Flip back</div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Details & Examples -->
-            <div class="vocab-details">
-              <div class="vocab-detail-item">
-                <div class="vocab-detail-label">Pronunciation</div>
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                  <button id="vocab-speak-btn" class="audio-btn" title="Listen Pronunciation">🔊</button>
-                  <span id="vocab-detail-pinyin" style="font-size: 1.3rem; font-weight: 600; color: var(--primary);">nǐ</span>
+            <!-- Left Column: Flashcard & Info -->
+            <div class="vocab-card-col">
+              <!-- Flipping Flashcard -->
+              <div class="flashcard-container">
+                <div id="vocab-flashcard" class="flashcard">
+                  <div class="flashcard-face flashcard-front">
+                    <div id="vocab-char" class="card-hanzi">你</div>
+                    <div class="card-hint">Tap Card to Flip</div>
+                  </div>
+                  <div class="flashcard-face flashcard-back">
+                    <div id="vocab-meaning" class="card-meaning">you</div>
+                    <div id="vocab-pinyin" class="card-pinyin">nǐ</div>
+                    <div class="card-hint">Tap to Flip back</div>
+                  </div>
                 </div>
               </div>
               
-              <div class="vocab-detail-item">
-                <div class="vocab-detail-label">Example Sentence</div>
-                <div class="example-box">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div id="vocab-ex-cn" class="example-cn">你好！</div>
-                    <button id="vocab-ex-speak-btn" class="audio-btn" style="width: 32px; height: 32px; font-size: 0.8rem;">🔊</button>
+              <!-- Details & Examples -->
+              <div class="vocab-details">
+                <div class="vocab-detail-item">
+                  <div class="vocab-detail-label">Pronunciation</div>
+                  <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="vocab-speak-btn" class="audio-btn" title="Listen Pronunciation">🔊</button>
+                    <span id="vocab-detail-pinyin" style="font-size: 1.3rem; font-weight: 600; color: var(--primary);">nǐ</span>
                   </div>
-                  <div id="vocab-ex-py" class="example-py">Nǐ hǎo!</div>
-                  <div id="vocab-ex-en" class="example-en">Hello!</div>
                 </div>
+                
+                <div class="vocab-detail-item">
+                  <div class="vocab-detail-label">Example Sentence</div>
+                  <div class="example-box">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                      <div id="vocab-ex-cn" class="example-cn">你好！</div>
+                      <button id="vocab-ex-speak-btn" class="audio-btn" style="width: 32px; height: 32px; font-size: 0.8rem;">🔊</button>
+                    </div>
+                    <div id="vocab-ex-py" class="example-py">Nǐ hǎo!</div>
+                    <div id="vocab-ex-en" class="example-en">Hello!</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Writing & Tracing Practice Panel -->
+            <div class="writing-practice-panel glass-panel">
+              <div class="writing-modes-header">
+                <button id="mode-animate-btn" class="btn-mode active" data-mode="animate">📹 Animate</button>
+                <button id="mode-trace-btn" class="btn-mode" data-mode="trace">✍️ Trace Guide</button>
+                <button id="mode-freewrite-btn" class="btn-mode" data-mode="freewrite">🎨 Free Write</button>
+              </div>
+
+              <!-- Tianzige Drawing Area -->
+              <div class="tianzige-container">
+                <!-- SVG target for HanziWriter -->
+                <div id="hanzi-writer-target" class="tianzige-grid"></div>
+                <!-- Canvas overlay for Free Write mode -->
+                <canvas id="free-write-canvas" width="260" height="260" style="display: none;"></canvas>
+              </div>
+
+              <!-- Controls -->
+              <div class="writing-controls">
+                <button id="btn-writing-play" class="btn btn-secondary btn-sm">▶ Play</button>
+                <button id="btn-writing-clear" class="btn btn-secondary btn-sm" style="display: none;">🧹 Clear</button>
+                <button id="btn-writing-reset" class="btn btn-secondary btn-sm">🔄 Reset</button>
+              </div>
+
+              <!-- Character Deconstruction Block -->
+              <div class="deconstruct-card">
+                <h4>🧩 Character Deconstruction</h4>
+                <p id="vocab-deconstruct-text" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; line-height: 1.4;">
+                  (Select a word to see its deconstruction)
+                </p>
               </div>
             </div>
           </div>

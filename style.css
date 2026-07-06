@@ -418,11 +418,153 @@ main {
 
 /* Vocabulary Section */
 .vocab-stage {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2.5rem;
+  margin: 2rem 0;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .vocab-stage {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.vocab-card-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+  width: 100%;
+}
+
+/* Writing & Tracing Practice Panel */
+.writing-practice-panel {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  border-color: rgba(255, 51, 102, 0.15);
+}
+
+.writing-modes-header {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: center;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 0.8rem;
+}
+
+.btn-mode {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btn-mode:hover {
+  background: var(--glass-bg-hover);
+  color: var(--text-primary);
+}
+
+.btn-mode.active {
+  background: var(--primary-glow);
+  border-color: var(--primary);
+  color: var(--text-primary);
+  box-shadow: 0 0 10px rgba(255, 51, 102, 0.25);
+}
+
+.tianzige-container {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  background: rgba(8, 6, 15, 0.6);
+  border: 2px solid var(--glass-border);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3rem;
-  margin: 2rem 0;
+}
+
+.tianzige-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(45deg, transparent 49.5%, rgba(255, 255, 255, 0.05) 50%, transparent 50.5%),
+    linear-gradient(-45deg, transparent 49.5%, rgba(255, 255, 255, 0.05) 50%, transparent 50.5%);
+  background-position: center;
+  background-size: 100% 100%;
+  z-index: 1;
+}
+
+.tianzige-grid {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* Canvas styling for Free Write mode */
+#free-write-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  cursor: crosshair;
+}
+
+.writing-controls {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  border-radius: var(--border-radius-sm);
+}
+
+.deconstruct-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-md);
+  padding: 1rem 1.2rem;
+  text-align: left;
+}
+
+.deconstruct-card h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
 }
 
 @media (max-width: 768px) {

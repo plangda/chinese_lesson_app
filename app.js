@@ -98,37 +98,62 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Load progress from LocalStorage
+// Load progress from LocalStorage and sync with server
 function loadProgress() {
   const saved = localStorage.getItem("hanpath_student_data");
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      state.userLevel = parsed.userLevel || null;
-      state.completedLessons = parsed.completedLessons || [];
-      state.streakCount = parsed.streakCount || 0;
-      state.lastStudyDate = parsed.lastStudyDate || null;
-      state.score = parsed.score || 0;
-      state.timeSpentMinutes = parsed.timeSpentMinutes || 0;
-      state.reminderTime = parsed.reminderTime || "09:00";
+      applyProgressState(parsed);
     } catch (e) {
-      console.error("Error loading saved student progress", e);
+      console.error("Error loading saved student progress from localStorage", e);
     }
   }
   
-  // Sync the reminder UI
-  const timeInput = document.getElementById("reminder-time-input");
-  if (timeInput && state.reminderTime) {
-    timeInput.value = state.reminderTime;
-  }
-  
+  // Fetch from server to sync
+  fetch("/api/progress")
+    .then(response => {
+      if (response.ok) return response.json();
+      throw new Error("Server response not ok");
+    })
+    .then(serverData => {
+      if (serverData && Object.keys(serverData).length > 0) {
+        applyProgressState(serverData);
+        // Save back to localStorage to keep in sync
+        localStorage.setItem("hanpath_student_data", JSON.stringify(serverData));
+        updateHeaderControls();
+        if (state.currentView === "dashboard-view") {
+          renderDashboard();
+        }
+      }
+    })
+    .catch(err => {
+      console.log("Could not sync with server, using local data:", err.message);
+    });
+
   // Check notification permission status
   if (typeof Notification !== 'undefined') {
     state.notificationGranted = Notification.permission === "granted";
   }
 }
 
-// Save progress to LocalStorage
+function applyProgressState(data) {
+  state.userLevel = data.userLevel || null;
+  state.completedLessons = data.completedLessons || [];
+  state.streakCount = data.streakCount || 0;
+  state.lastStudyDate = data.lastStudyDate || null;
+  state.score = data.score || 0;
+  state.timeSpentMinutes = data.timeSpentMinutes || 0;
+  state.reminderTime = data.reminderTime || "09:00";
+  
+  // Sync the reminder UI
+  const timeInput = document.getElementById("reminder-time-input");
+  if (timeInput && state.reminderTime) {
+    timeInput.value = state.reminderTime;
+  }
+}
+
+// Save progress to LocalStorage and Server
 function saveProgress() {
   const dataToSave = {
     userLevel: state.userLevel,
@@ -141,6 +166,15 @@ function saveProgress() {
   };
   localStorage.setItem("hanpath_student_data", JSON.stringify(dataToSave));
   updateHeaderControls();
+  
+  // Send to server
+  fetch("/api/progress", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dataToSave)
+  }).catch(err => {
+    console.error("Failed to sync progress with server:", err);
+  });
 }
 
 // Update Top Bar & Badges
@@ -307,6 +341,37 @@ function setupEventListeners() {
   document.getElementById("finish-to-dashboard-btn").addEventListener("click", () => {
     switchView("dashboard-view");
   });
+
+  // Writing mode switches
+  document.getElementById("mode-animate-btn").addEventListener("click", () => switchWritingMode("animate"));
+  document.getElementById("mode-trace-btn").addEventListener("click", () => switchWritingMode("trace"));
+  document.getElementById("mode-freewrite-btn").addEventListener("click", () => switchWritingMode("freewrite"));
+
+  // Writing controls
+  document.getElementById("btn-writing-play").addEventListener("click", () => {
+    if (writerInstance && currentWritingMode === "animate") {
+      writerInstance.animateCharacter();
+    }
+  });
+
+  document.getElementById("btn-writing-clear").addEventListener("click", () => {
+    if (currentWritingMode === "freewrite") {
+      clearFreeWriteCanvas();
+    }
+  });
+
+  document.getElementById("btn-writing-reset").addEventListener("click", () => {
+    if (writerInstance) {
+      if (currentWritingMode === "animate") {
+        writerInstance.animateCharacter();
+      } else if (currentWritingMode === "trace") {
+        writerInstance.quiz();
+      }
+    }
+  });
+
+  // Initialize free-write canvas drawing logic
+  initFreeWriteCanvas();
 }
 
 // ----------------------------------------------------
@@ -686,6 +751,13 @@ function paneGoNext() {
 // ----------------------------------------------------
 // STAGE 1: VOCABULARY CARD DRAWING
 // ----------------------------------------------------
+let writerInstance = null;
+let currentWritingMode = "animate"; // 'animate', 'trace', 'freewrite'
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+let canvasCtx = null;
+
 function loadVocabWord() {
   const vocabList = state.currentLesson.vocab;
   const word = vocabList[state.vocabIndex];
@@ -707,6 +779,19 @@ function loadVocabWord() {
   
   // Indicator
   document.getElementById("vocab-index-indicator").textContent = `Word ${state.vocabIndex + 1} of ${vocabList.length}`;
+  
+  // Deconstruction
+  const deconstructText = document.getElementById("vocab-deconstruct-text");
+  if (deconstructText) {
+    deconstructText.textContent = word.deconstruct || "No deconstruction data available.";
+  }
+
+  // Initialize or update writing mode for the current character
+  if (currentWritingMode === "freewrite") {
+    clearFreeWriteCanvas();
+  } else {
+    initHanziWriter(word.character);
+  }
 }
 
 function vocabPrev() {
@@ -721,6 +806,161 @@ function vocabNext() {
   if (state.vocabIndex < vocabList.length - 1) {
     state.vocabIndex++;
     loadVocabWord();
+  }
+}
+
+// Hanzi Writer & Drawing Canvas Handlers
+function initHanziWriter(character) {
+  const target = document.getElementById("hanzi-writer-target");
+  if (!target) return;
+  target.innerHTML = ""; // Clear existing SVG
+  
+  if (typeof HanziWriter === "undefined") {
+    target.innerHTML = `<div style="color:var(--text-muted);font-size:0.85rem;padding:2rem;text-align:center;">HanziWriter not loaded</div>`;
+    return;
+  }
+
+  writerInstance = HanziWriter.create("hanzi-writer-target", character, {
+    width: 220,
+    height: 220,
+    padding: 10,
+    showOutline: true,
+    strokeColor: "#ff3366",      // Rose Red (--primary)
+    outlineColor: "rgba(255, 255, 255, 0.08)",
+    drawingColor: "#00f5d4",     // Teal (--success)
+    drawingWidth: 4,
+    strokeAnimationSpeed: 1.5,
+    delayBetweenStrokes: 400
+  });
+
+  if (currentWritingMode === "animate") {
+    setTimeout(() => {
+      if (writerInstance && currentWritingMode === "animate") {
+        writerInstance.animateCharacter();
+      }
+    }, 450);
+  } else if (currentWritingMode === "trace") {
+    setTimeout(() => {
+      if (writerInstance && currentWritingMode === "trace") {
+        writerInstance.quiz();
+      }
+    }, 450);
+  }
+}
+
+function switchWritingMode(mode) {
+  currentWritingMode = mode;
+  
+  document.querySelectorAll(".writing-modes-header .btn-mode").forEach(btn => {
+    if (btn.getAttribute("data-mode") === mode) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+
+  const writerTarget = document.getElementById("hanzi-writer-target");
+  const canvas = document.getElementById("free-write-canvas");
+  const playBtn = document.getElementById("btn-writing-play");
+  const clearBtn = document.getElementById("btn-writing-clear");
+  const resetBtn = document.getElementById("btn-writing-reset");
+
+  if (mode === "freewrite") {
+    writerTarget.style.display = "none";
+    canvas.style.display = "block";
+    
+    playBtn.style.display = "none";
+    clearBtn.style.display = "inline-flex";
+    resetBtn.style.display = "none";
+    
+    clearFreeWriteCanvas();
+  } else {
+    writerTarget.style.display = "flex";
+    canvas.style.display = "none";
+    
+    playBtn.style.display = "inline-flex";
+    clearBtn.style.display = "none";
+    resetBtn.style.display = "inline-flex";
+
+    const vocabList = state.currentLesson.vocab;
+    const word = vocabList[state.vocabIndex];
+    initHanziWriter(word.character);
+  }
+}
+
+function initFreeWriteCanvas() {
+  const canvas = document.getElementById("free-write-canvas");
+  if (!canvas) return;
+  canvasCtx = canvas.getContext("2d");
+  
+  canvas.width = 260;
+  canvas.height = 260;
+  
+  canvasCtx.strokeStyle = "#00f5d4"; // Teal drawing color
+  canvasCtx.lineWidth = 4;
+  canvasCtx.lineCap = "round";
+  canvasCtx.lineJoin = "round";
+
+  canvas.addEventListener("mousedown", startDrawing);
+  canvas.addEventListener("mousemove", draw);
+  canvas.addEventListener("mouseup", stopDrawing);
+  canvas.addEventListener("mouseleave", stopDrawing);
+
+  canvas.addEventListener("touchstart", (e) => {
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent("mousedown", {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+    e.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener("touchmove", (e) => {
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent("mousemove", {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+    e.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener("touchend", (e) => {
+    const mouseEvent = new MouseEvent("mouseup", {});
+    canvas.dispatchEvent(mouseEvent);
+  });
+}
+
+function startDrawing(e) {
+  isDrawing = true;
+  const rect = e.target.getBoundingClientRect();
+  lastX = e.clientX - rect.left;
+  lastY = e.clientY - rect.top;
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  const rect = e.target.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  canvasCtx.beginPath();
+  canvasCtx.moveTo(lastX, lastY);
+  canvasCtx.lineTo(x, y);
+  canvasCtx.stroke();
+  
+  lastX = x;
+  lastY = y;
+}
+
+function stopDrawing() {
+  isDrawing = false;
+}
+
+function clearFreeWriteCanvas() {
+  if (canvasCtx) {
+    canvasCtx.clearRect(0, 0, 260, 260);
   }
 }
 

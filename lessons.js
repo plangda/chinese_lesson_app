@@ -139,11 +139,11 @@ const CHINESE_LESSONS = {
         level: "HSK 1 (Beginner)",
         duration: "60 min",
         vocab: [
-          { character: "你", pinyin: "nǐ", meaning: "you", exampleCn: "你好！", examplePy: "Nǐ hǎo!", exampleEn: "Hello!" },
-          { character: "好", pinyin: "hǎo", meaning: "good / well", exampleCn: "他很好。", examplePy: "Tā hěn hǎo.", exampleEn: "He is very well." },
-          { character: "您", pinyin: "nín", meaning: "you (polite)", exampleCn: "老师，您好！", examplePy: "Lǎoshī, nín hǎo!", exampleEn: "Teacher, hello!" },
-          { character: "谢谢", pinyin: "xièxie", meaning: "to thank / thanks", exampleCn: "谢谢你！", examplePy: "Xièxie nǐ!", exampleEn: "Thank you!" },
-          { character: "再见", pinyin: "zàijiàn", meaning: "goodbye / see you again", exampleCn: "爸爸，再见。", examplePy: "Bàba, zàijiàn.", exampleEn: "Goodbye, Dad." }
+          { character: "你", pinyin: "nǐ", meaning: "you", deconstruct: "工 (Person) + 尔 (You). The person radical represents human connection; combined with 尔, it means 'you'.", exampleCn: "你好！", examplePy: "Nǐ hǎo!", exampleEn: "Hello!" },
+          { character: "好", pinyin: "hǎo", meaning: "good / well", deconstruct: "女 (Woman) + 子 (Child). A woman holding a child signifies goodness, harmony, and positivity.", exampleCn: "他很好。", examplePy: "Tā hěn hǎo.", exampleEn: "He is very well." },
+          { character: "您", pinyin: "nín", meaning: "you (polite)", deconstruct: "你 (You) + 心 (Heart). Placing 'heart' under 'you' represents respect and politeness.", exampleCn: "老师，您好！", examplePy: "Lǎoshī, nín hǎo!", exampleEn: "Teacher, hello!" },
+          { character: "谢谢", pinyin: "xièxie", meaning: "to thank / thanks", deconstruct: "讠 (Speech) + 射 (Shoot) + 寸 (Inch). Words of gratitude spoken from the heart.", exampleCn: "谢谢你！", examplePy: "Xièxie nǐ!", exampleEn: "Thank you!" },
+          { character: "再见", pinyin: "zàijiàn", meaning: "goodbye / see you again", deconstruct: "再 (Again) + 见 (See). Literally 'again see', meaning goodbye or see you again.", exampleCn: "爸爸，再见。", examplePy: "Bàba, zàijiàn.", exampleEn: "Goodbye, Dad." }
         ],
         grammar: [
           {
@@ -218,11 +218,11 @@ const CHINESE_LESSONS = {
         level: "HSK 1 (Beginner)",
         duration: "60 min",
         vocab: [
-          { character: "一", pinyin: "yī", meaning: "one", exampleCn: "一个苹果。", examplePy: "Yí gè píngguǒ.", exampleEn: "One apple." },
-          { character: "五", pinyin: "wǔ", meaning: "five", exampleCn: "五个人。", examplePy: "Wǔ gè rén.", exampleEn: "Five people." },
-          { character: "十", pinyin: "shí", meaning: "ten", exampleCn: "十个学生。", examplePy: "Shí gè xuéshēng.", exampleEn: "Ten students." },
-          { character: "月", pinyin: "yuè", meaning: "month / moon", exampleCn: "一月一日。", examplePy: "Yī yuè yī rì.", exampleEn: "January 1st." },
-          { character: "号", pinyin: "hào", meaning: "number / day of the month", exampleCn: "今天五号。", examplePy: "Jīntiān wǔ hào.", exampleEn: "Today is the 5th." }
+          { character: "一", pinyin: "yī", meaning: "one", deconstruct: "一 (One). A single horizontal stroke representing the number one.", exampleCn: "一个苹果。", examplePy: "Yí gè píngguǒ.", exampleEn: "One apple." },
+          { character: "五", pinyin: "wǔ", meaning: "five", deconstruct: "五 (Five). Originally represented an intersection of heaven and earth, now standard for five.", exampleCn: "五个人。", examplePy: "Wǔ gè rén.", exampleEn: "Five people." },
+          { character: "十", pinyin: "shí", meaning: "ten", deconstruct: "十 (Ten). A cross representing the intersection of two lines, representing completeness or ten.", exampleCn: "十个学生。", examplePy: "Shí gè xuéshēng.", exampleEn: "Ten students." },
+          { character: "月", pinyin: "yuè", meaning: "month / moon", deconstruct: "月 (Moon/Month). A pictograph of a crescent moon, representing the moon or a month.", exampleCn: "一月一日。", examplePy: "Yī yuè yī rì.", exampleEn: "January 1st." },
+          { character: "号", pinyin: "hào", meaning: "number / day of the month", deconstruct: "口 (Mouth) + 丂 (Breath). Represents designation, numbering, or a specific day.", exampleCn: "今天五号。", examplePy: "Jīntiān wǔ hào.", exampleEn: "Today is the 5th." }
         ],
         grammar: [
           {
@@ -295,11 +295,11 @@ const CHINESE_LESSONS = {
         level: "HSK 1 (Beginner)",
         duration: "60 min",
         vocab: [
-          { character: "爸爸", pinyin: "bàba", meaning: "father / dad", exampleCn: "我爸爸是医生。", examplePy: "Wǒ bàba shì yīshēng.", exampleEn: "My dad is a doctor." },
-          { character: "妈妈", pinyin: "māma", meaning: "mother / mom", exampleCn: "我妈妈喜欢猫。", examplePy: "Wǒ māma xǐhuān māo.", exampleEn: "My mom likes cats." },
-          { character: "家", pinyin: "jiā", meaning: "family / home", exampleCn: "我家在北京。", examplePy: "Wǒ jiā zài Běijīng.", exampleEn: "My home is in Beijing." },
-          { character: "有", pinyin: "yǒu", meaning: "to have / there is", exampleCn: "我有一个哥哥。", examplePy: "Wǒ yǒu yí gè gēge.", exampleEn: "I have an older brother." },
-          { character: "个", pinyin: "gè", meaning: "general measure word", exampleCn: "三个人。", examplePy: "Sān gè rén.", exampleEn: "Three people." }
+          { character: "爸爸", pinyin: "bàba", meaning: "father / dad", deconstruct: "父 (Father) + 巴 (Cling). 父 represents a hand holding a rod (authority), standard for father.", exampleCn: "我爸爸是医生。", examplePy: "Wǒ bàba shì yīshēng.", exampleEn: "My dad is a doctor." },
+          { character: "妈妈", pinyin: "māma", meaning: "mother / mom", deconstruct: "女 (Woman) + 马 (Horse). 女 represents female, and 马 provides the phonetic sound 'mǎ'.", exampleCn: "我妈妈喜欢猫。", examplePy: "Wǒ māma xǐhuān māo.", exampleEn: "My mom likes cats." },
+          { character: "家", pinyin: "jiā", meaning: "family / home", deconstruct: "宀 (Roof) + 豕 (Pig). A pig under a roof. Historically, having livestock inside represented home and wealth.", exampleCn: "我家在北京。", examplePy: "Wǒ jiā zài Běijīng.", exampleEn: "My home is in Beijing." },
+          { character: "有", pinyin: "yǒu", meaning: "to have / there is", deconstruct: "𠂇 (Hand) + 月 (Meat). A hand holding a piece of meat, symbolizing possession or 'to have'.", exampleCn: "我有一个哥哥。", examplePy: "Wǒ yǒu yí gè gēge.", exampleEn: "I have an older brother." },
+          { character: "个", pinyin: "gè", meaning: "general measure word", deconstruct: "个 (Individual). A pictograph of a single bamboo leaf, representing a general measure word.", exampleCn: "三个人。", examplePy: "Sān gè rén.", exampleEn: "Three people." }
         ],
         grammar: [
           {
@@ -372,11 +372,11 @@ const CHINESE_LESSONS = {
         level: "HSK 1 (Beginner)",
         duration: "60 min",
         vocab: [
-          { character: "吃", pinyin: "chī", meaning: "to eat", exampleCn: "吃米饭。", examplePy: "Chī mǐfàn.", exampleEn: "Eat cooked rice." },
-          { character: "喝", pinyin: "hē", meaning: "to drink", exampleCn: "喝热水。", examplePy: "Hē rèshuǐ.", exampleEn: "Drink hot water." },
-          { character: "茶", pinyin: "chá", meaning: "tea", exampleCn: "喝绿茶。", examplePy: "Hē lǜchá.", exampleEn: "Drink green tea." },
-          { character: "米饭", pinyin: "mǐfàn", meaning: "cooked rice", exampleCn: "我喜欢吃米饭。", examplePy: "Wǒ xǐhuān chī mǐfàn.", exampleEn: "I like to eat rice." },
-          { character: "苹果", pinyin: "píngguǒ", meaning: "apple", exampleCn: "买红苹果。", examplePy: "Mǎi hóng píngguǒ.", exampleEn: "Buy red apples." }
+          { character: "吃", pinyin: "chī", meaning: "to eat", deconstruct: "口 (Mouth) + 乞 (Beg). 口 represents using the mouth to eat, and 乞 is phonetic.", exampleCn: "吃米饭。", examplePy: "Chī mǐfàn.", exampleEn: "Eat cooked rice." },
+          { character: "喝", pinyin: "hē", meaning: "to drink", deconstruct: "口 (Mouth) + 曷 (Why/How). 口 represents using the mouth to drink, and 曷 provides the phonetic guide.", exampleCn: "喝热水。", examplePy: "Hē rèshuǐ.", exampleEn: "Drink hot water." },
+          { character: "茶", pinyin: "chá", meaning: "tea", deconstruct: "艹 (Grass) + 人 (Person) + 木 (Wood). Leaves of a plant (tea leaves) picked by a person from a tree.", exampleCn: "喝绿茶。", examplePy: "Hē lǜchá.", exampleEn: "Drink green tea." },
+          { character: "米饭", pinyin: "mǐfàn", meaning: "cooked rice", deconstruct: "米 (Rice) + 饭 (Food/Meal). 米 is raw rice grains; 饭 is 饣 (Food) + 反 (Phonetic). Cooked rice.", exampleCn: "我喜欢吃米饭。", examplePy: "Wǒ xǐhuān chī mǐfàn.", exampleEn: "I like to eat rice." },
+          { character: "苹果", pinyin: "píngguǒ", meaning: "apple", deconstruct: "苹 (Duckweed) + 果 (Fruit). 果 is a pictograph of fruit on a tree. Together, apple.", exampleCn: "买红苹果。", examplePy: "Mǎi hóng píngguǒ.", exampleEn: "Buy red apples." }
         ],
         grammar: [
           {
@@ -451,11 +451,11 @@ const CHINESE_LESSONS = {
         level: "HSK 2 (Elementary)",
         duration: "60 min",
         vocab: [
-          { character: "起床", pinyin: "qǐchuáng", meaning: "to get up (from bed)", exampleCn: "我早上六点起床。", examplePy: "Wǒ zǎoshang liù diǎn qǐchuáng.", exampleEn: "I get up at 6 AM." },
-          { character: "跑步", pinyin: "pǎobù", meaning: "to run / jog", exampleCn: "他喜欢去公园跑步。", examplePy: "Tā xǐhuān qù gōngyuán pǎobù.", exampleEn: "He likes running in the park." },
-          { character: "上班", pinyin: "shàngbān", meaning: "to go to work", exampleCn: "她每天八点半上班。", examplePy: "Tā měitiān bā diǎn bàn shàngbān.", exampleEn: "She goes to work at 8:30 every day." },
-          { character: "生病", pinyin: "shēngbìng", meaning: "to fall ill", exampleCn: "他今天生病了，没去上班。", examplePy: "Tā jīntiān shēngbìng le, méi qù shàngbān.", exampleEn: "He fell ill today and didn't go to work." },
-          { character: "药", pinyin: "yào", meaning: "medicine", exampleCn: "记得吃药。", examplePy: "Jìde chī yào.", exampleEn: "Remember to take your medicine." }
+          { character: "起床", pinyin: "qǐchuáng", meaning: "to get up (from bed)", deconstruct: "起 (Rise) + 床 (Bed). 起 is 走 (Walk) + 己 (Self); 床 is 广 (Shelter) + 木 (Wood). Rising from bed.", exampleCn: "我早上六点起床。", examplePy: "Wǒ zǎoshang liù diǎn qǐchuáng.", exampleEn: "I get up at 6 AM." },
+          { character: "跑步", pinyin: "pǎobù", meaning: "to run / jog", deconstruct: "跑 (Run) + 步 (Step). 跑 is ⻊ (Foot) + 包 (Phonetic); 步 represents two feet taking steps.", exampleCn: "他喜欢去公园跑步。", examplePy: "Tā xǐhuān qù gōngyuán pǎobù.", exampleEn: "He likes running in the park." },
+          { character: "上班", pinyin: "shàngbān", meaning: "to go to work", deconstruct: "上 (Go up) + 班 (Shift). 班 represents jade pieces separated and shared among workers on a shift.", exampleCn: "她每天八点半上班。", examplePy: "Tā měitiān bā diǎn bàn shàngbān.", exampleEn: "She goes to work at 8:30 every day." },
+          { character: "生病", pinyin: "shēngbìng", meaning: "to fall ill", deconstruct: "生 (Life) + 病 (Sickness). 病 has the 疒 (Sickness/Pain) radical, indicating physical illness.", exampleCn: "他今天生病了，没去上班。", examplePy: "Tā jīntiān shēngbìng le, méi qù shàngbān.", exampleEn: "He fell ill today and didn't go to work." },
+          { character: "药", pinyin: "yào", meaning: "medicine", deconstruct: "艹 (Grass/Herb) + 乐 (Joy/Music). Herbs/plants (艹) used as medicine to bring relief and comfort (乐).", exampleCn: "记得吃药。", examplePy: "Jìde chī yào.", exampleEn: "Remember to take your medicine." }
         ],
         grammar: [
           {
@@ -528,11 +528,11 @@ const CHINESE_LESSONS = {
         level: "HSK 2 (Elementary)",
         duration: "60 min",
         vocab: [
-          { character: "晴天", pinyin: "qíngtiān", meaning: "sunny day", exampleCn: "今天是个晴天。", examplePy: "Jīntiān  shì gè qíngtiān.", exampleEn: "Today is a sunny day." },
-          { character: "阴天", pinyin: "yīntiān", meaning: "cloudy day / overcast", exampleCn: "外面是阴天，可能会下雨。", examplePy: "Wàimiàn  shì yīntiān, kěnéng huì xià yǔ.", exampleEn: "It is cloudy outside, it might rain." },
-          { character: "自行车", pinyin: "zìxíngchē", meaning: "bicycle / bike", exampleCn: "我骑自行车去学校。", examplePy: "Wǒ qí zìxíngchē qù xuéxiào.", exampleEn: "I ride a bicycle to school." },
-          { character: "公共汽车", pinyin: "gōnggòng qìchē", meaning: "bus", exampleCn: "坐公共汽车很方便。", examplePy: "Zuò gōnggòng qìchē hěn fāngbiàn.", exampleEn: "Taking the bus is very convenient." },
-          { character: "便宜", pinyin: "piányi", meaning: "cheap / inexpensive", exampleCn: "这件衣服很便宜。", examplePy: "Zhè jiàn yīfu hěn piányi.", exampleEn: "This piece of clothing is very cheap." }
+          { character: "晴天", pinyin: "qíngtiān", meaning: "sunny day", deconstruct: "晴 (Sunny) + 天 (Sky). 晴 has 日 (Sun) + 青 (Blue/Green). A clear sunny day.", exampleCn: "今天是个晴天。", examplePy: "Jīntiān  shì gè qíngtiān.", exampleEn: "Today is a sunny day." },
+          { character: "阴天", pinyin: "yīntiān", meaning: "cloudy day / overcast", deconstruct: "阴 (Cloudy) + 天 (Sky). 阴 has 阝 (Mound) + 月 (Shadow). Represents shade or clouds.", exampleCn: "外面是阴天，可能会下雨。", examplePy: "Wàimiàn  shì yīntiān, kěnéng huì xià yǔ.", exampleEn: "It is cloudy outside, it might rain." },
+          { character: "自行车", pinyin: "zìxíngchē", meaning: "bicycle / bike", deconstruct: "自 (Self) + 行 (Go/Move) + 车 (Vehicle). Self-propelled wheeled vehicle, i.e., bicycle.", exampleCn: "我骑自行车去学校。", examplePy: "Wǒ qí zìxíngchē qù xuéxiào.", exampleEn: "I ride a bicycle to school." },
+          { character: "公共汽车", pinyin: "gōnggòng qìchē", meaning: "bus", deconstruct: "公共 (Public) + 汽车 (Car). 汽 (Steam/Gas) + 车 (Vehicle). Public automobile/bus.", exampleCn: "坐公共汽车很方便。", examplePy: "Zuò gōnggòng qìchē hěn fāngbiàn.", exampleEn: "Taking the bus is very convenient." },
+          { character: "便宜", pinyin: "piányi", meaning: "cheap / inexpensive", deconstruct: "便 (Convenient) + 宜 (Suitable). 便 has 亻 (Person); 宜 has 宀 (Roof). Suitable and convenient price.", exampleCn: "这件衣服很便宜。", examplePy: "Zhè jiàn yīfu hěn piányi.", exampleEn: "This piece of clothing is very cheap." }
         ],
         grammar: [
           {
@@ -605,11 +605,11 @@ const CHINESE_LESSONS = {
         level: "HSK 2 (Elementary)",
         duration: "60 min",
         vocab: [
-          { character: "旅游", pinyin: "lǚyóu", meaning: "to travel", exampleCn: "我喜欢去中国旅游。", examplePy: "Wǒ xǐhuān qù Zhōngguó lǚyóu.", exampleEn: "I like to travel to China." },
-          { character: "唱歌", pinyin: "chànggē", meaning: "to sing a song", exampleCn: "她唱歌唱得非常好听。", examplePy: "Tā chànggē chàng de fēicháng hǎotīng.", exampleEn: "She sings very beautifully." },
-          { character: "跳舞", pinyin: "tiàowǔ", meaning: "to dance", exampleCn: "我不会跳舞。", examplePy: "Wǒ bú huì tiàowǔ.", exampleEn: "I cannot dance." },
-          { character: "运动", pinyin: "yùndòng", meaning: "sports / to exercise", exampleCn: "每天运动身体好。", examplePy: "Měitiān  yùndòng shēntǐ hǎo.", exampleEn: "Exercising every day is good for health." },
-          { character: "足球", pinyin: "zúqiú", meaning: "soccer / football", exampleCn: "踢足球。", examplePy: "Tī zúqiú.", exampleEn: "Play soccer." }
+          { character: "旅游", pinyin: "lǚyóu", meaning: "to travel", deconstruct: "旅 (Travel) + 游 (Wander). 旅 is a banner for a group of soldiers; 游 is 氵 (Water) + 斿 (Float). Wander around.", exampleCn: "我喜欢去中国旅游。", examplePy: "Wǒ xǐhuān qù Zhōngguó lǚyóu.", exampleEn: "I like to travel to China." },
+          { character: "唱歌", pinyin: "chànggē", meaning: "to sing a song", deconstruct: "唱 (Sing) + 歌 (Song). 唱 has 口 (Mouth) + 昌 (Phonetic); 歌 has 哥 + 欠 (Breath). Opening mouth to emit musical notes.", exampleCn: "她唱歌唱得非常好听。", examplePy: "Tā chànggē chàng de fēicháng hǎotīng.", exampleEn: "She sings very beautifully." },
+          { character: "跳舞", pinyin: "tiàowǔ", meaning: "to dance", deconstruct: "跳 (Jump) + 舞 (Dance). 跳 has ⻊ (Foot); 舞 is a pictograph of a dancer holding tassels. Expressive movement of feet and body.", exampleCn: "我不会跳舞。", examplePy: "Wǒ bú huì tiàowǔ.", exampleEn: "I cannot dance." },
+          { character: "运动", pinyin: "yùndòng", meaning: "sports / to exercise", deconstruct: "运 (Transport/Move) + 动 (Move/Action). 运 has 辶 (Walk); 动 has 力 (Strength). Moving with physical effort.", exampleCn: "每天运动身体好。", examplePy: "Měitiān  yùndòng shēntǐ hǎo.", exampleEn: "Exercising every day is good for health." },
+          { character: "足球", pinyin: "zúqiú", meaning: "soccer / football", deconstruct: "足 (Foot) + 球 (Ball). 足 represents foot/leg; 球 has 王 (Jade/Jewel) + 求 (Phonetic). Ball game played with feet.", exampleCn: "踢足球。", examplePy: "Tī zúqiú.", exampleEn: "Play soccer." }
         ],
         grammar: [
           {
@@ -686,11 +686,11 @@ const CHINESE_LESSONS = {
         level: "HSK 2 (Elementary)",
         duration: "60 min",
         vocab: [
-          { character: "买", pinyin: "mǎi", meaning: "to buy", exampleCn: "你想买什么？", examplePy: "Nǐ xiǎng mǎi shénme?", exampleEn: "What do you want to buy?" },
-          { character: "卖", pinyin: "mài", meaning: "to sell", exampleCn: "这里不卖自行车。", examplePy: "Zhèlǐ bú mài zìxíngchē.", exampleEn: "They don't sell bicycles here." },
-          { character: "衣服", pinyin: "yīfu", meaning: "clothes / clothing", exampleCn: "买新衣服。", examplePy: "Mǎi xīn yīfu.", exampleEn: "Buy new clothes." },
-          { character: "贵", pinyin: "guì", meaning: "expensive", exampleCn: "太贵了，便宜一点吧。", examplePy: "Tài guì le, piányi  yìdiǎn ba.", exampleEn: "Too expensive, make it cheaper." },
-          { character: "百", pinyin: "bǎi", meaning: "hundred", exampleCn: "两百块钱。", examplePy: "Liǎng bǎi kuài qián.", exampleEn: "Two hundred yuan." }
+          { character: "买", pinyin: "mǎi", meaning: "to buy", deconstruct: "买 (Buy). Originally a net buying cowries (money), now simplified to buying goods.", exampleCn: "你想买什么？", examplePy: "Nǐ xiǎng mǎi shénme?", exampleEn: "What do you want to buy?" },
+          { character: "卖", pinyin: "mài", meaning: "to sell", deconstruct: "卖 (Sell). Notice the cross '十' on top of '买' (Buy), representing putting goods out for sale.", exampleCn: "这里不卖自行车。", examplePy: "Zhèlǐ bú mài zìxíngchē.", exampleEn: "They don't sell bicycles here." },
+          { character: "衣服", pinyin: "yīfu", meaning: "clothes / clothing", deconstruct: "衣 (Clothes) + 服 (Garment). 衣 is a pictograph of a high-collar jacket; 服 has 月 (Body) + 卩 + 又.", exampleCn: "买新衣服。", examplePy: "Mǎi xīn yīfu.", exampleEn: "Buy new clothes." },
+          { character: "贵", pinyin: "guì", meaning: "expensive", deconstruct: "贵 (Expensive). 贝 (Cowrie shell/Money) at the bottom. A high-value item.", exampleCn: "太贵了，便宜一点吧。", examplePy: "Tài guì le, piányi  yìdiǎn ba.", exampleEn: "Too expensive, make it cheaper." },
+          { character: "百", pinyin: "bǎi", meaning: "hundred", deconstruct: "百 (Hundred). A line (一) over 白 (White), representing the number one hundred.", exampleCn: "两百块钱。", examplePy: "Liǎng bǎi kuài qián.", exampleEn: "Two hundred yuan." }
         ],
         grammar: [
           {
@@ -856,11 +856,11 @@ const CHINESE_LESSONS = {
         level: "HSK 3 (Intermediate)",
         duration: "60 min",
         vocab: [
-          { character: "感冒", pinyin: "gǎnmào", meaning: "to catch a cold / flu", exampleCn: "我感冒了，流鼻涕。", examplePy: "Wǒ gǎnmào le, liú bítì.", exampleEn: "I caught a cold, and have a runny nose." },
-          { character: "发烧", pinyin: "fāshāo", meaning: "to have a fever", exampleCn: "他发烧到三十九度。", examplePy: "Tā fāshāo dào sānshíjiǔ dù.", exampleEn: "He has a fever of 39 degrees." },
-          { character: "检查", pinyin: "jiǎnchá", meaning: "to examine / check up", exampleCn: "医生帮我检查了身体。", examplePy: "Yīshēng bāng wǒ jiǎnchá le shēntǐ.", exampleEn: "The doctor checked my body." },
-          { character: "健康", pinyin: "jiànkāng", meaning: "health / healthy", exampleCn: "祝你身体健康！", examplePy: "Zhù nǐ shēntǐ jiànkāng!", exampleEn: "Wish you good health!" },
-          { character: "舒服", pinyin: "shūfu", meaning: "comfortable / feeling well", exampleCn: "我今天身体不舒服。", examplePy: "Wǒ jīntiān shēntǐ bù shūfu.", exampleEn: "I don't feel well today." }
+          { character: "感冒", pinyin: "gǎnmào", meaning: "to catch a cold / flu", deconstruct: "感 (Feel/Emotion) + 冒 (Emit/Risk). 感 has 心 (Heart); 冒 is ⺜ (Cover) + 目 (Eye). Feeling affected by elements.", exampleCn: "我感冒了，流鼻涕。", examplePy: "Wǒ gǎnmào le, liú bítì.", exampleEn: "I caught a cold, and have a runny nose." },
+          { character: "发烧", pinyin: "fāshāo", meaning: "to have a fever", deconstruct: "发 (Send out) + 烧 (Burn). 发 is sending forth; 烧 has 火 (Fire) + 尧 (Phonetic). Body burning with heat.", exampleCn: "他发烧到三十九度。", examplePy: "Tā fāshāo dào sānshíjiǔ dù.", exampleEn: "He has a fever of 39 degrees." },
+          { character: "检查", pinyin: "jiǎnchá", meaning: "to examine / check up", deconstruct: "检 (Examine) + 查 (Investigate). Both characters have 木 (Wood) as a radical, historically referring to wooden labels and files inspected for accuracy.", exampleCn: "医生帮我检查了身体。", examplePy: "Yīshēng bāng wǒ jiǎnchá le shēntǐ.", exampleEn: "The doctor checked my body." },
+          { character: "健康", pinyin: "jiànkāng", meaning: "health / healthy", deconstruct: "健 (Strong) + 康 (Peace/Health). 健 has 亻 (Person) + 建 (Build); 康 represents peaceful well-being. A robust body in peace.", exampleCn: "祝你身体健康！", examplePy: "Zhù nǐ shēntǐ jiànkāng!", exampleEn: "Wish you good health!" },
+          { character: "舒服", pinyin: "shūfu", meaning: "comfortable / feeling well", deconstruct: "舒 (Stretch/Relax) + 服 (Garment/Adapt). 舒 has 舍 (House) + 予 (Give); 服 has 月 (Body) + 又. Body relaxed and fitting well.", exampleCn: "我今天身体不舒服。", examplePy: "Wǒ jīntiān shēntǐ bù shūfu.", exampleEn: "I don't feel well today." }
         ],
         grammar: [
           {
@@ -934,11 +934,11 @@ const CHINESE_LESSONS = {
         level: "HSK 3 (Intermediate)",
         duration: "60 min",
         vocab: [
-          { character: "感兴趣", pinyin: "gǎn xìngqù", meaning: "to be interested in", exampleCn: "我对画画很感兴趣。", examplePy: "Wǒ duì huàhuà hěn gǎn xìngqù.", exampleEn: "I am very interested in drawing." },
-          { character: "音乐", pinyin: "yīnyuè", meaning: "music", exampleCn: "听古典音乐。", examplePy: "Tīng gǔdiǎn yīnyuè.", exampleEn: "Listen to classical music." },
-          { character: "爱好", pinyin: "àihào", meaning: "hobby / interest", exampleCn: "他的爱好是看电影。", examplePy: "Tā de àihào  shì kàn diànyǐng.", exampleEn: "His hobby is watching movies." },
-          { character: "游戏", pinyin: "yóuxì", meaning: "game", exampleCn: "玩电脑游戏。", examplePy: "Wán diànnǎo yóuxì.", exampleEn: "Play computer games." },
-          { character: "比赛", pinyin: "bǐsài", meaning: "competition / match", exampleCn: "今晚有一场足球比赛。", examplePy: "Jīnwǎn  yǒu yì cháng zúqiú bǐsài.", exampleEn: "There is a soccer match tonight." }
+          { character: "感兴趣", pinyin: "gǎn xìngqù", meaning: "to be interested in", deconstruct: "感 (Feel) + 兴趣 (Interest). 兴 has ⺠ + 𠔁; 趣 has 走 (Walk) + 取 (Take). Feeling an attraction towards a topic.", exampleCn: "我对画画很感兴趣。", examplePy: "Wǒ duì huàhuà hěn gǎn xìngqù.", exampleEn: "I am very interested in drawing." },
+          { character: "音乐", pinyin: "yīnyuè", meaning: "music", deconstruct: "音 (Sound) + 乐 (Music/Joy). 音 is a mouth blowing a flute; 乐 is a pictograph of a musical instrument. Sound of joy.", exampleCn: "听古典音乐。", examplePy: "Tīng gǔdiǎn yīnyuè.", exampleEn: "Listen to classical music." },
+          { character: "爱好", pinyin: "àihào", meaning: "hobby / interest", deconstruct: "爱 (Love) + 好 (Good). 爱 has 爪 + 心 (Heart) + 友 (Friend);好 is 女 + 子. What you love and find good.", exampleCn: "他的爱好是看电影。", examplePy: "Tā de àihào  shì kàn diànyǐng.", exampleEn: "His hobby is watching movies." },
+          { character: "游戏", pinyin: "yóuxì", meaning: "game", deconstruct: "游 (Wander) + 戏 (Play/Drama). 游 is 氵 + 斿; 戏 has 又 (Hand) + 戈 (Spear). Wandering, active play.", exampleCn: "玩电脑游戏。", examplePy: "Wán diànnǎo yóuxì.", exampleEn: "Play computer games." },
+          { character: "比赛", pinyin: "bǐsài", meaning: "competition / match", deconstruct: "比 (Compare) + 赛 (Compete). 比 is two people standing together comparing; 赛 has 贝 (Money/Prize). Competing for a prize.", exampleCn: "今晚有一场足球比赛。", examplePy: "Jīnwǎn  yǒu yì cháng zúqiú bǐsài.", exampleEn: "There is a soccer match tonight." }
         ],
         grammar: [
           {
@@ -1016,11 +1016,11 @@ const CHINESE_LESSONS = {
         level: "HSK 3 (Intermediate)",
         duration: "60 min",
         vocab: [
-          { character: "行李箱", pinyin: "xínglixiāng", meaning: "suitcase / luggage", exampleCn: "把行李箱放进车里。", examplePy: "Bǎ xínglixiāng fàng jìn chē lǐ.", exampleEn: "Put the suitcase in the car." },
-          { character: "护照", pinyin: "hùzhào", meaning: "passport", exampleCn: "别忘了带护照和机票。", examplePy: "Bié wàng le dài hùzhào hé jīpiào.", exampleEn: "Don't forget to bring your passport and plane ticket." },
-          { character: "安全", pinyin: "ānquán", meaning: "safe / safety", exampleCn: "祝你一路平安，注意安全。", examplePy: "Zhù nǐ yílù píng'ān, zhùyì ānquán.", exampleEn: "Have a safe trip and pay attention to safety." },
-          { character: "介绍", pinyin: "jièshào", meaning: "to introduce", exampleCn: "让我来介绍一下新同事。", examplePy: "Ràng wǒ lái jièshào yíxià xīn tóngshì.", exampleEn: "Let me introduce the new colleague." },
-          { character: "欢迎", pinyin: "huānyíng", meaning: "to welcome", exampleCn: "欢迎你来到北京！", examplePy: "Huānyíng nǐ lái dào Běijīng!", exampleEn: "Welcome to Beijing!" }
+          { character: "行李箱", pinyin: "xínglixiāng", meaning: "suitcase / luggage", deconstruct: "行 (Go) + 李 (Plum/Bag) + 箱 (Box/Trunk). 箱 has ⺮ (Bamboo) + 相. A container for traveling items.", exampleCn: "把行李箱放进车里。", examplePy: "Bǎ xínglixiāng fàng jìn chē lǐ.", exampleEn: "Put the suitcase in the car." },
+          { character: "护照", pinyin: "hùzhào", meaning: "passport", deconstruct: "护 (Protect) + 照 (Shine/Reflect). 护 has 扌 (Hand) + 户 (Door); 照 has 昭 + 灬 (Fire). Protective credential.", exampleCn: "别忘了带护照和机票。", examplePy: "Bié wàng le dài hùzhào hé jīpiào.", exampleEn: "Don't forget to bring your passport and plane ticket." },
+          { character: "安全", pinyin: "ānquán", meaning: "safe / safety", deconstruct: "安 (Safe/Quiet) + 全 (Whole). 安 is a woman (女) under a roof (宀); 全 is a king (王) under a cover (人). Total safety.", exampleCn: "祝你一路平安，注意安全。", examplePy: "Zhù nǐ yílù píng'ān, zhùyì ānquán.", exampleEn: "Have a safe trip and pay attention to safety." },
+          { character: "介绍", pinyin: "jièshào", meaning: "to introduce", deconstruct: "介 (Between) + 绍 (Connect). 介 is a person standing between; 绍 has 纟 (Thread) + 召. Introduce to connect people.", exampleCn: "让我来介绍一下新同事。", examplePy: "Ràng wǒ lái jièshào yíxià xīn tóngshì.", exampleEn: "Let me introduce the new colleague." },
+          { character: "欢迎", pinyin: "huānyíng", meaning: "to welcome", deconstruct: "欢 (Joy) + 迎 (Greet). 欢 has 又 + 欠 (Yawn/Breath); 迎 has 辶 (Walk) + 卬. Welcoming someone with joy.", exampleCn: "欢迎你来到北京！", examplePy: "Huānyíng nǐ lái dào Běijīng!", exampleEn: "Welcome to Beijing!" }
         ],
         grammar: [
           {
