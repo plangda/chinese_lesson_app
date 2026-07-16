@@ -31,7 +31,8 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Daily Study Reminder System** | Phase 4: Consistency & Retention | `Complete` | 100% | Periodic interval checks on user-set reminder times and integrated UI status notifications. |
 | **User Progress Synchronization** | Phase 4: Consistency & Retention | `Complete` | 100% | Multi-storage model syncing local state (`localStorage`), Express SQLite backend, and IDE `student_progress.json` file. |
 | **Settings & Account Management** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Dropdown selectors to change HSK level and database-wide user progress reset button. |
-| **Kid-friendly styling & animations** | Phase 5: Settings & UX Polishing | `In Progress` | 95% | Tailored kid-friendly theme with smooth bouncy spring-like physics and transitions; minor fine-tuning. |
+| **Kid-friendly styling & animations** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Tailored kid-friendly theme with smooth bouncy spring-like physics and transitions; mobile layout refined. |
+| **Thai Localization Expansion** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Integrated a structural language-selection modal with full Turso DB translations for Thai (Vocab, Grammar, Dialogues). |
 | **Pronunciation Assessment** | Phase 6: Future Enhancements | `Not Started` | 0% | Planned integration of speech recognition API to analyze and score user speech input. |
 | **Production Deployment & DevOps** | Phase 6: Future Enhancements | `Not Started` | 0% | Docker containerization and setup on cloud platform (e.g. Vercel/Render). |
 | **Automated Test Suite** | Phase 6: Future Enhancements | `Not Started` | 0% | Mock backend API testing (Jest/Supertest) and frontend component testing. |
@@ -77,8 +78,8 @@ gantt
    - **Progress**: 100%
    - *Next Action*: Complete.
 5. **Phase 5: Settings & UX Polishing** (Settings, Reset, Spring Animations)
-   - **Progress**: 97.5%
-   - *Next Action*: Refine responsive layout behavior on smaller mobile displays.
+   - **Progress**: 100%
+   - *Next Action*: Complete.
 6. **Phase 6: Future Enhancements** (Voice Assessment, DevOps, Testing)
    - **Progress**: 0%
    - *Next Action*: Plan speech-to-text API integration and outline tests.

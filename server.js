@@ -63,7 +63,7 @@ app.get('/api/lessons/:id', async (req, res) => {
     const rawGrammar = await db.all('SELECT * FROM grammar WHERE lesson_id = ? ORDER BY sort_order ASC', [lessonId]);
     const grammar = [];
     for (const g of rawGrammar) {
-      const examples = await db.all('SELECT cn, py, en FROM grammar_examples WHERE grammar_id = ? ORDER BY sort_order ASC', [g.id]);
+      const examples = await db.all('SELECT cn, py, en, th FROM grammar_examples WHERE grammar_id = ? ORDER BY sort_order ASC', [g.id]);
       const practice = await db.get('SELECT prompt, words, answer FROM grammar_practice WHERE grammar_id = ?', [g.id]);
       
       const gItem = {
@@ -86,7 +86,7 @@ app.get('/api/lessons/:id', async (req, res) => {
     const dialogueRaw = await db.get('SELECT id, title FROM dialogues WHERE lesson_id = ?', [lessonId]);
     let dialogue = null;
     if (dialogueRaw) {
-      const lines = await db.all('SELECT speaker, cn, py, en FROM dialogue_lines WHERE dialogue_id = ? ORDER BY sort_order ASC', [dialogueRaw.id]);
+      const lines = await db.all('SELECT speaker, cn, py, en, th FROM dialogue_lines WHERE dialogue_id = ? ORDER BY sort_order ASC', [dialogueRaw.id]);
       dialogue = {
         title: dialogueRaw.title,
         lines: lines
@@ -94,7 +94,7 @@ app.get('/api/lessons/:id', async (req, res) => {
     }
     
     // Quiz
-    const quizzesRaw = await db.all('SELECT type, testWord, question, options, answer, explanation FROM quizzes WHERE lesson_id = ? ORDER BY sort_order ASC', [lessonId]);
+    const quizzesRaw = await db.all('SELECT type, testWord, question, question_th, options, answer, explanation, explanation_th FROM quizzes WHERE lesson_id = ? ORDER BY sort_order ASC', [lessonId]);
     const quiz = quizzesRaw.map(q => ({
       ...q,
       options: JSON.parse(q.options)
@@ -104,6 +104,7 @@ app.get('/api/lessons/:id', async (req, res) => {
     const fullLesson = {
       id: lesson.id,
       title: lesson.title,
+      title_th: lesson.title_th,
       vocab: vocab,
       grammar: grammar,
       dialogue: dialogue,
@@ -130,12 +131,12 @@ app.get('/api/curriculum/:level', async (req, res) => {
     for (const l of lessons) {
       // (This is n+1 queries, but okay for trial/local usage. For prod, we'd use JOINs)
       const lesson = await db.get('SELECT * FROM lessons WHERE id = ?', [l.id]);
-      const vocab = await db.all('SELECT character, pinyin, meaning, deconstruct, example_cn as exampleCn, example_py as examplePy, example_en as exampleEn FROM vocab WHERE lesson_id = ? ORDER BY sort_order ASC', [l.id]);
+      const vocab = await db.all('SELECT character, pinyin, meaning, meaning_th, deconstruct, deconstruct_th, example_cn as exampleCn, example_py as examplePy, example_en as exampleEn, example_th FROM vocab WHERE lesson_id = ? ORDER BY sort_order ASC', [l.id]);
       
       const rawGrammar = await db.all('SELECT * FROM grammar WHERE lesson_id = ? ORDER BY sort_order ASC', [l.id]);
       const grammar = [];
       for (const g of rawGrammar) {
-        const examples = await db.all('SELECT cn, py, en FROM grammar_examples WHERE grammar_id = ? ORDER BY sort_order ASC', [g.id]);
+        const examples = await db.all('SELECT cn, py, en, th FROM grammar_examples WHERE grammar_id = ? ORDER BY sort_order ASC', [g.id]);
         const practice = await db.get('SELECT prompt, words, answer FROM grammar_practice WHERE grammar_id = ?', [g.id]);
         
         const gItem = { title: g.title, explanation: g.explanation, examples: examples };
@@ -148,16 +149,17 @@ app.get('/api/curriculum/:level', async (req, res) => {
       const dialogueRaw = await db.get('SELECT id, title FROM dialogues WHERE lesson_id = ?', [l.id]);
       let dialogue = null;
       if (dialogueRaw) {
-        const lines = await db.all('SELECT speaker, cn, py, en FROM dialogue_lines WHERE dialogue_id = ? ORDER BY sort_order ASC', [dialogueRaw.id]);
+        const lines = await db.all('SELECT speaker, cn, py, en, th FROM dialogue_lines WHERE dialogue_id = ? ORDER BY sort_order ASC', [dialogueRaw.id]);
         dialogue = { title: dialogueRaw.title, lines: lines };
       }
       
-      const quizzesRaw = await db.all('SELECT type, testWord, question, options, answer, explanation FROM quizzes WHERE lesson_id = ? ORDER BY sort_order ASC', [l.id]);
+      const quizzesRaw = await db.all('SELECT type, testWord, question, question_th, options, answer, explanation, explanation_th FROM quizzes WHERE lesson_id = ? ORDER BY sort_order ASC', [l.id]);
       const quiz = quizzesRaw.map(q => ({ ...q, options: JSON.parse(q.options) }));
       
       curriculum.push({
         id: lesson.id,
         title: lesson.title,
+      title_th: lesson.title_th,
         vocab: vocab,
         grammar: grammar,
         dialogue: dialogue,

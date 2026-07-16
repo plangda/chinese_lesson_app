@@ -14,6 +14,8 @@ const state = {
   currentLesson: null,
   currentPane: "vocab-pane",
   
+  currentLanguage: "en",
+  pendingLessonId: null,
   timerSeconds: 3600,
   timerInterval: null,
   timerPaused: false,
@@ -75,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProgress();
   }
   setupEventListeners();
+  translateUI();
   setInterval(checkDailyReminder, 30000);
 });
 
@@ -211,6 +214,38 @@ function saveProgress() {
   });
 }
 
+
+
+function translateUI() {
+  const currentLang = state.currentLanguage || "en";
+  const dict = i18nDictionary[currentLang];
+  if (!dict) return;
+  
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key]) {
+      if (el.tagName === 'INPUT' && el.hasAttribute('placeholder')) {
+        el.setAttribute('placeholder', dict[key]);
+      } else {
+        el.textContent = dict[key];
+      }
+    }
+  });
+  
+  // Update the global language toggle button label in the header
+  const langToggleBtn = document.getElementById('global-lang-toggle-btn');
+  if (langToggleBtn) {
+    langToggleBtn.textContent = currentLang === 'th' ? '🇬🇧 EN' : '🇹🇭 TH';
+  }
+  
+  // Specific dynamic updates
+  const el = (id) => document.getElementById(id);
+  if (el('dialogue-title-lbl') && state.currentLesson && state.currentLesson.dialogue) {
+     el('dialogue-title-lbl').textContent = state.currentLesson.dialogue.title;
+  }
+}
+
+
 function switchView(viewId) {
   document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
   document.getElementById(viewId).classList.add('active');
@@ -223,9 +258,27 @@ function switchView(viewId) {
       renderDashboard();
     }
   }
+  translateUI();
 }
 
 function setupEventListeners() {
+    // Global Language Toggle Button in header
+    const globalLangBtn = document.getElementById('global-lang-toggle-btn');
+    if (globalLangBtn) {
+      globalLangBtn.addEventListener('click', () => {
+        state.currentLanguage = state.currentLanguage === 'th' ? 'en' : 'th';
+        translateUI();
+        // Re-render the current view to update dynamic strings
+        if (state.currentView === 'dashboard-view') {
+          renderDashboard();
+        } else if (state.currentView === 'pretest-view') {
+          initPretest();
+        } else if (state.currentView === 'welcome-view') {
+          // static, translateUI is enough
+        }
+      });
+    }
+
   // Auth Form Listeners
   let isLogin = true;
   const toggleLink = document.getElementById("auth-toggle-link");
@@ -233,9 +286,10 @@ function setupEventListeners() {
     toggleLink.addEventListener("click", (e) => {
       e.preventDefault();
       isLogin = !isLogin;
-      document.getElementById("auth-title").textContent = isLogin ? "Login to HanPath" : "Create Account";
-      document.getElementById("auth-submit-btn").textContent = isLogin ? "Login" : "Sign Up";
-      document.getElementById("auth-toggle-text").textContent = isLogin ? "Don't have an account?" : "Already have an account?";
+      document.getElementById("auth-title").setAttribute("data-i18n", isLogin ? "login_title" : "signup_title");
+      document.getElementById("auth-submit-btn").setAttribute("data-i18n", isLogin ? "btn_login" : "btn_signup");
+      document.getElementById("auth-toggle-text").setAttribute("data-i18n", isLogin ? "auth_no_account" : "auth_have_account");
+      translateUI();
       toggleLink.textContent = isLogin ? "Sign Up" : "Login";
       document.getElementById("auth-name").style.display = isLogin ? "none" : "block";
       document.getElementById("auth-error").style.display = "none";
@@ -372,18 +426,18 @@ function setupEventListeners() {
   });
   
   document.getElementById('reset-progress-btn').addEventListener('click', () => {
-    if (confirm("Reset all progress?")) {
+    showConfirmModal("title_confirm", "msg_reset_progress", () => {
       state.userLevel = null;
       state.completedLessons = [];
       state.score = 0;
       state.timeSpentMinutes = 0;
       saveProgress();
       switchView("welcome-view");
-    }
+    });
   });
 
   document.getElementById('logout-btn').addEventListener('click', () => {
-    if (confirm("Are you sure you want to log out?")) {
+    showConfirmModal("title_confirm", "msg_logout", () => {
       localStorage.removeItem("hanpath_token");
       localStorage.removeItem("hanpath_progress");
       state = {
@@ -397,15 +451,15 @@ function setupEventListeners() {
         hasTakenPlacementTest: false
       };
       switchView("welcome-view");
-    }
+    });
   });
 
   // Lesson Nav
   document.getElementById('lesson-exit-btn').addEventListener('click', () => {
-    if (confirm("Exit lesson? Progress will be lost.")) {
+    showConfirmModal("title_confirm", "msg_exit_lesson", () => {
       clearInterval(state.timerInterval);
       switchView("dashboard-view");
-    }
+    });
   });
 
   document.getElementById('timer-pause-btn').addEventListener('click', () => {
@@ -592,28 +646,25 @@ function renderDashboard() {
   if (todayPanel) {
     if (activeLesson) {
       todayPanel.style.display = 'block';
-      document.getElementById('today-lesson-title').textContent = activeLesson.title;
+      document.getElementById('today-lesson-title').textContent = (state.currentLanguage === 'th' && activeLesson.title_th) ? activeLesson.title_th : activeLesson.title;
       
-      let desc = "Learn essential vocabulary, build core sentences, participate in interactive dialogue, and complete the review quiz.";
-      if (state.userLevel === 'hsk2') {
-        desc = "Expand your vocabulary, understand modals and helper verbs, practice everyday dialogues, and take your test.";
-      } else if (state.userLevel === 'hsk3') {
-        desc = "Deepen your knowledge with complex structures like 把, practice intermediate dialogues, and test your comprehension.";
-      }
-      document.getElementById('today-lesson-desc').textContent = desc;
+      let descId = "todays_lesson_desc";
+      if (state.userLevel === 'hsk2') descId = "todays_lesson_desc_hsk2";
+      if (state.userLevel === 'hsk3') descId = "todays_lesson_desc_hsk3";
+      document.getElementById('today-lesson-desc').textContent = window.i18nDictionary[state.currentLanguage][descId] || "Learn essential vocabulary...";
       
       const todayTag = document.getElementById('today-lesson-tag');
-      todayTag.textContent = `TODAY'S LESSON • ${state.userLevel.toUpperCase()}`;
+      todayTag.textContent = `${state.currentLanguage === 'th' ? 'บทเรียนวันนี้' : "TODAY'S LESSON"} • ${state.userLevel.toUpperCase()}`;
       todayTag.className = `tag tag-${state.userLevel}`;
       
       const startBtn = document.getElementById('today-lesson-start-btn');
-      startBtn.textContent = "🚀 Start Today's 1-Hour Lesson";
+      startBtn.textContent = state.currentLanguage === 'th' ? '🚀 เริ่มบทเรียน 1 ชั่วโมง' : "🚀 Start Today's 1-Hour Lesson";
       startBtn.onclick = () => routeToLesson(activeLesson.id);
     } else {
       if (lessons.length > 0) {
         todayPanel.style.display = 'block';
-        document.getElementById('today-lesson-title').textContent = "🎉 Level Complete!";
-        document.getElementById('today-lesson-desc').textContent = `Congratulations! You have completed all lessons for ${state.userLevel.toUpperCase()}. You are ready to move on to the next level or review your lessons below.`;
+        document.getElementById('today-lesson-title').textContent = state.currentLanguage === "th" ? "🎉 จบระดับแล้ว!" : "🎉 Level Complete!";
+        document.getElementById('today-lesson-desc').textContent = state.currentLanguage === "th" ? `ยินดีด้วย! คุณเรียนจบบทเรียนทั้งหมดสำหรับ ${state.userLevel.toUpperCase()} แล้ว คุณพร้อมที่จะเรียนระดับถัดไปหรือทบทวนบทเรียนด้านล่าง` : `Congratulations! You have completed all lessons for ${state.userLevel.toUpperCase()}. You are ready to move on to the next level or review your lessons below.`;
         
         const todayTag = document.getElementById('today-lesson-tag');
         todayTag.textContent = "COMPLETE";
@@ -621,14 +672,14 @@ function renderDashboard() {
         todayTag.style.background = "var(--success)";
         
         const startBtn = document.getElementById('today-lesson-start-btn');
-        startBtn.textContent = "Explore Next Level";
+        startBtn.textContent = state.currentLanguage === "th" ? "สำรวจระดับถัดไป" : "Explore Next Level";
         startBtn.onclick = () => {
           if (state.userLevel === 'hsk1') {
             state.userLevel = 'hsk2';
           } else if (state.userLevel === 'hsk2') {
             state.userLevel = 'hsk3';
           } else {
-            document.getElementById('today-lesson-desc').textContent = "Outstanding! You've mastered all available HSK 1-3 levels!";
+            document.getElementById('today-lesson-desc').textContent = state.currentLanguage === "th" ? "ยอดเยี่ยมมาก! คุณเรียนรู้ HSK 1-3 ครบทุกระดับแล้ว!" : "Outstanding! You've mastered all available HSK 1-3 levels!";
             document.getElementById('today-lesson-desc').style.color = "var(--success)";
             startBtn.style.display = "none";
             return;
@@ -648,15 +699,15 @@ function renderDashboard() {
     div.className = `lesson-row glass-panel ${isCompleted ? 'completed' : ''}`;
     div.innerHTML = `
       <div class="lesson-info">
-        <h4 style="margin-bottom: 0.25rem;">${l.title}</h4>
+        <h4 style="margin-bottom: 0.25rem;">${(state.currentLanguage === 'th' && l.title_th) ? l.title_th : l.title}</h4>
         <div style="font-size: 0.85rem; color: var(--text-muted);">
-          4 Stages • 60 Minutes
+          ${state.currentLanguage === 'th' ? '4 ด่าน • 60 นาที' : '4 Stages • 60 Minutes'}
         </div>
       </div>
       <div>
         ${isCompleted ? 
-          `<span style="color: var(--success); font-weight: bold;">✔ Done</span>` : 
-          `<button class="btn btn-primary btn-sm start-lesson-btn" data-id="${l.id}">Start Lesson</button>`
+          `<span style="color: var(--success); font-weight: bold;">✔ ${state.currentLanguage === 'th' ? 'เสร็จแล้ว' : 'Done'}</span>` : 
+          `<button class="btn btn-primary btn-sm start-lesson-btn" data-id="${l.id}">${state.currentLanguage === 'th' ? 'เริ่มบทเรียน' : 'Start Lesson'}</button>`
         }
       </div>
     `;
@@ -669,6 +720,9 @@ function renderDashboard() {
       routeToLesson(id);
     });
   });
+
+  // Apply translations to all static data-i18n elements
+  translateUI();
 }
 
 function startLesson(id) {
@@ -678,7 +732,7 @@ function startLesson(id) {
       state.currentLesson = data;
       
       document.getElementById('lesson-level-badge').textContent = getLevelName(state.userLevel);
-      document.getElementById('lesson-title-display').textContent = state.currentLesson.title;
+      document.getElementById('lesson-title-display').textContent = (state.currentLanguage === 'th' && state.currentLesson.title_th) ? state.currentLesson.title_th : state.currentLesson.title;
       
       state.timerSeconds = 3600;
       state.timerPaused = false;
@@ -729,147 +783,213 @@ function switchPane(paneId) {
 }
 
 function renderVocabPane() {
-  if (!state.currentLesson || !state.currentLesson.vocab) return;
-  const v = state.currentLesson.vocab[state.vocabIndex];
-  if (!v) return;
-  
-  document.getElementById('vocab-char').textContent = v.character;
-  document.getElementById('vocab-meaning').textContent = v.meaning;
-  document.getElementById('vocab-pinyin').textContent = v.pinyin;
-  
-  document.getElementById('vocab-detail-pinyin').textContent = v.pinyin;
-  document.getElementById('vocab-ex-cn').textContent = v.exampleCn;
-  document.getElementById('vocab-ex-py').textContent = v.examplePy;
-  document.getElementById('vocab-ex-en').textContent = v.exampleEn;
-  document.getElementById('vocab-deconstruct-text').textContent = v.deconstruct || "Basic radical combination.";
-  
-  document.getElementById('vocab-flashcard').classList.remove('flipped');
-  document.getElementById('vocab-index-indicator').textContent = `Word ${state.vocabIndex + 1} of ${state.currentLesson.vocab.length}`;
-  
-  // HanziWriter init
-  if (typeof HanziWriter !== "undefined") {
-    document.getElementById('hanzi-writer-target').innerHTML = '';
-    writer = HanziWriter.create('hanzi-writer-target', v.character.charAt(0), {
-      width: 200,
-      height: 200,
-      padding: 15,
-      strokeColor: '#ff3366',
-      radicalColor: '#00f5d4',
-      delayBetweenStrokes: 150
-    });
+    if (!state.currentLesson || !state.currentLesson.vocab) return;
+    const v = state.currentLesson.vocab[state.vocabIndex];
+    if (!v) return;
+    
+    document.getElementById('vocab-char').textContent = v.character;
+    document.getElementById('vocab-meaning').textContent = (state.currentLanguage === 'th' && v.meaning_th) ? v.meaning_th : v.meaning;
+    document.getElementById('vocab-pinyin').textContent = v.pinyin;
+    
+    document.getElementById('vocab-detail-pinyin').textContent = v.pinyin;
+    document.getElementById('vocab-ex-cn').textContent = v.exampleCn;
+    document.getElementById('vocab-ex-py').textContent = v.examplePy;
+    document.getElementById('vocab-ex-en').textContent = (state.currentLanguage === 'th') ? (v.example_th || '') : v.exampleEn;
+    
+    let deconstructDefault = "Basic radical combination.";
+    document.getElementById('vocab-deconstruct-text').textContent = (state.currentLanguage === 'th' && v.deconstruct_th) ? v.deconstruct_th : (v.deconstruct || deconstructDefault);
+    
+    document.getElementById('vocab-flashcard').classList.remove('flipped');
+    document.getElementById('vocab-index-indicator').textContent = (state.currentLanguage === 'th' ? `คำที่ ${state.vocabIndex + 1} จาก ${state.currentLesson.vocab.length}` : `Word ${state.vocabIndex + 1} of ${state.currentLesson.vocab.length}`);
+    
+    // HanziWriter init
+    if (typeof HanziWriter !== "undefined") {
+      const targetDiv = document.getElementById('hanzi-writer-target');
+      targetDiv.innerHTML = '';
+      
+      let tabsContainer = document.getElementById('hanzi-tabs-container');
+      if (!tabsContainer) {
+         tabsContainer = document.createElement('div');
+         tabsContainer.id = 'hanzi-tabs-container';
+         tabsContainer.style.display = 'flex';
+         tabsContainer.style.gap = '0.5rem';
+         tabsContainer.style.justifyContent = 'center';
+         tabsContainer.style.marginTop = '1rem';
+         tabsContainer.style.flexWrap = 'wrap';
+         targetDiv.parentNode.insertBefore(tabsContainer, targetDiv.nextSibling);
+      }
+      tabsContainer.innerHTML = '';
+
+      writer = HanziWriter.create('hanzi-writer-target', v.character.charAt(0), {
+        width: 200,
+        height: 200,
+        padding: 15,
+        strokeColor: '#ff3366',
+        radicalColor: '#00f5d4',
+        delayBetweenStrokes: 150
+      });
+
+      if (v.character.length > 1) {
+        for (let i = 0; i < v.character.length; i++) {
+          const char = v.character.charAt(i);
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-secondary btn-sm';
+          btn.textContent = char;
+          if (i === 0) btn.style.borderColor = 'var(--primary)';
+          btn.onclick = () => {
+             writer.setCharacter(char);
+             Array.from(tabsContainer.children).forEach(c => c.style.borderColor = 'var(--glass-border)');
+             btn.style.borderColor = 'var(--primary)';
+          };
+          tabsContainer.appendChild(btn);
+        }
+      }
+    }
   }
-}
 
 function renderGrammarPane() {
-  const container = document.getElementById('grammar-topics-container');
-  container.innerHTML = '';
-  
-  state.currentLesson.grammar.forEach((g, idx) => {
-    const div = document.createElement('div');
-    div.className = 'glass-panel';
-    div.style.padding = '1.5rem';
-    div.style.marginBottom = '1.5rem';
+    const container = document.getElementById('grammar-topics-container');
+    container.innerHTML = '';
     
-    let html = `<h4 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem;">${g.title}</h4>`;
-    html += `<p style="margin-bottom: 1rem;">${g.explanation}</p>`;
-    
-    g.examples.forEach(ex => {
-      html += `<div class="example-box" style="margin-bottom: 0.5rem;">
-        <div class="example-cn">${ex.cn}</div>
-        <div class="example-py">${ex.py}</div>
-        <div class="example-en">${ex.en}</div>
-      </div>`;
-    });
-    
-    if (g.practice && g.practice.prompt) {
-       const pId = `grammar-prac-${idx}`;
-       let wordsHtml = '';
-       if(g.practice.words && g.practice.words.length > 0) {
-         wordsHtml = `
-           <div class="grammar-practice-area" id="${pId}-area">
-             <div class="grammar-answer-box" id="${pId}-answer-box" style="min-height: 40px; padding: 0.5rem; margin: 0.5rem 0; border: 2px dashed var(--glass-border-focus); border-radius: 8px; display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
-             <div class="grammar-word-bank" id="${pId}-word-bank" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
-               ${g.practice.words.map((w, wIdx) => `<button class="btn btn-secondary btn-sm prac-word-btn" data-word="${w}">${w}</button>`).join('')}
+    state.currentLesson.grammar.forEach((g, idx) => {
+      const div = document.createElement('div');
+      div.className = 'glass-panel';
+      div.style.padding = '1.5rem';
+      div.style.marginBottom = '1.5rem';
+      
+      let html = `<h4 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem;">${g.title}</h4>`;
+      let explanation = (state.currentLanguage === 'th' && g.explanation_th) ? g.explanation_th : g.explanation;
+      html += `<p style="margin-bottom: 1rem;">${explanation}</p>`;
+      
+      g.examples.forEach(ex => {
+        let exEn = (state.currentLanguage === 'th' && ex.th) ? ex.th : ex.en;
+        html += `<div class="example-box" style="margin-bottom: 0.5rem;">
+          <div class="example-cn">${ex.cn}</div>
+          <div class="example-py">${ex.py}</div>
+          <div class="example-en">${exEn}</div>
+        </div>`;
+      });
+      
+      if (g.practice && g.practice.prompt) {
+         const pId = `grammar-prac-${idx}`;
+         let wordsHtml = '';
+         if(g.practice.words && g.practice.words.length > 0) {
+           wordsHtml = `
+             <div class="grammar-practice-area" id="${pId}-area">
+               <div class="grammar-answer-box" id="${pId}-answer-box" style="min-height: 40px; padding: 0.5rem; margin: 0.5rem 0; border: 2px dashed var(--glass-border-focus); border-radius: 8px; display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+               <div class="grammar-word-bank" id="${pId}-word-bank" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                 ${g.practice.words.map((w, wIdx) => `<button class="btn btn-secondary btn-sm prac-word-btn" data-word="${w}">${w}</button>`).join('')}
+               </div>
+               <button class="btn btn-primary btn-sm check-prac-btn" data-pid="${pId}" data-answer='${JSON.stringify(g.practice.answer)}'>${state.currentLanguage === "th" ? "ตรวจคำตอบ" : "Check Answer"}</button>
+               <span class="prac-feedback" id="${pId}-feedback" style="margin-left: 1rem; font-weight: bold;"></span>
              </div>
-             <button class="btn btn-primary btn-sm check-prac-btn" data-pid="${pId}" data-answer='${JSON.stringify(g.practice.answer)}'>Check Answer</button>
-             <span class="prac-feedback" id="${pId}-feedback" style="margin-left: 1rem; font-weight: bold;"></span>
+           `;
+         }
+         
+         html += `
+           <div style="margin-top: 1rem; padding: 1rem; background: rgba(0,245,212,0.05); border: 1px solid rgba(0,245,212,0.2); border-radius: 8px;">
+             <strong style="color: var(--primary);">🎯 ${g.practice.prompt}</strong>
+             ${wordsHtml}
            </div>
          `;
-       }
-       
-       html += `
-         <div style="margin-top: 1rem; padding: 1rem; background: rgba(0,245,212,0.05); border: 1px solid rgba(0,245,212,0.2); border-radius: 8px;">
-           <strong style="color: var(--primary);">📝 ${g.practice.prompt}</strong>
-           ${wordsHtml}
-           <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Tap the words to build the correct sentence.</p>
-         </div>
-       `;
-    }
+      }
+      
+      div.innerHTML = html;
+      container.appendChild(div);
+    });
     
-    div.innerHTML = html;
-    container.appendChild(div);
-  });
-  
-  // Attach event listeners for practice areas
-  document.querySelectorAll('.prac-word-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const b = e.target;
-      const bank = b.closest('.grammar-practice-area').querySelector('.grammar-word-bank');
-      const ansBox = b.closest('.grammar-practice-area').querySelector('.grammar-answer-box');
-      if (b.parentElement === bank) {
-        ansBox.appendChild(b);
-      } else {
-        bank.appendChild(b);
-      }
+    // Bind practice listeners
+    document.querySelectorAll('.prac-word-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+         const btnEl = e.target;
+         const container = btnEl.closest('.grammar-practice-area');
+         const answerBox = container.querySelector('.grammar-answer-box');
+         const bank = container.querySelector('.grammar-word-bank');
+         
+         if (btnEl.parentElement === bank) {
+           answerBox.appendChild(btnEl);
+         } else {
+           bank.appendChild(btnEl);
+         }
+      });
     });
-  });
-  
-  document.querySelectorAll('.check-prac-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const pId = e.target.getAttribute('data-pid');
-      const ansArr = JSON.parse(e.target.getAttribute('data-answer'));
-      const ansBox = document.getElementById(`${pId}-answer-box`);
-      const feedback = document.getElementById(`${pId}-feedback`);
-      
-      const userArr = Array.from(ansBox.children).map(b => b.getAttribute('data-word'));
-      
-      if (userArr.join('') === ansArr.join('')) {
-        feedback.textContent = '✅ Correct!';
-        feedback.style.color = 'var(--success)';
-      } else {
-        feedback.textContent = '❌ Try again!';
-        feedback.style.color = 'var(--error)';
-      }
+    
+    document.querySelectorAll('.check-prac-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const btnEl = e.target;
+        const pId = btnEl.getAttribute('data-pid');
+        const correctAnswer = JSON.parse(btnEl.getAttribute('data-answer'));
+        
+        const answerBox = document.getElementById(`${pId}-answer-box`);
+        const userWords = Array.from(answerBox.children).map(c => c.getAttribute('data-word'));
+        
+        const feedback = document.getElementById(`${pId}-feedback`);
+        if (JSON.stringify(userWords) === JSON.stringify(correctAnswer)) {
+          feedback.textContent = window.i18nDictionary[state.currentLanguage]["msg_correct"] + " 🎉";
+          feedback.style.color = "var(--success)";
+          answerBox.style.borderColor = "var(--success)";
+          state.score += 20;
+          updateDashboardStats();
+        } else {
+          feedback.textContent = state.currentLanguage === "th" ? "ลองอีกครั้ง" : "Try again.";
+          feedback.style.color = "var(--error)";
+          answerBox.style.borderColor = "var(--error)";
+        }
+      });
     });
-  });
-}
+  }
 
 function renderDialoguePane() {
-  document.getElementById('dialogue-title-lbl').textContent = state.currentLesson.dialogue.title;
-  const container = document.getElementById('dialogue-bubbles-container');
-  container.innerHTML = '';
-  
-  state.currentLesson.dialogue.lines.forEach((l, idx) => {
-    const isRight = idx % 2 !== 0;
-    const alignClass = isRight ? "right" : "left";
+    const container = document.getElementById('dialogue-bubbles-container');
+    container.innerHTML = '';
     
-    const div = document.createElement('div');
-    div.style.display = 'flex';
-    div.style.flexDirection = 'column';
-    div.style.alignItems = isRight ? 'flex-end' : 'flex-start';
-    div.style.marginBottom = '1.5rem';
+    state.currentLesson.dialogue.lines.forEach(line => {
+      const div = document.createElement('div');
+      div.className = 'dialogue-line glass-panel';
+      
+      let avatarHtml = '';
+      if (line.speaker === 'A') {
+         avatarHtml = `<div class="dialogue-avatar" style="background: var(--primary);">👦</div>`;
+      } else {
+         div.style.flexDirection = 'row-reverse';
+         div.style.textAlign = 'right';
+         avatarHtml = `<div class="dialogue-avatar" style="background: var(--accent);">👧</div>`;
+      }
+      
+      let trans = (state.currentLanguage === 'th') ? (line.th || '') : line.en;
+      let textHtml = `
+        <div style="flex: 1; padding: 0 1rem;">
+          <div class="dialogue-text">${line.cn}</div>
+          <div class="dialogue-py">${line.py}</div>
+          <div class="dialogue-en">${trans}</div>
+        </div>
+      `;
+      
+      if (line.speaker === 'A') {
+         div.innerHTML = avatarHtml + textHtml;
+      } else {
+         div.innerHTML = textHtml + avatarHtml;
+      }
+      
+      container.appendChild(div);
+    });
     
-    div.innerHTML = `
-      <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem; padding: 0 0.5rem;">${l.speaker}</div>
-      <div class="glass-panel" style="padding: 1rem 1.5rem; max-width: 80%; border-color: ${isRight ? 'rgba(0, 245, 212, 0.3)' : 'var(--glass-border)'}; border-bottom-${isRight ? 'right' : 'left'}-radius: 4px;">
-        <div style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.5rem;">${l.cn}</div>
-        <div class="dialogue-py-text" style="color: var(--primary); font-size: 0.95rem; margin-bottom: 0.25rem;">${l.py}</div>
-        <div style="color: var(--text-secondary); font-size: 0.9rem;">${l.en}</div>
-      </div>
-    `;
-    container.appendChild(div);
-  });
-}
+    const toggleBtn = document.getElementById('btn-dialogue-toggle');
+    if (toggleBtn) {
+      toggleBtn.onclick = () => {
+        const enLines = document.querySelectorAll('.dialogue-en');
+        enLines.forEach(l => {
+           if (l.style.display === 'none') {
+             l.style.display = 'block';
+           } else {
+             l.style.display = 'none';
+             l.style.opacity = '1';
+             l.style.transform = 'translateY(0)';
+           }
+        });
+      };
+    }
+  }
 
 function renderQuizPane() {
   state.quizIndex = 0;
@@ -947,9 +1067,9 @@ function handleQuizAnswer(selectedOpt, btnEl) {
   const nextBtn = document.getElementById('lesson-quiz-next-btn');
   nextBtn.style.display = 'inline-block';
   if (state.quizIndex === state.currentLesson.quiz.length - 1) {
-    nextBtn.textContent = "Finish Lesson ➔";
+    nextBtn.textContent = window.i18nDictionary[state.currentLanguage]["btn_finish_lesson"];
   } else {
-    nextBtn.textContent = "Next Question ➔";
+    nextBtn.textContent = window.i18nDictionary[state.currentLanguage]["btn_next_question"];
   }
 }
 
@@ -997,6 +1117,9 @@ function initPretest() {
   document.getElementById("pretest-intro-screen").style.display = "block";
   document.getElementById("pretest-quiz-screen").style.display = "none";
   document.getElementById("pretest-result-screen").style.display = "none";
+
+  // Apply translations after showing the pretest view
+  translateUI();
 }
 
 function loadPretestQuestion() {
@@ -1004,8 +1127,17 @@ function loadPretestQuestion() {
   const totalCount = questionsList.length;
   const question = questionsList[state.pretestIndex];
   
-  document.getElementById("pretest-question-number").textContent = `Question ${state.pretestIndex + 1} of ${totalCount}`;
-  document.getElementById("pretest-question-level").textContent = `HSK level benchmark: Level ${question.level}`;
+  
+  const currentLang = state.currentLanguage || "en";
+  const questionNumberText = currentLang === "th" 
+    ? `คำถามที่ ${state.pretestIndex + 1} จาก ${totalCount}` 
+    : `Question ${state.pretestIndex + 1} of ${totalCount}`;
+  document.getElementById("pretest-question-number").textContent = questionNumberText;
+  
+  const hskLevelText = currentLang === "th" 
+    ? `มาตรฐานระดับ HSK: ระดับ ${question.level}` 
+    : `HSK level benchmark: Level ${question.level}`;
+  document.getElementById("pretest-question-level").textContent = hskLevelText;
   document.getElementById("pretest-progress-fill").style.width = `${((state.pretestIndex) / totalCount) * 100}%`;
   
   const qText = document.getElementById("pretest-question-text");
@@ -1056,7 +1188,7 @@ function selectPretestAnswer(button, selectedVal) {
   expBox.style.display = "block";
   expBox.style.borderColor = isCorrect ? "var(--success)" : "var(--error)";
   expBox.querySelector("strong").style.color = isCorrect ? "var(--success)" : "var(--error)";
-  expBox.querySelector("strong").textContent = isCorrect ? "✓ Correct!" : "✗ Incorrect";
+  expBox.querySelector("strong").textContent = isCorrect ? (window.i18nDictionary[state.currentLanguage]["msg_correct"]) : (window.i18nDictionary[state.currentLanguage]["msg_incorrect"]);
   
   document.getElementById("pretest-next-btn").style.display = "inline-block";
 }
@@ -1181,18 +1313,29 @@ function showCurriculumMilestoneNotification(title, message) {
 // ----------------------------------------------------
 // LESSON-SPECIFIC PRE-TEST LOGIC
 // ----------------------------------------------------
+
+
+
 function routeToLesson(id) {
   if (!state.hasTakenPlacementTest) {
-    if (confirm("We recommend taking the level placement pre-test first so the lessons match your level. Would you like to take the placement pre-test now?")) {
+    showConfirmModal("title_confirm", "msg_pretest_rec", () => {
       switchView("pretest-view");
       initPretest();
-      return;
-    }
+    });
+    // Add cancel handler to proceed if they skip
+    const cancelBtn = document.getElementById('custom-confirm-cancel');
+    const newCancel = cancelBtn.cloneNode(true);
+    cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+    newCancel.addEventListener('click', () => {
+      document.getElementById('custom-confirm-modal').style.display = 'none';
+      startLessonPretest(id);
+    });
+  } else {
+    startLessonPretest(id);
   }
-  startLessonPretest(id);
 }
-
-function startLessonPretest(id) {
+  
+  function startLessonPretest(id) {
   state.currentLessonId = id;
   
   // Fetch full lesson data from server so we have the vocab array for generating questions
@@ -1210,7 +1353,7 @@ function startLessonPretest(id) {
       document.getElementById("lesson-pretest-quiz-screen").style.display = "none";
       document.getElementById("lesson-pretest-result-screen").style.display = "none";
 
-      document.getElementById("lesson-pretest-intro-title").textContent = `Pre-Test: ${state.pretestLesson.title}`;
+      document.getElementById("lesson-pretest-intro-title").textContent = window.i18nDictionary[state.currentLanguage]["lesson_pretest_intro_title"] + ": " + state.pretestLesson.title;
 
       switchView("lesson-pretest-view");
     })
@@ -1315,7 +1458,12 @@ function loadLessonPretestQuestion() {
   const q = state.lessonPretestQuestions[state.lessonPretestIndex];
   const totalCount = state.lessonPretestQuestions.length;
 
-  document.getElementById("lesson-pretest-question-number").textContent = `Question ${state.lessonPretestIndex + 1} of ${totalCount}`;
+  
+  const currentLang2 = state.currentLanguage || "en";
+  const questionNumberText2 = currentLang2 === "th" 
+    ? `คำถามที่ ${state.lessonPretestIndex + 1} จาก ${totalCount}` 
+    : `Question ${state.lessonPretestIndex + 1} of ${totalCount}`;
+  document.getElementById("lesson-pretest-question-number").textContent = questionNumberText2;
   document.getElementById("lesson-pretest-progress-fill").style.width = `${(state.lessonPretestIndex / totalCount) * 100}%`;
 
   const qText = document.getElementById("lesson-pretest-question-text");
@@ -1383,14 +1531,14 @@ function selectLessonPretestAnswer(button, selectedVal) {
   expBox.style.display = "block";
   expBox.style.borderColor = isCorrect ? "var(--success)" : "var(--error)";
   expBox.querySelector("strong").style.color = isCorrect ? "var(--success)" : "var(--error)";
-  expBox.querySelector("strong").textContent = isCorrect ? "✓ Correct!" : "✗ Incorrect";
+  expBox.querySelector("strong").textContent = isCorrect ? (window.i18nDictionary[state.currentLanguage]["msg_correct"]) : (window.i18nDictionary[state.currentLanguage]["msg_incorrect"]);
 
   const nextBtn = document.getElementById("lesson-pretest-next-btn");
   nextBtn.style.display = "inline-block";
   if (state.lessonPretestIndex === state.lessonPretestQuestions.length - 1) {
-    nextBtn.textContent = "See Results ➔";
+    nextBtn.textContent = window.i18nDictionary[state.currentLanguage]["btn_next_question"];
   } else {
-    nextBtn.textContent = "Next Question ➔";
+    nextBtn.textContent = window.i18nDictionary[state.currentLanguage]["btn_next_question"];
   }
 }
 
@@ -1534,5 +1682,38 @@ function playTone(text) {
   audio.play().catch(err => {
     console.error("Audio playback failed:", err);
     alert('Audio playback failed. Make sure your volume is up and you are connected to the internet.');
+  });
+}
+
+// Initialize translations on load
+translateUI();
+
+
+function showConfirmModal(i18nKeyTitle, i18nKeyMsg, onConfirm) {
+  const currentLang = state.currentLanguage || "en";
+  const dict = i18nDictionary[currentLang] || i18nDictionary['en'];
+  
+  document.getElementById('custom-confirm-title').textContent = dict[i18nKeyTitle] || dict['title_confirm'] || "Confirm";
+  document.getElementById('custom-confirm-message').textContent = dict[i18nKeyMsg] || i18nKeyMsg;
+  
+  document.getElementById('custom-confirm-modal').style.display = 'flex';
+  
+  const cancelBtn = document.getElementById('custom-confirm-cancel');
+  const okBtn = document.getElementById('custom-confirm-ok');
+  
+  // Clean up previous event listeners by cloning
+  const newCancel = cancelBtn.cloneNode(true);
+  cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+  
+  const newOk = okBtn.cloneNode(true);
+  okBtn.parentNode.replaceChild(newOk, okBtn);
+  
+  newCancel.addEventListener('click', () => {
+    document.getElementById('custom-confirm-modal').style.display = 'none';
+  });
+  
+  newOk.addEventListener('click', () => {
+    document.getElementById('custom-confirm-modal').style.display = 'none';
+    if (onConfirm) onConfirm();
   });
 }
