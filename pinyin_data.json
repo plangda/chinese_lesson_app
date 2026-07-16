@@ -1,0 +1,7034 @@
+{
+  "initials": [
+    "",
+    "b",
+    "p",
+    "m",
+    "f",
+    "d",
+    "t",
+    "n",
+    "l",
+    "g",
+    "k",
+    "h",
+    "j",
+    "q",
+    "x",
+    "zh",
+    "ch",
+    "sh",
+    "r",
+    "z",
+    "c",
+    "s",
+    "y",
+    "w"
+  ],
+  "finals": [
+    "a",
+    "o",
+    "e",
+    "i",
+    "u",
+    "ü",
+    "ai",
+    "ei",
+    "ui",
+    "ao",
+    "ou",
+    "iu",
+    "ie",
+    "üe",
+    "er",
+    "an",
+    "en",
+    "in",
+    "un",
+    "ün",
+    "ang",
+    "eng",
+    "ing",
+    "ong"
+  ],
+  "matrix": {
+    "": {
+      "a": {
+        "base": "a",
+        "tones": [
+          {
+            "pinyin": "ā",
+            "character": ""
+          },
+          {
+            "pinyin": "á",
+            "character": ""
+          },
+          {
+            "pinyin": "ǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "à",
+            "character": ""
+          }
+        ]
+      },
+      "o": {
+        "base": "o",
+        "tones": [
+          {
+            "pinyin": "ō",
+            "character": ""
+          },
+          {
+            "pinyin": "ó",
+            "character": ""
+          },
+          {
+            "pinyin": "ǒ",
+            "character": ""
+          },
+          {
+            "pinyin": "ò",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "e",
+        "tones": [
+          {
+            "pinyin": "ē",
+            "character": ""
+          },
+          {
+            "pinyin": "é",
+            "character": ""
+          },
+          {
+            "pinyin": "ě",
+            "character": ""
+          },
+          {
+            "pinyin": "è",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "ai",
+        "tones": [
+          {
+            "pinyin": "āi",
+            "character": ""
+          },
+          {
+            "pinyin": "ái",
+            "character": ""
+          },
+          {
+            "pinyin": "ǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "ài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "ei",
+        "tones": [
+          {
+            "pinyin": "ēi",
+            "character": ""
+          },
+          {
+            "pinyin": "éi",
+            "character": ""
+          },
+          {
+            "pinyin": "ěi",
+            "character": ""
+          },
+          {
+            "pinyin": "èi",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "ao",
+        "tones": [
+          {
+            "pinyin": "āo",
+            "character": ""
+          },
+          {
+            "pinyin": "áo",
+            "character": ""
+          },
+          {
+            "pinyin": "ǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "ào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "ou",
+        "tones": [
+          {
+            "pinyin": "ōu",
+            "character": ""
+          },
+          {
+            "pinyin": "óu",
+            "character": ""
+          },
+          {
+            "pinyin": "ǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "òu",
+            "character": ""
+          }
+        ]
+      },
+      "er": {
+        "base": "er",
+        "tones": [
+          {
+            "pinyin": "ēr",
+            "character": ""
+          },
+          {
+            "pinyin": "ér",
+            "character": ""
+          },
+          {
+            "pinyin": "ěr",
+            "character": ""
+          },
+          {
+            "pinyin": "èr",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "an",
+        "tones": [
+          {
+            "pinyin": "ān",
+            "character": ""
+          },
+          {
+            "pinyin": "án",
+            "character": ""
+          },
+          {
+            "pinyin": "ǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "àn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "en",
+        "tones": [
+          {
+            "pinyin": "ēn",
+            "character": ""
+          },
+          {
+            "pinyin": "én",
+            "character": ""
+          },
+          {
+            "pinyin": "ěn",
+            "character": ""
+          },
+          {
+            "pinyin": "èn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "ang",
+        "tones": [
+          {
+            "pinyin": "āng",
+            "character": ""
+          },
+          {
+            "pinyin": "áng",
+            "character": ""
+          },
+          {
+            "pinyin": "ǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "àng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "eng",
+        "tones": [
+          {
+            "pinyin": "ēng",
+            "character": ""
+          },
+          {
+            "pinyin": "éng",
+            "character": ""
+          },
+          {
+            "pinyin": "ěng",
+            "character": ""
+          },
+          {
+            "pinyin": "èng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "b": {
+      "a": {
+        "base": "ba",
+        "tones": [
+          {
+            "pinyin": "bā",
+            "character": ""
+          },
+          {
+            "pinyin": "bá",
+            "character": ""
+          },
+          {
+            "pinyin": "bǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "bà",
+            "character": ""
+          }
+        ]
+      },
+      "o": {
+        "base": "bo",
+        "tones": [
+          {
+            "pinyin": "bō",
+            "character": ""
+          },
+          {
+            "pinyin": "bó",
+            "character": ""
+          },
+          {
+            "pinyin": "bǒ",
+            "character": ""
+          },
+          {
+            "pinyin": "bò",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "bi",
+        "tones": [
+          {
+            "pinyin": "bī",
+            "character": ""
+          },
+          {
+            "pinyin": "bí",
+            "character": ""
+          },
+          {
+            "pinyin": "bǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "bì",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "bai",
+        "tones": [
+          {
+            "pinyin": "bāi",
+            "character": ""
+          },
+          {
+            "pinyin": "bái",
+            "character": ""
+          },
+          {
+            "pinyin": "bǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "bài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "bei",
+        "tones": [
+          {
+            "pinyin": "bēi",
+            "character": ""
+          },
+          {
+            "pinyin": "béi",
+            "character": ""
+          },
+          {
+            "pinyin": "běi",
+            "character": ""
+          },
+          {
+            "pinyin": "bèi",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "bao",
+        "tones": [
+          {
+            "pinyin": "bāo",
+            "character": ""
+          },
+          {
+            "pinyin": "báo",
+            "character": ""
+          },
+          {
+            "pinyin": "bǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "bào",
+            "character": ""
+          }
+        ]
+      },
+      "ie": {
+        "base": "bie",
+        "tones": [
+          {
+            "pinyin": "biē",
+            "character": ""
+          },
+          {
+            "pinyin": "bié",
+            "character": ""
+          },
+          {
+            "pinyin": "biě",
+            "character": ""
+          },
+          {
+            "pinyin": "biè",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "ban",
+        "tones": [
+          {
+            "pinyin": "bān",
+            "character": ""
+          },
+          {
+            "pinyin": "bán",
+            "character": ""
+          },
+          {
+            "pinyin": "bǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "bàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "ben",
+        "tones": [
+          {
+            "pinyin": "bēn",
+            "character": ""
+          },
+          {
+            "pinyin": "bén",
+            "character": ""
+          },
+          {
+            "pinyin": "běn",
+            "character": ""
+          },
+          {
+            "pinyin": "bèn",
+            "character": ""
+          }
+        ]
+      },
+      "in": {
+        "base": "bin",
+        "tones": [
+          {
+            "pinyin": "bīn",
+            "character": ""
+          },
+          {
+            "pinyin": "bín",
+            "character": ""
+          },
+          {
+            "pinyin": "bǐn",
+            "character": ""
+          },
+          {
+            "pinyin": "bìn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "bang",
+        "tones": [
+          {
+            "pinyin": "bāng",
+            "character": ""
+          },
+          {
+            "pinyin": "báng",
+            "character": ""
+          },
+          {
+            "pinyin": "bǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "bàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "beng",
+        "tones": [
+          {
+            "pinyin": "bēng",
+            "character": ""
+          },
+          {
+            "pinyin": "béng",
+            "character": ""
+          },
+          {
+            "pinyin": "běng",
+            "character": ""
+          },
+          {
+            "pinyin": "bèng",
+            "character": ""
+          }
+        ]
+      },
+      "ing": {
+        "base": "bing",
+        "tones": [
+          {
+            "pinyin": "bīng",
+            "character": ""
+          },
+          {
+            "pinyin": "bíng",
+            "character": ""
+          },
+          {
+            "pinyin": "bǐng",
+            "character": ""
+          },
+          {
+            "pinyin": "bìng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "p": {
+      "a": {
+        "base": "pa",
+        "tones": [
+          {
+            "pinyin": "pā",
+            "character": ""
+          },
+          {
+            "pinyin": "pá",
+            "character": ""
+          },
+          {
+            "pinyin": "pǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "pà",
+            "character": ""
+          }
+        ]
+      },
+      "o": {
+        "base": "po",
+        "tones": [
+          {
+            "pinyin": "pō",
+            "character": ""
+          },
+          {
+            "pinyin": "pó",
+            "character": ""
+          },
+          {
+            "pinyin": "pǒ",
+            "character": ""
+          },
+          {
+            "pinyin": "pò",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "pi",
+        "tones": [
+          {
+            "pinyin": "pī",
+            "character": ""
+          },
+          {
+            "pinyin": "pí",
+            "character": ""
+          },
+          {
+            "pinyin": "pǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "pì",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "pai",
+        "tones": [
+          {
+            "pinyin": "pāi",
+            "character": ""
+          },
+          {
+            "pinyin": "pái",
+            "character": ""
+          },
+          {
+            "pinyin": "pǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "pài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "pei",
+        "tones": [
+          {
+            "pinyin": "pēi",
+            "character": ""
+          },
+          {
+            "pinyin": "péi",
+            "character": ""
+          },
+          {
+            "pinyin": "pěi",
+            "character": ""
+          },
+          {
+            "pinyin": "pèi",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "pao",
+        "tones": [
+          {
+            "pinyin": "pāo",
+            "character": ""
+          },
+          {
+            "pinyin": "páo",
+            "character": ""
+          },
+          {
+            "pinyin": "pǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "pào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "pou",
+        "tones": [
+          {
+            "pinyin": "pōu",
+            "character": ""
+          },
+          {
+            "pinyin": "póu",
+            "character": ""
+          },
+          {
+            "pinyin": "pǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "pòu",
+            "character": ""
+          }
+        ]
+      },
+      "ie": {
+        "base": "pie",
+        "tones": [
+          {
+            "pinyin": "piē",
+            "character": ""
+          },
+          {
+            "pinyin": "pié",
+            "character": ""
+          },
+          {
+            "pinyin": "piě",
+            "character": ""
+          },
+          {
+            "pinyin": "piè",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "pan",
+        "tones": [
+          {
+            "pinyin": "pān",
+            "character": ""
+          },
+          {
+            "pinyin": "pán",
+            "character": ""
+          },
+          {
+            "pinyin": "pǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "pàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "pen",
+        "tones": [
+          {
+            "pinyin": "pēn",
+            "character": ""
+          },
+          {
+            "pinyin": "pén",
+            "character": ""
+          },
+          {
+            "pinyin": "pěn",
+            "character": ""
+          },
+          {
+            "pinyin": "pèn",
+            "character": ""
+          }
+        ]
+      },
+      "in": {
+        "base": "pin",
+        "tones": [
+          {
+            "pinyin": "pīn",
+            "character": ""
+          },
+          {
+            "pinyin": "pín",
+            "character": ""
+          },
+          {
+            "pinyin": "pǐn",
+            "character": ""
+          },
+          {
+            "pinyin": "pìn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "pang",
+        "tones": [
+          {
+            "pinyin": "pāng",
+            "character": ""
+          },
+          {
+            "pinyin": "páng",
+            "character": ""
+          },
+          {
+            "pinyin": "pǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "pàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "peng",
+        "tones": [
+          {
+            "pinyin": "pēng",
+            "character": ""
+          },
+          {
+            "pinyin": "péng",
+            "character": ""
+          },
+          {
+            "pinyin": "pěng",
+            "character": ""
+          },
+          {
+            "pinyin": "pèng",
+            "character": ""
+          }
+        ]
+      },
+      "ing": {
+        "base": "ping",
+        "tones": [
+          {
+            "pinyin": "pīng",
+            "character": ""
+          },
+          {
+            "pinyin": "píng",
+            "character": ""
+          },
+          {
+            "pinyin": "pǐng",
+            "character": ""
+          },
+          {
+            "pinyin": "pìng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "m": {
+      "a": {
+        "base": "ma",
+        "tones": [
+          {
+            "pinyin": "mā",
+            "character": ""
+          },
+          {
+            "pinyin": "má",
+            "character": ""
+          },
+          {
+            "pinyin": "mǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "mà",
+            "character": ""
+          }
+        ]
+      },
+      "o": {
+        "base": "mo",
+        "tones": [
+          {
+            "pinyin": "mō",
+            "character": ""
+          },
+          {
+            "pinyin": "mó",
+            "character": ""
+          },
+          {
+            "pinyin": "mǒ",
+            "character": ""
+          },
+          {
+            "pinyin": "mò",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "me",
+        "tones": [
+          {
+            "pinyin": "mē",
+            "character": ""
+          },
+          {
+            "pinyin": "mé",
+            "character": ""
+          },
+          {
+            "pinyin": "mě",
+            "character": ""
+          },
+          {
+            "pinyin": "mè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "mi",
+        "tones": [
+          {
+            "pinyin": "mī",
+            "character": ""
+          },
+          {
+            "pinyin": "mí",
+            "character": ""
+          },
+          {
+            "pinyin": "mǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "mì",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "mai",
+        "tones": [
+          {
+            "pinyin": "māi",
+            "character": ""
+          },
+          {
+            "pinyin": "mái",
+            "character": ""
+          },
+          {
+            "pinyin": "mǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "mài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "mei",
+        "tones": [
+          {
+            "pinyin": "mēi",
+            "character": ""
+          },
+          {
+            "pinyin": "méi",
+            "character": ""
+          },
+          {
+            "pinyin": "měi",
+            "character": ""
+          },
+          {
+            "pinyin": "mèi",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "mao",
+        "tones": [
+          {
+            "pinyin": "māo",
+            "character": ""
+          },
+          {
+            "pinyin": "máo",
+            "character": ""
+          },
+          {
+            "pinyin": "mǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "mào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "mou",
+        "tones": [
+          {
+            "pinyin": "mōu",
+            "character": ""
+          },
+          {
+            "pinyin": "móu",
+            "character": ""
+          },
+          {
+            "pinyin": "mǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "mòu",
+            "character": ""
+          }
+        ]
+      },
+      "iu": {
+        "base": "miu",
+        "tones": [
+          {
+            "pinyin": "miū",
+            "character": ""
+          },
+          {
+            "pinyin": "miú",
+            "character": ""
+          },
+          {
+            "pinyin": "miǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "miù",
+            "character": ""
+          }
+        ]
+      },
+      "ie": {
+        "base": "mie",
+        "tones": [
+          {
+            "pinyin": "miē",
+            "character": ""
+          },
+          {
+            "pinyin": "mié",
+            "character": ""
+          },
+          {
+            "pinyin": "miě",
+            "character": ""
+          },
+          {
+            "pinyin": "miè",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "man",
+        "tones": [
+          {
+            "pinyin": "mān",
+            "character": ""
+          },
+          {
+            "pinyin": "mán",
+            "character": ""
+          },
+          {
+            "pinyin": "mǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "màn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "men",
+        "tones": [
+          {
+            "pinyin": "mēn",
+            "character": ""
+          },
+          {
+            "pinyin": "mén",
+            "character": ""
+          },
+          {
+            "pinyin": "měn",
+            "character": ""
+          },
+          {
+            "pinyin": "mèn",
+            "character": ""
+          }
+        ]
+      },
+      "in": {
+        "base": "min",
+        "tones": [
+          {
+            "pinyin": "mīn",
+            "character": ""
+          },
+          {
+            "pinyin": "mín",
+            "character": ""
+          },
+          {
+            "pinyin": "mǐn",
+            "character": ""
+          },
+          {
+            "pinyin": "mìn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "mang",
+        "tones": [
+          {
+            "pinyin": "māng",
+            "character": ""
+          },
+          {
+            "pinyin": "máng",
+            "character": ""
+          },
+          {
+            "pinyin": "mǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "màng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "meng",
+        "tones": [
+          {
+            "pinyin": "mēng",
+            "character": ""
+          },
+          {
+            "pinyin": "méng",
+            "character": ""
+          },
+          {
+            "pinyin": "měng",
+            "character": ""
+          },
+          {
+            "pinyin": "mèng",
+            "character": ""
+          }
+        ]
+      },
+      "ing": {
+        "base": "ming",
+        "tones": [
+          {
+            "pinyin": "mīng",
+            "character": ""
+          },
+          {
+            "pinyin": "míng",
+            "character": ""
+          },
+          {
+            "pinyin": "mǐng",
+            "character": ""
+          },
+          {
+            "pinyin": "mìng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "f": {
+      "a": {
+        "base": "fa",
+        "tones": [
+          {
+            "pinyin": "fā",
+            "character": ""
+          },
+          {
+            "pinyin": "fá",
+            "character": ""
+          },
+          {
+            "pinyin": "fǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "fà",
+            "character": ""
+          }
+        ]
+      },
+      "o": {
+        "base": "fo",
+        "tones": [
+          {
+            "pinyin": "fō",
+            "character": ""
+          },
+          {
+            "pinyin": "fó",
+            "character": ""
+          },
+          {
+            "pinyin": "fǒ",
+            "character": ""
+          },
+          {
+            "pinyin": "fò",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "fei",
+        "tones": [
+          {
+            "pinyin": "fēi",
+            "character": ""
+          },
+          {
+            "pinyin": "féi",
+            "character": ""
+          },
+          {
+            "pinyin": "fěi",
+            "character": ""
+          },
+          {
+            "pinyin": "fèi",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "fou",
+        "tones": [
+          {
+            "pinyin": "fōu",
+            "character": ""
+          },
+          {
+            "pinyin": "fóu",
+            "character": ""
+          },
+          {
+            "pinyin": "fǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "fòu",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "fan",
+        "tones": [
+          {
+            "pinyin": "fān",
+            "character": ""
+          },
+          {
+            "pinyin": "fán",
+            "character": ""
+          },
+          {
+            "pinyin": "fǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "fàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "fen",
+        "tones": [
+          {
+            "pinyin": "fēn",
+            "character": ""
+          },
+          {
+            "pinyin": "fén",
+            "character": ""
+          },
+          {
+            "pinyin": "fěn",
+            "character": ""
+          },
+          {
+            "pinyin": "fèn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "fang",
+        "tones": [
+          {
+            "pinyin": "fāng",
+            "character": ""
+          },
+          {
+            "pinyin": "fáng",
+            "character": ""
+          },
+          {
+            "pinyin": "fǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "fàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "feng",
+        "tones": [
+          {
+            "pinyin": "fēng",
+            "character": ""
+          },
+          {
+            "pinyin": "féng",
+            "character": ""
+          },
+          {
+            "pinyin": "fěng",
+            "character": ""
+          },
+          {
+            "pinyin": "fèng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "d": {
+      "a": {
+        "base": "da",
+        "tones": [
+          {
+            "pinyin": "dā",
+            "character": ""
+          },
+          {
+            "pinyin": "dá",
+            "character": ""
+          },
+          {
+            "pinyin": "dǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "dà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "de",
+        "tones": [
+          {
+            "pinyin": "dē",
+            "character": ""
+          },
+          {
+            "pinyin": "dé",
+            "character": ""
+          },
+          {
+            "pinyin": "dě",
+            "character": ""
+          },
+          {
+            "pinyin": "dè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "di",
+        "tones": [
+          {
+            "pinyin": "dī",
+            "character": ""
+          },
+          {
+            "pinyin": "dí",
+            "character": ""
+          },
+          {
+            "pinyin": "dǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "dì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "du",
+        "tones": [
+          {
+            "pinyin": "dū",
+            "character": ""
+          },
+          {
+            "pinyin": "dú",
+            "character": ""
+          },
+          {
+            "pinyin": "dǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "dù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "dai",
+        "tones": [
+          {
+            "pinyin": "dāi",
+            "character": ""
+          },
+          {
+            "pinyin": "dái",
+            "character": ""
+          },
+          {
+            "pinyin": "dǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "dài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "dei",
+        "tones": [
+          {
+            "pinyin": "dēi",
+            "character": ""
+          },
+          {
+            "pinyin": "déi",
+            "character": ""
+          },
+          {
+            "pinyin": "děi",
+            "character": ""
+          },
+          {
+            "pinyin": "dèi",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "dui",
+        "tones": [
+          {
+            "pinyin": "duī",
+            "character": ""
+          },
+          {
+            "pinyin": "duí",
+            "character": ""
+          },
+          {
+            "pinyin": "duǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "duì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "dao",
+        "tones": [
+          {
+            "pinyin": "dāo",
+            "character": ""
+          },
+          {
+            "pinyin": "dáo",
+            "character": ""
+          },
+          {
+            "pinyin": "dǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "dào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "dou",
+        "tones": [
+          {
+            "pinyin": "dōu",
+            "character": ""
+          },
+          {
+            "pinyin": "dóu",
+            "character": ""
+          },
+          {
+            "pinyin": "dǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "dòu",
+            "character": ""
+          }
+        ]
+      },
+      "iu": {
+        "base": "diu",
+        "tones": [
+          {
+            "pinyin": "diū",
+            "character": ""
+          },
+          {
+            "pinyin": "diú",
+            "character": ""
+          },
+          {
+            "pinyin": "diǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "diù",
+            "character": ""
+          }
+        ]
+      },
+      "ie": {
+        "base": "die",
+        "tones": [
+          {
+            "pinyin": "diē",
+            "character": ""
+          },
+          {
+            "pinyin": "dié",
+            "character": ""
+          },
+          {
+            "pinyin": "diě",
+            "character": ""
+          },
+          {
+            "pinyin": "diè",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "dan",
+        "tones": [
+          {
+            "pinyin": "dān",
+            "character": ""
+          },
+          {
+            "pinyin": "dán",
+            "character": ""
+          },
+          {
+            "pinyin": "dǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "dàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "den",
+        "tones": [
+          {
+            "pinyin": "dēn",
+            "character": ""
+          },
+          {
+            "pinyin": "dén",
+            "character": ""
+          },
+          {
+            "pinyin": "děn",
+            "character": ""
+          },
+          {
+            "pinyin": "dèn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "dun",
+        "tones": [
+          {
+            "pinyin": "dūn",
+            "character": ""
+          },
+          {
+            "pinyin": "dún",
+            "character": ""
+          },
+          {
+            "pinyin": "dǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "dùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "dang",
+        "tones": [
+          {
+            "pinyin": "dāng",
+            "character": ""
+          },
+          {
+            "pinyin": "dáng",
+            "character": ""
+          },
+          {
+            "pinyin": "dǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "dàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "deng",
+        "tones": [
+          {
+            "pinyin": "dēng",
+            "character": ""
+          },
+          {
+            "pinyin": "déng",
+            "character": ""
+          },
+          {
+            "pinyin": "děng",
+            "character": ""
+          },
+          {
+            "pinyin": "dèng",
+            "character": ""
+          }
+        ]
+      },
+      "ing": {
+        "base": "ding",
+        "tones": [
+          {
+            "pinyin": "dīng",
+            "character": ""
+          },
+          {
+            "pinyin": "díng",
+            "character": ""
+          },
+          {
+            "pinyin": "dǐng",
+            "character": ""
+          },
+          {
+            "pinyin": "dìng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "dong",
+        "tones": [
+          {
+            "pinyin": "dōng",
+            "character": ""
+          },
+          {
+            "pinyin": "dóng",
+            "character": ""
+          },
+          {
+            "pinyin": "dǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "dòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "t": {
+      "a": {
+        "base": "ta",
+        "tones": [
+          {
+            "pinyin": "tā",
+            "character": ""
+          },
+          {
+            "pinyin": "tá",
+            "character": ""
+          },
+          {
+            "pinyin": "tǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "tà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "te",
+        "tones": [
+          {
+            "pinyin": "tē",
+            "character": ""
+          },
+          {
+            "pinyin": "té",
+            "character": ""
+          },
+          {
+            "pinyin": "tě",
+            "character": ""
+          },
+          {
+            "pinyin": "tè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "ti",
+        "tones": [
+          {
+            "pinyin": "tī",
+            "character": ""
+          },
+          {
+            "pinyin": "tí",
+            "character": ""
+          },
+          {
+            "pinyin": "tǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "tì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "tu",
+        "tones": [
+          {
+            "pinyin": "tū",
+            "character": ""
+          },
+          {
+            "pinyin": "tú",
+            "character": ""
+          },
+          {
+            "pinyin": "tǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "tù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "tai",
+        "tones": [
+          {
+            "pinyin": "tāi",
+            "character": ""
+          },
+          {
+            "pinyin": "tái",
+            "character": ""
+          },
+          {
+            "pinyin": "tǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "tài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "tei",
+        "tones": [
+          {
+            "pinyin": "tēi",
+            "character": ""
+          },
+          {
+            "pinyin": "téi",
+            "character": ""
+          },
+          {
+            "pinyin": "těi",
+            "character": ""
+          },
+          {
+            "pinyin": "tèi",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "tui",
+        "tones": [
+          {
+            "pinyin": "tuī",
+            "character": ""
+          },
+          {
+            "pinyin": "tuí",
+            "character": ""
+          },
+          {
+            "pinyin": "tuǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "tuì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "tao",
+        "tones": [
+          {
+            "pinyin": "tāo",
+            "character": ""
+          },
+          {
+            "pinyin": "táo",
+            "character": ""
+          },
+          {
+            "pinyin": "tǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "tào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "tou",
+        "tones": [
+          {
+            "pinyin": "tōu",
+            "character": ""
+          },
+          {
+            "pinyin": "tóu",
+            "character": ""
+          },
+          {
+            "pinyin": "tǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "tòu",
+            "character": ""
+          }
+        ]
+      },
+      "ie": {
+        "base": "tie",
+        "tones": [
+          {
+            "pinyin": "tiē",
+            "character": ""
+          },
+          {
+            "pinyin": "tié",
+            "character": ""
+          },
+          {
+            "pinyin": "tiě",
+            "character": ""
+          },
+          {
+            "pinyin": "tiè",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "tan",
+        "tones": [
+          {
+            "pinyin": "tān",
+            "character": ""
+          },
+          {
+            "pinyin": "tán",
+            "character": ""
+          },
+          {
+            "pinyin": "tǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "tàn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "tun",
+        "tones": [
+          {
+            "pinyin": "tūn",
+            "character": ""
+          },
+          {
+            "pinyin": "tún",
+            "character": ""
+          },
+          {
+            "pinyin": "tǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "tùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "tang",
+        "tones": [
+          {
+            "pinyin": "tāng",
+            "character": ""
+          },
+          {
+            "pinyin": "táng",
+            "character": ""
+          },
+          {
+            "pinyin": "tǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "tàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "teng",
+        "tones": [
+          {
+            "pinyin": "tēng",
+            "character": ""
+          },
+          {
+            "pinyin": "téng",
+            "character": ""
+          },
+          {
+            "pinyin": "těng",
+            "character": ""
+          },
+          {
+            "pinyin": "tèng",
+            "character": ""
+          }
+        ]
+      },
+      "ing": {
+        "base": "ting",
+        "tones": [
+          {
+            "pinyin": "tīng",
+            "character": ""
+          },
+          {
+            "pinyin": "tíng",
+            "character": ""
+          },
+          {
+            "pinyin": "tǐng",
+            "character": ""
+          },
+          {
+            "pinyin": "tìng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "tong",
+        "tones": [
+          {
+            "pinyin": "tōng",
+            "character": ""
+          },
+          {
+            "pinyin": "tóng",
+            "character": ""
+          },
+          {
+            "pinyin": "tǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "tòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "n": {
+      "a": {
+        "base": "na",
+        "tones": [
+          {
+            "pinyin": "nā",
+            "character": ""
+          },
+          {
+            "pinyin": "ná",
+            "character": ""
+          },
+          {
+            "pinyin": "nǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "nà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "ne",
+        "tones": [
+          {
+            "pinyin": "nē",
+            "character": ""
+          },
+          {
+            "pinyin": "né",
+            "character": ""
+          },
+          {
+            "pinyin": "ně",
+            "character": ""
+          },
+          {
+            "pinyin": "nè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "ni",
+        "tones": [
+          {
+            "pinyin": "nī",
+            "character": ""
+          },
+          {
+            "pinyin": "ní",
+            "character": ""
+          },
+          {
+            "pinyin": "nǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "nì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "nu",
+        "tones": [
+          {
+            "pinyin": "nū",
+            "character": ""
+          },
+          {
+            "pinyin": "nú",
+            "character": ""
+          },
+          {
+            "pinyin": "nǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "nù",
+            "character": ""
+          }
+        ]
+      },
+      "ü": {
+        "base": "nü",
+        "tones": [
+          {
+            "pinyin": "nǖ",
+            "character": ""
+          },
+          {
+            "pinyin": "nǘ",
+            "character": ""
+          },
+          {
+            "pinyin": "nǚ",
+            "character": ""
+          },
+          {
+            "pinyin": "nǜ",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "nai",
+        "tones": [
+          {
+            "pinyin": "nāi",
+            "character": ""
+          },
+          {
+            "pinyin": "nái",
+            "character": ""
+          },
+          {
+            "pinyin": "nǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "nài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "nei",
+        "tones": [
+          {
+            "pinyin": "nēi",
+            "character": ""
+          },
+          {
+            "pinyin": "néi",
+            "character": ""
+          },
+          {
+            "pinyin": "něi",
+            "character": ""
+          },
+          {
+            "pinyin": "nèi",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "nao",
+        "tones": [
+          {
+            "pinyin": "nāo",
+            "character": ""
+          },
+          {
+            "pinyin": "náo",
+            "character": ""
+          },
+          {
+            "pinyin": "nǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "nào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "nou",
+        "tones": [
+          {
+            "pinyin": "nōu",
+            "character": ""
+          },
+          {
+            "pinyin": "nóu",
+            "character": ""
+          },
+          {
+            "pinyin": "nǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "nòu",
+            "character": ""
+          }
+        ]
+      },
+      "iu": {
+        "base": "niu",
+        "tones": [
+          {
+            "pinyin": "niū",
+            "character": ""
+          },
+          {
+            "pinyin": "niú",
+            "character": ""
+          },
+          {
+            "pinyin": "niǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "niù",
+            "character": ""
+          }
+        ]
+      },
+      "ie": {
+        "base": "nie",
+        "tones": [
+          {
+            "pinyin": "niē",
+            "character": ""
+          },
+          {
+            "pinyin": "nié",
+            "character": ""
+          },
+          {
+            "pinyin": "niě",
+            "character": ""
+          },
+          {
+            "pinyin": "niè",
+            "character": ""
+          }
+        ]
+      },
+      "üe": {
+        "base": "nüe",
+        "tones": [
+          {
+            "pinyin": "nüē",
+            "character": ""
+          },
+          {
+            "pinyin": "nüé",
+            "character": ""
+          },
+          {
+            "pinyin": "nüě",
+            "character": ""
+          },
+          {
+            "pinyin": "nüè",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "nan",
+        "tones": [
+          {
+            "pinyin": "nān",
+            "character": ""
+          },
+          {
+            "pinyin": "nán",
+            "character": ""
+          },
+          {
+            "pinyin": "nǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "nàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "nen",
+        "tones": [
+          {
+            "pinyin": "nēn",
+            "character": ""
+          },
+          {
+            "pinyin": "nén",
+            "character": ""
+          },
+          {
+            "pinyin": "něn",
+            "character": ""
+          },
+          {
+            "pinyin": "nèn",
+            "character": ""
+          }
+        ]
+      },
+      "in": {
+        "base": "nin",
+        "tones": [
+          {
+            "pinyin": "nīn",
+            "character": ""
+          },
+          {
+            "pinyin": "nín",
+            "character": ""
+          },
+          {
+            "pinyin": "nǐn",
+            "character": ""
+          },
+          {
+            "pinyin": "nìn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "nang",
+        "tones": [
+          {
+            "pinyin": "nāng",
+            "character": ""
+          },
+          {
+            "pinyin": "náng",
+            "character": ""
+          },
+          {
+            "pinyin": "nǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "nàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "neng",
+        "tones": [
+          {
+            "pinyin": "nēng",
+            "character": ""
+          },
+          {
+            "pinyin": "néng",
+            "character": ""
+          },
+          {
+            "pinyin": "něng",
+            "character": ""
+          },
+          {
+            "pinyin": "nèng",
+            "character": ""
+          }
+        ]
+      },
+      "ing": {
+        "base": "ning",
+        "tones": [
+          {
+            "pinyin": "nīng",
+            "character": ""
+          },
+          {
+            "pinyin": "níng",
+            "character": ""
+          },
+          {
+            "pinyin": "nǐng",
+            "character": ""
+          },
+          {
+            "pinyin": "nìng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "nong",
+        "tones": [
+          {
+            "pinyin": "nōng",
+            "character": ""
+          },
+          {
+            "pinyin": "nóng",
+            "character": ""
+          },
+          {
+            "pinyin": "nǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "nòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "l": {
+      "a": {
+        "base": "la",
+        "tones": [
+          {
+            "pinyin": "lā",
+            "character": ""
+          },
+          {
+            "pinyin": "lá",
+            "character": ""
+          },
+          {
+            "pinyin": "lǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "là",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "le",
+        "tones": [
+          {
+            "pinyin": "lē",
+            "character": ""
+          },
+          {
+            "pinyin": "lé",
+            "character": ""
+          },
+          {
+            "pinyin": "lě",
+            "character": ""
+          },
+          {
+            "pinyin": "lè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "li",
+        "tones": [
+          {
+            "pinyin": "lī",
+            "character": ""
+          },
+          {
+            "pinyin": "lí",
+            "character": ""
+          },
+          {
+            "pinyin": "lǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "lì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "lu",
+        "tones": [
+          {
+            "pinyin": "lū",
+            "character": ""
+          },
+          {
+            "pinyin": "lú",
+            "character": ""
+          },
+          {
+            "pinyin": "lǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "lù",
+            "character": ""
+          }
+        ]
+      },
+      "ü": {
+        "base": "lü",
+        "tones": [
+          {
+            "pinyin": "lǖ",
+            "character": ""
+          },
+          {
+            "pinyin": "lǘ",
+            "character": ""
+          },
+          {
+            "pinyin": "lǚ",
+            "character": ""
+          },
+          {
+            "pinyin": "lǜ",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "lai",
+        "tones": [
+          {
+            "pinyin": "lāi",
+            "character": ""
+          },
+          {
+            "pinyin": "lái",
+            "character": ""
+          },
+          {
+            "pinyin": "lǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "lài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "lei",
+        "tones": [
+          {
+            "pinyin": "lēi",
+            "character": ""
+          },
+          {
+            "pinyin": "léi",
+            "character": ""
+          },
+          {
+            "pinyin": "lěi",
+            "character": ""
+          },
+          {
+            "pinyin": "lèi",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "lui",
+        "tones": [
+          {
+            "pinyin": "luī",
+            "character": ""
+          },
+          {
+            "pinyin": "luí",
+            "character": ""
+          },
+          {
+            "pinyin": "luǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "luì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "lao",
+        "tones": [
+          {
+            "pinyin": "lāo",
+            "character": ""
+          },
+          {
+            "pinyin": "láo",
+            "character": ""
+          },
+          {
+            "pinyin": "lǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "lào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "lou",
+        "tones": [
+          {
+            "pinyin": "lōu",
+            "character": ""
+          },
+          {
+            "pinyin": "lóu",
+            "character": ""
+          },
+          {
+            "pinyin": "lǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "lòu",
+            "character": ""
+          }
+        ]
+      },
+      "iu": {
+        "base": "liu",
+        "tones": [
+          {
+            "pinyin": "liū",
+            "character": ""
+          },
+          {
+            "pinyin": "liú",
+            "character": ""
+          },
+          {
+            "pinyin": "liǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "liù",
+            "character": ""
+          }
+        ]
+      },
+      "ie": {
+        "base": "lie",
+        "tones": [
+          {
+            "pinyin": "liē",
+            "character": ""
+          },
+          {
+            "pinyin": "lié",
+            "character": ""
+          },
+          {
+            "pinyin": "liě",
+            "character": ""
+          },
+          {
+            "pinyin": "liè",
+            "character": ""
+          }
+        ]
+      },
+      "üe": {
+        "base": "lüe",
+        "tones": [
+          {
+            "pinyin": "lüē",
+            "character": ""
+          },
+          {
+            "pinyin": "lüé",
+            "character": ""
+          },
+          {
+            "pinyin": "lüě",
+            "character": ""
+          },
+          {
+            "pinyin": "lüè",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "lan",
+        "tones": [
+          {
+            "pinyin": "lān",
+            "character": ""
+          },
+          {
+            "pinyin": "lán",
+            "character": ""
+          },
+          {
+            "pinyin": "lǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "làn",
+            "character": ""
+          }
+        ]
+      },
+      "in": {
+        "base": "lin",
+        "tones": [
+          {
+            "pinyin": "līn",
+            "character": ""
+          },
+          {
+            "pinyin": "lín",
+            "character": ""
+          },
+          {
+            "pinyin": "lǐn",
+            "character": ""
+          },
+          {
+            "pinyin": "lìn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "lun",
+        "tones": [
+          {
+            "pinyin": "lūn",
+            "character": ""
+          },
+          {
+            "pinyin": "lún",
+            "character": ""
+          },
+          {
+            "pinyin": "lǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "lùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "lang",
+        "tones": [
+          {
+            "pinyin": "lāng",
+            "character": ""
+          },
+          {
+            "pinyin": "láng",
+            "character": ""
+          },
+          {
+            "pinyin": "lǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "làng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "leng",
+        "tones": [
+          {
+            "pinyin": "lēng",
+            "character": ""
+          },
+          {
+            "pinyin": "léng",
+            "character": ""
+          },
+          {
+            "pinyin": "lěng",
+            "character": ""
+          },
+          {
+            "pinyin": "lèng",
+            "character": ""
+          }
+        ]
+      },
+      "ing": {
+        "base": "ling",
+        "tones": [
+          {
+            "pinyin": "līng",
+            "character": ""
+          },
+          {
+            "pinyin": "líng",
+            "character": ""
+          },
+          {
+            "pinyin": "lǐng",
+            "character": ""
+          },
+          {
+            "pinyin": "lìng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "long",
+        "tones": [
+          {
+            "pinyin": "lōng",
+            "character": ""
+          },
+          {
+            "pinyin": "lóng",
+            "character": ""
+          },
+          {
+            "pinyin": "lǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "lòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "g": {
+      "a": {
+        "base": "ga",
+        "tones": [
+          {
+            "pinyin": "gā",
+            "character": ""
+          },
+          {
+            "pinyin": "gá",
+            "character": ""
+          },
+          {
+            "pinyin": "gǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "gà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "ge",
+        "tones": [
+          {
+            "pinyin": "gē",
+            "character": ""
+          },
+          {
+            "pinyin": "gé",
+            "character": ""
+          },
+          {
+            "pinyin": "gě",
+            "character": ""
+          },
+          {
+            "pinyin": "gè",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "gu",
+        "tones": [
+          {
+            "pinyin": "gū",
+            "character": ""
+          },
+          {
+            "pinyin": "gú",
+            "character": ""
+          },
+          {
+            "pinyin": "gǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "gù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "gai",
+        "tones": [
+          {
+            "pinyin": "gāi",
+            "character": ""
+          },
+          {
+            "pinyin": "gái",
+            "character": ""
+          },
+          {
+            "pinyin": "gǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "gài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "gei",
+        "tones": [
+          {
+            "pinyin": "gēi",
+            "character": ""
+          },
+          {
+            "pinyin": "géi",
+            "character": ""
+          },
+          {
+            "pinyin": "gěi",
+            "character": ""
+          },
+          {
+            "pinyin": "gèi",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "gui",
+        "tones": [
+          {
+            "pinyin": "guī",
+            "character": ""
+          },
+          {
+            "pinyin": "guí",
+            "character": ""
+          },
+          {
+            "pinyin": "guǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "guì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "gao",
+        "tones": [
+          {
+            "pinyin": "gāo",
+            "character": ""
+          },
+          {
+            "pinyin": "gáo",
+            "character": ""
+          },
+          {
+            "pinyin": "gǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "gào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "gou",
+        "tones": [
+          {
+            "pinyin": "gōu",
+            "character": ""
+          },
+          {
+            "pinyin": "góu",
+            "character": ""
+          },
+          {
+            "pinyin": "gǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "gòu",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "gan",
+        "tones": [
+          {
+            "pinyin": "gān",
+            "character": ""
+          },
+          {
+            "pinyin": "gán",
+            "character": ""
+          },
+          {
+            "pinyin": "gǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "gàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "gen",
+        "tones": [
+          {
+            "pinyin": "gēn",
+            "character": ""
+          },
+          {
+            "pinyin": "gén",
+            "character": ""
+          },
+          {
+            "pinyin": "gěn",
+            "character": ""
+          },
+          {
+            "pinyin": "gèn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "gun",
+        "tones": [
+          {
+            "pinyin": "gūn",
+            "character": ""
+          },
+          {
+            "pinyin": "gún",
+            "character": ""
+          },
+          {
+            "pinyin": "gǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "gùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "gang",
+        "tones": [
+          {
+            "pinyin": "gāng",
+            "character": ""
+          },
+          {
+            "pinyin": "gáng",
+            "character": ""
+          },
+          {
+            "pinyin": "gǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "gàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "geng",
+        "tones": [
+          {
+            "pinyin": "gēng",
+            "character": ""
+          },
+          {
+            "pinyin": "géng",
+            "character": ""
+          },
+          {
+            "pinyin": "gěng",
+            "character": ""
+          },
+          {
+            "pinyin": "gèng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "gong",
+        "tones": [
+          {
+            "pinyin": "gōng",
+            "character": ""
+          },
+          {
+            "pinyin": "góng",
+            "character": ""
+          },
+          {
+            "pinyin": "gǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "gòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "k": {
+      "a": {
+        "base": "ka",
+        "tones": [
+          {
+            "pinyin": "kā",
+            "character": ""
+          },
+          {
+            "pinyin": "ká",
+            "character": ""
+          },
+          {
+            "pinyin": "kǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "kà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "ke",
+        "tones": [
+          {
+            "pinyin": "kē",
+            "character": ""
+          },
+          {
+            "pinyin": "ké",
+            "character": ""
+          },
+          {
+            "pinyin": "kě",
+            "character": ""
+          },
+          {
+            "pinyin": "kè",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "ku",
+        "tones": [
+          {
+            "pinyin": "kū",
+            "character": ""
+          },
+          {
+            "pinyin": "kú",
+            "character": ""
+          },
+          {
+            "pinyin": "kǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "kù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "kai",
+        "tones": [
+          {
+            "pinyin": "kāi",
+            "character": ""
+          },
+          {
+            "pinyin": "kái",
+            "character": ""
+          },
+          {
+            "pinyin": "kǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "kài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "kei",
+        "tones": [
+          {
+            "pinyin": "kēi",
+            "character": ""
+          },
+          {
+            "pinyin": "kéi",
+            "character": ""
+          },
+          {
+            "pinyin": "kěi",
+            "character": ""
+          },
+          {
+            "pinyin": "kèi",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "kui",
+        "tones": [
+          {
+            "pinyin": "kuī",
+            "character": ""
+          },
+          {
+            "pinyin": "kuí",
+            "character": ""
+          },
+          {
+            "pinyin": "kuǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "kuì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "kao",
+        "tones": [
+          {
+            "pinyin": "kāo",
+            "character": ""
+          },
+          {
+            "pinyin": "káo",
+            "character": ""
+          },
+          {
+            "pinyin": "kǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "kào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "kou",
+        "tones": [
+          {
+            "pinyin": "kōu",
+            "character": ""
+          },
+          {
+            "pinyin": "kóu",
+            "character": ""
+          },
+          {
+            "pinyin": "kǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "kòu",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "kan",
+        "tones": [
+          {
+            "pinyin": "kān",
+            "character": ""
+          },
+          {
+            "pinyin": "kán",
+            "character": ""
+          },
+          {
+            "pinyin": "kǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "kàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "ken",
+        "tones": [
+          {
+            "pinyin": "kēn",
+            "character": ""
+          },
+          {
+            "pinyin": "kén",
+            "character": ""
+          },
+          {
+            "pinyin": "kěn",
+            "character": ""
+          },
+          {
+            "pinyin": "kèn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "kun",
+        "tones": [
+          {
+            "pinyin": "kūn",
+            "character": ""
+          },
+          {
+            "pinyin": "kún",
+            "character": ""
+          },
+          {
+            "pinyin": "kǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "kùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "kang",
+        "tones": [
+          {
+            "pinyin": "kāng",
+            "character": ""
+          },
+          {
+            "pinyin": "káng",
+            "character": ""
+          },
+          {
+            "pinyin": "kǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "kàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "keng",
+        "tones": [
+          {
+            "pinyin": "kēng",
+            "character": ""
+          },
+          {
+            "pinyin": "kéng",
+            "character": ""
+          },
+          {
+            "pinyin": "kěng",
+            "character": ""
+          },
+          {
+            "pinyin": "kèng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "kong",
+        "tones": [
+          {
+            "pinyin": "kōng",
+            "character": ""
+          },
+          {
+            "pinyin": "kóng",
+            "character": ""
+          },
+          {
+            "pinyin": "kǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "kòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "h": {
+      "a": {
+        "base": "ha",
+        "tones": [
+          {
+            "pinyin": "hā",
+            "character": ""
+          },
+          {
+            "pinyin": "há",
+            "character": ""
+          },
+          {
+            "pinyin": "hǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "hà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "he",
+        "tones": [
+          {
+            "pinyin": "hē",
+            "character": ""
+          },
+          {
+            "pinyin": "hé",
+            "character": ""
+          },
+          {
+            "pinyin": "hě",
+            "character": ""
+          },
+          {
+            "pinyin": "hè",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "hu",
+        "tones": [
+          {
+            "pinyin": "hū",
+            "character": ""
+          },
+          {
+            "pinyin": "hú",
+            "character": ""
+          },
+          {
+            "pinyin": "hǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "hù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "hai",
+        "tones": [
+          {
+            "pinyin": "hāi",
+            "character": ""
+          },
+          {
+            "pinyin": "hái",
+            "character": ""
+          },
+          {
+            "pinyin": "hǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "hài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "hei",
+        "tones": [
+          {
+            "pinyin": "hēi",
+            "character": ""
+          },
+          {
+            "pinyin": "héi",
+            "character": ""
+          },
+          {
+            "pinyin": "hěi",
+            "character": ""
+          },
+          {
+            "pinyin": "hèi",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "hui",
+        "tones": [
+          {
+            "pinyin": "huī",
+            "character": ""
+          },
+          {
+            "pinyin": "huí",
+            "character": ""
+          },
+          {
+            "pinyin": "huǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "huì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "hao",
+        "tones": [
+          {
+            "pinyin": "hāo",
+            "character": ""
+          },
+          {
+            "pinyin": "háo",
+            "character": ""
+          },
+          {
+            "pinyin": "hǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "hào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "hou",
+        "tones": [
+          {
+            "pinyin": "hōu",
+            "character": ""
+          },
+          {
+            "pinyin": "hóu",
+            "character": ""
+          },
+          {
+            "pinyin": "hǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "hòu",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "han",
+        "tones": [
+          {
+            "pinyin": "hān",
+            "character": ""
+          },
+          {
+            "pinyin": "hán",
+            "character": ""
+          },
+          {
+            "pinyin": "hǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "hàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "hen",
+        "tones": [
+          {
+            "pinyin": "hēn",
+            "character": ""
+          },
+          {
+            "pinyin": "hén",
+            "character": ""
+          },
+          {
+            "pinyin": "hěn",
+            "character": ""
+          },
+          {
+            "pinyin": "hèn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "hun",
+        "tones": [
+          {
+            "pinyin": "hūn",
+            "character": ""
+          },
+          {
+            "pinyin": "hún",
+            "character": ""
+          },
+          {
+            "pinyin": "hǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "hùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "hang",
+        "tones": [
+          {
+            "pinyin": "hāng",
+            "character": ""
+          },
+          {
+            "pinyin": "háng",
+            "character": ""
+          },
+          {
+            "pinyin": "hǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "hàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "heng",
+        "tones": [
+          {
+            "pinyin": "hēng",
+            "character": ""
+          },
+          {
+            "pinyin": "héng",
+            "character": ""
+          },
+          {
+            "pinyin": "hěng",
+            "character": ""
+          },
+          {
+            "pinyin": "hèng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "hong",
+        "tones": [
+          {
+            "pinyin": "hōng",
+            "character": ""
+          },
+          {
+            "pinyin": "hóng",
+            "character": ""
+          },
+          {
+            "pinyin": "hǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "hòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "j": {
+      "i": {
+        "base": "ji",
+        "tones": [
+          {
+            "pinyin": "jī",
+            "character": ""
+          },
+          {
+            "pinyin": "jí",
+            "character": ""
+          },
+          {
+            "pinyin": "jǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "jì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "ju",
+        "tones": [
+          {
+            "pinyin": "jū",
+            "character": ""
+          },
+          {
+            "pinyin": "jú",
+            "character": ""
+          },
+          {
+            "pinyin": "jǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "jù",
+            "character": ""
+          }
+        ]
+      },
+      "ü": {
+        "base": "ju",
+        "tones": [
+          {
+            "pinyin": "jǖ",
+            "character": ""
+          },
+          {
+            "pinyin": "jǘ",
+            "character": ""
+          },
+          {
+            "pinyin": "jǚ",
+            "character": ""
+          },
+          {
+            "pinyin": "jǜ",
+            "character": ""
+          }
+        ]
+      },
+      "iu": {
+        "base": "jiu",
+        "tones": [
+          {
+            "pinyin": "jiū",
+            "character": ""
+          },
+          {
+            "pinyin": "jiú",
+            "character": ""
+          },
+          {
+            "pinyin": "jiǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "jiù",
+            "character": ""
+          }
+        ]
+      },
+      "ie": {
+        "base": "jie",
+        "tones": [
+          {
+            "pinyin": "jiē",
+            "character": ""
+          },
+          {
+            "pinyin": "jié",
+            "character": ""
+          },
+          {
+            "pinyin": "jiě",
+            "character": ""
+          },
+          {
+            "pinyin": "jiè",
+            "character": ""
+          }
+        ]
+      },
+      "üe": {
+        "base": "jue",
+        "tones": [
+          {
+            "pinyin": "jüē",
+            "character": ""
+          },
+          {
+            "pinyin": "jüé",
+            "character": ""
+          },
+          {
+            "pinyin": "jüě",
+            "character": ""
+          },
+          {
+            "pinyin": "jüè",
+            "character": ""
+          }
+        ]
+      },
+      "in": {
+        "base": "jin",
+        "tones": [
+          {
+            "pinyin": "jīn",
+            "character": ""
+          },
+          {
+            "pinyin": "jín",
+            "character": ""
+          },
+          {
+            "pinyin": "jǐn",
+            "character": ""
+          },
+          {
+            "pinyin": "jìn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "jun",
+        "tones": [
+          {
+            "pinyin": "jūn",
+            "character": ""
+          },
+          {
+            "pinyin": "jún",
+            "character": ""
+          },
+          {
+            "pinyin": "jǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "jùn",
+            "character": ""
+          }
+        ]
+      },
+      "ün": {
+        "base": "jun",
+        "tones": [
+          {
+            "pinyin": "jǖn",
+            "character": ""
+          },
+          {
+            "pinyin": "jǘn",
+            "character": ""
+          },
+          {
+            "pinyin": "jǚn",
+            "character": ""
+          },
+          {
+            "pinyin": "jǜn",
+            "character": ""
+          }
+        ]
+      },
+      "ing": {
+        "base": "jing",
+        "tones": [
+          {
+            "pinyin": "jīng",
+            "character": ""
+          },
+          {
+            "pinyin": "jíng",
+            "character": ""
+          },
+          {
+            "pinyin": "jǐng",
+            "character": ""
+          },
+          {
+            "pinyin": "jìng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "q": {
+      "i": {
+        "base": "qi",
+        "tones": [
+          {
+            "pinyin": "qī",
+            "character": ""
+          },
+          {
+            "pinyin": "qí",
+            "character": ""
+          },
+          {
+            "pinyin": "qǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "qì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "qu",
+        "tones": [
+          {
+            "pinyin": "qū",
+            "character": ""
+          },
+          {
+            "pinyin": "qú",
+            "character": ""
+          },
+          {
+            "pinyin": "qǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "qù",
+            "character": ""
+          }
+        ]
+      },
+      "ü": {
+        "base": "qu",
+        "tones": [
+          {
+            "pinyin": "qǖ",
+            "character": ""
+          },
+          {
+            "pinyin": "qǘ",
+            "character": ""
+          },
+          {
+            "pinyin": "qǚ",
+            "character": ""
+          },
+          {
+            "pinyin": "qǜ",
+            "character": ""
+          }
+        ]
+      },
+      "iu": {
+        "base": "qiu",
+        "tones": [
+          {
+            "pinyin": "qiū",
+            "character": ""
+          },
+          {
+            "pinyin": "qiú",
+            "character": ""
+          },
+          {
+            "pinyin": "qiǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "qiù",
+            "character": ""
+          }
+        ]
+      },
+      "ie": {
+        "base": "qie",
+        "tones": [
+          {
+            "pinyin": "qiē",
+            "character": ""
+          },
+          {
+            "pinyin": "qié",
+            "character": ""
+          },
+          {
+            "pinyin": "qiě",
+            "character": ""
+          },
+          {
+            "pinyin": "qiè",
+            "character": ""
+          }
+        ]
+      },
+      "üe": {
+        "base": "que",
+        "tones": [
+          {
+            "pinyin": "qüē",
+            "character": ""
+          },
+          {
+            "pinyin": "qüé",
+            "character": ""
+          },
+          {
+            "pinyin": "qüě",
+            "character": ""
+          },
+          {
+            "pinyin": "qüè",
+            "character": ""
+          }
+        ]
+      },
+      "in": {
+        "base": "qin",
+        "tones": [
+          {
+            "pinyin": "qīn",
+            "character": ""
+          },
+          {
+            "pinyin": "qín",
+            "character": ""
+          },
+          {
+            "pinyin": "qǐn",
+            "character": ""
+          },
+          {
+            "pinyin": "qìn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "qun",
+        "tones": [
+          {
+            "pinyin": "qūn",
+            "character": ""
+          },
+          {
+            "pinyin": "qún",
+            "character": ""
+          },
+          {
+            "pinyin": "qǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "qùn",
+            "character": ""
+          }
+        ]
+      },
+      "ün": {
+        "base": "qun",
+        "tones": [
+          {
+            "pinyin": "qǖn",
+            "character": ""
+          },
+          {
+            "pinyin": "qǘn",
+            "character": ""
+          },
+          {
+            "pinyin": "qǚn",
+            "character": ""
+          },
+          {
+            "pinyin": "qǜn",
+            "character": ""
+          }
+        ]
+      },
+      "ing": {
+        "base": "qing",
+        "tones": [
+          {
+            "pinyin": "qīng",
+            "character": ""
+          },
+          {
+            "pinyin": "qíng",
+            "character": ""
+          },
+          {
+            "pinyin": "qǐng",
+            "character": ""
+          },
+          {
+            "pinyin": "qìng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "x": {
+      "i": {
+        "base": "xi",
+        "tones": [
+          {
+            "pinyin": "xī",
+            "character": ""
+          },
+          {
+            "pinyin": "xí",
+            "character": ""
+          },
+          {
+            "pinyin": "xǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "xì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "xu",
+        "tones": [
+          {
+            "pinyin": "xū",
+            "character": ""
+          },
+          {
+            "pinyin": "xú",
+            "character": ""
+          },
+          {
+            "pinyin": "xǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "xù",
+            "character": ""
+          }
+        ]
+      },
+      "ü": {
+        "base": "xu",
+        "tones": [
+          {
+            "pinyin": "xǖ",
+            "character": ""
+          },
+          {
+            "pinyin": "xǘ",
+            "character": ""
+          },
+          {
+            "pinyin": "xǚ",
+            "character": ""
+          },
+          {
+            "pinyin": "xǜ",
+            "character": ""
+          }
+        ]
+      },
+      "iu": {
+        "base": "xiu",
+        "tones": [
+          {
+            "pinyin": "xiū",
+            "character": ""
+          },
+          {
+            "pinyin": "xiú",
+            "character": ""
+          },
+          {
+            "pinyin": "xiǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "xiù",
+            "character": ""
+          }
+        ]
+      },
+      "ie": {
+        "base": "xie",
+        "tones": [
+          {
+            "pinyin": "xiē",
+            "character": ""
+          },
+          {
+            "pinyin": "xié",
+            "character": ""
+          },
+          {
+            "pinyin": "xiě",
+            "character": ""
+          },
+          {
+            "pinyin": "xiè",
+            "character": ""
+          }
+        ]
+      },
+      "üe": {
+        "base": "xue",
+        "tones": [
+          {
+            "pinyin": "xüē",
+            "character": ""
+          },
+          {
+            "pinyin": "xüé",
+            "character": ""
+          },
+          {
+            "pinyin": "xüě",
+            "character": ""
+          },
+          {
+            "pinyin": "xüè",
+            "character": ""
+          }
+        ]
+      },
+      "in": {
+        "base": "xin",
+        "tones": [
+          {
+            "pinyin": "xīn",
+            "character": ""
+          },
+          {
+            "pinyin": "xín",
+            "character": ""
+          },
+          {
+            "pinyin": "xǐn",
+            "character": ""
+          },
+          {
+            "pinyin": "xìn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "xun",
+        "tones": [
+          {
+            "pinyin": "xūn",
+            "character": ""
+          },
+          {
+            "pinyin": "xún",
+            "character": ""
+          },
+          {
+            "pinyin": "xǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "xùn",
+            "character": ""
+          }
+        ]
+      },
+      "ün": {
+        "base": "xun",
+        "tones": [
+          {
+            "pinyin": "xǖn",
+            "character": ""
+          },
+          {
+            "pinyin": "xǘn",
+            "character": ""
+          },
+          {
+            "pinyin": "xǚn",
+            "character": ""
+          },
+          {
+            "pinyin": "xǜn",
+            "character": ""
+          }
+        ]
+      },
+      "ing": {
+        "base": "xing",
+        "tones": [
+          {
+            "pinyin": "xīng",
+            "character": ""
+          },
+          {
+            "pinyin": "xíng",
+            "character": ""
+          },
+          {
+            "pinyin": "xǐng",
+            "character": ""
+          },
+          {
+            "pinyin": "xìng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "zh": {
+      "a": {
+        "base": "zha",
+        "tones": [
+          {
+            "pinyin": "zhā",
+            "character": ""
+          },
+          {
+            "pinyin": "zhá",
+            "character": ""
+          },
+          {
+            "pinyin": "zhǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "zhà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "zhe",
+        "tones": [
+          {
+            "pinyin": "zhē",
+            "character": ""
+          },
+          {
+            "pinyin": "zhé",
+            "character": ""
+          },
+          {
+            "pinyin": "zhě",
+            "character": ""
+          },
+          {
+            "pinyin": "zhè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "zhi",
+        "tones": [
+          {
+            "pinyin": "zhī",
+            "character": ""
+          },
+          {
+            "pinyin": "zhí",
+            "character": ""
+          },
+          {
+            "pinyin": "zhǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "zhì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "zhu",
+        "tones": [
+          {
+            "pinyin": "zhū",
+            "character": ""
+          },
+          {
+            "pinyin": "zhú",
+            "character": ""
+          },
+          {
+            "pinyin": "zhǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "zhù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "zhai",
+        "tones": [
+          {
+            "pinyin": "zhāi",
+            "character": ""
+          },
+          {
+            "pinyin": "zhái",
+            "character": ""
+          },
+          {
+            "pinyin": "zhǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "zhài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "zhei",
+        "tones": [
+          {
+            "pinyin": "zhēi",
+            "character": ""
+          },
+          {
+            "pinyin": "zhéi",
+            "character": ""
+          },
+          {
+            "pinyin": "zhěi",
+            "character": ""
+          },
+          {
+            "pinyin": "zhèi",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "zhui",
+        "tones": [
+          {
+            "pinyin": "zhuī",
+            "character": ""
+          },
+          {
+            "pinyin": "zhuí",
+            "character": ""
+          },
+          {
+            "pinyin": "zhuǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "zhuì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "zhao",
+        "tones": [
+          {
+            "pinyin": "zhāo",
+            "character": ""
+          },
+          {
+            "pinyin": "zháo",
+            "character": ""
+          },
+          {
+            "pinyin": "zhǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "zhào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "zhou",
+        "tones": [
+          {
+            "pinyin": "zhōu",
+            "character": ""
+          },
+          {
+            "pinyin": "zhóu",
+            "character": ""
+          },
+          {
+            "pinyin": "zhǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "zhòu",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "zhan",
+        "tones": [
+          {
+            "pinyin": "zhān",
+            "character": ""
+          },
+          {
+            "pinyin": "zhán",
+            "character": ""
+          },
+          {
+            "pinyin": "zhǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "zhàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "zhen",
+        "tones": [
+          {
+            "pinyin": "zhēn",
+            "character": ""
+          },
+          {
+            "pinyin": "zhén",
+            "character": ""
+          },
+          {
+            "pinyin": "zhěn",
+            "character": ""
+          },
+          {
+            "pinyin": "zhèn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "zhun",
+        "tones": [
+          {
+            "pinyin": "zhūn",
+            "character": ""
+          },
+          {
+            "pinyin": "zhún",
+            "character": ""
+          },
+          {
+            "pinyin": "zhǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "zhùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "zhang",
+        "tones": [
+          {
+            "pinyin": "zhāng",
+            "character": ""
+          },
+          {
+            "pinyin": "zháng",
+            "character": ""
+          },
+          {
+            "pinyin": "zhǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "zhàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "zheng",
+        "tones": [
+          {
+            "pinyin": "zhēng",
+            "character": ""
+          },
+          {
+            "pinyin": "zhéng",
+            "character": ""
+          },
+          {
+            "pinyin": "zhěng",
+            "character": ""
+          },
+          {
+            "pinyin": "zhèng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "zhong",
+        "tones": [
+          {
+            "pinyin": "zhōng",
+            "character": ""
+          },
+          {
+            "pinyin": "zhóng",
+            "character": ""
+          },
+          {
+            "pinyin": "zhǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "zhòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "ch": {
+      "a": {
+        "base": "cha",
+        "tones": [
+          {
+            "pinyin": "chā",
+            "character": ""
+          },
+          {
+            "pinyin": "chá",
+            "character": ""
+          },
+          {
+            "pinyin": "chǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "chà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "che",
+        "tones": [
+          {
+            "pinyin": "chē",
+            "character": ""
+          },
+          {
+            "pinyin": "ché",
+            "character": ""
+          },
+          {
+            "pinyin": "chě",
+            "character": ""
+          },
+          {
+            "pinyin": "chè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "chi",
+        "tones": [
+          {
+            "pinyin": "chī",
+            "character": ""
+          },
+          {
+            "pinyin": "chí",
+            "character": ""
+          },
+          {
+            "pinyin": "chǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "chì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "chu",
+        "tones": [
+          {
+            "pinyin": "chū",
+            "character": ""
+          },
+          {
+            "pinyin": "chú",
+            "character": ""
+          },
+          {
+            "pinyin": "chǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "chù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "chai",
+        "tones": [
+          {
+            "pinyin": "chāi",
+            "character": ""
+          },
+          {
+            "pinyin": "chái",
+            "character": ""
+          },
+          {
+            "pinyin": "chǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "chài",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "chui",
+        "tones": [
+          {
+            "pinyin": "chuī",
+            "character": ""
+          },
+          {
+            "pinyin": "chuí",
+            "character": ""
+          },
+          {
+            "pinyin": "chuǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "chuì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "chao",
+        "tones": [
+          {
+            "pinyin": "chāo",
+            "character": ""
+          },
+          {
+            "pinyin": "cháo",
+            "character": ""
+          },
+          {
+            "pinyin": "chǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "chào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "chou",
+        "tones": [
+          {
+            "pinyin": "chōu",
+            "character": ""
+          },
+          {
+            "pinyin": "chóu",
+            "character": ""
+          },
+          {
+            "pinyin": "chǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "chòu",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "chan",
+        "tones": [
+          {
+            "pinyin": "chān",
+            "character": ""
+          },
+          {
+            "pinyin": "chán",
+            "character": ""
+          },
+          {
+            "pinyin": "chǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "chàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "chen",
+        "tones": [
+          {
+            "pinyin": "chēn",
+            "character": ""
+          },
+          {
+            "pinyin": "chén",
+            "character": ""
+          },
+          {
+            "pinyin": "chěn",
+            "character": ""
+          },
+          {
+            "pinyin": "chèn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "chun",
+        "tones": [
+          {
+            "pinyin": "chūn",
+            "character": ""
+          },
+          {
+            "pinyin": "chún",
+            "character": ""
+          },
+          {
+            "pinyin": "chǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "chùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "chang",
+        "tones": [
+          {
+            "pinyin": "chāng",
+            "character": ""
+          },
+          {
+            "pinyin": "cháng",
+            "character": ""
+          },
+          {
+            "pinyin": "chǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "chàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "cheng",
+        "tones": [
+          {
+            "pinyin": "chēng",
+            "character": ""
+          },
+          {
+            "pinyin": "chéng",
+            "character": ""
+          },
+          {
+            "pinyin": "chěng",
+            "character": ""
+          },
+          {
+            "pinyin": "chèng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "chong",
+        "tones": [
+          {
+            "pinyin": "chōng",
+            "character": ""
+          },
+          {
+            "pinyin": "chóng",
+            "character": ""
+          },
+          {
+            "pinyin": "chǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "chòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "sh": {
+      "a": {
+        "base": "sha",
+        "tones": [
+          {
+            "pinyin": "shā",
+            "character": ""
+          },
+          {
+            "pinyin": "shá",
+            "character": ""
+          },
+          {
+            "pinyin": "shǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "shà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "she",
+        "tones": [
+          {
+            "pinyin": "shē",
+            "character": ""
+          },
+          {
+            "pinyin": "shé",
+            "character": ""
+          },
+          {
+            "pinyin": "shě",
+            "character": ""
+          },
+          {
+            "pinyin": "shè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "shi",
+        "tones": [
+          {
+            "pinyin": "shī",
+            "character": ""
+          },
+          {
+            "pinyin": "shí",
+            "character": ""
+          },
+          {
+            "pinyin": "shǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "shì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "shu",
+        "tones": [
+          {
+            "pinyin": "shū",
+            "character": ""
+          },
+          {
+            "pinyin": "shú",
+            "character": ""
+          },
+          {
+            "pinyin": "shǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "shù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "shai",
+        "tones": [
+          {
+            "pinyin": "shāi",
+            "character": ""
+          },
+          {
+            "pinyin": "shái",
+            "character": ""
+          },
+          {
+            "pinyin": "shǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "shài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "shei",
+        "tones": [
+          {
+            "pinyin": "shēi",
+            "character": ""
+          },
+          {
+            "pinyin": "shéi",
+            "character": ""
+          },
+          {
+            "pinyin": "shěi",
+            "character": ""
+          },
+          {
+            "pinyin": "shèi",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "shui",
+        "tones": [
+          {
+            "pinyin": "shuī",
+            "character": ""
+          },
+          {
+            "pinyin": "shuí",
+            "character": ""
+          },
+          {
+            "pinyin": "shuǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "shuì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "shao",
+        "tones": [
+          {
+            "pinyin": "shāo",
+            "character": ""
+          },
+          {
+            "pinyin": "sháo",
+            "character": ""
+          },
+          {
+            "pinyin": "shǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "shào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "shou",
+        "tones": [
+          {
+            "pinyin": "shōu",
+            "character": ""
+          },
+          {
+            "pinyin": "shóu",
+            "character": ""
+          },
+          {
+            "pinyin": "shǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "shòu",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "shan",
+        "tones": [
+          {
+            "pinyin": "shān",
+            "character": ""
+          },
+          {
+            "pinyin": "shán",
+            "character": ""
+          },
+          {
+            "pinyin": "shǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "shàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "shen",
+        "tones": [
+          {
+            "pinyin": "shēn",
+            "character": ""
+          },
+          {
+            "pinyin": "shén",
+            "character": ""
+          },
+          {
+            "pinyin": "shěn",
+            "character": ""
+          },
+          {
+            "pinyin": "shèn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "shun",
+        "tones": [
+          {
+            "pinyin": "shūn",
+            "character": ""
+          },
+          {
+            "pinyin": "shún",
+            "character": ""
+          },
+          {
+            "pinyin": "shǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "shùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "shang",
+        "tones": [
+          {
+            "pinyin": "shāng",
+            "character": ""
+          },
+          {
+            "pinyin": "sháng",
+            "character": ""
+          },
+          {
+            "pinyin": "shǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "shàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "sheng",
+        "tones": [
+          {
+            "pinyin": "shēng",
+            "character": ""
+          },
+          {
+            "pinyin": "shéng",
+            "character": ""
+          },
+          {
+            "pinyin": "shěng",
+            "character": ""
+          },
+          {
+            "pinyin": "shèng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "r": {
+      "e": {
+        "base": "re",
+        "tones": [
+          {
+            "pinyin": "rē",
+            "character": ""
+          },
+          {
+            "pinyin": "ré",
+            "character": ""
+          },
+          {
+            "pinyin": "rě",
+            "character": ""
+          },
+          {
+            "pinyin": "rè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "ri",
+        "tones": [
+          {
+            "pinyin": "rī",
+            "character": ""
+          },
+          {
+            "pinyin": "rí",
+            "character": ""
+          },
+          {
+            "pinyin": "rǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "rì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "ru",
+        "tones": [
+          {
+            "pinyin": "rū",
+            "character": ""
+          },
+          {
+            "pinyin": "rú",
+            "character": ""
+          },
+          {
+            "pinyin": "rǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "rù",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "rui",
+        "tones": [
+          {
+            "pinyin": "ruī",
+            "character": ""
+          },
+          {
+            "pinyin": "ruí",
+            "character": ""
+          },
+          {
+            "pinyin": "ruǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "ruì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "rao",
+        "tones": [
+          {
+            "pinyin": "rāo",
+            "character": ""
+          },
+          {
+            "pinyin": "ráo",
+            "character": ""
+          },
+          {
+            "pinyin": "rǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "rào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "rou",
+        "tones": [
+          {
+            "pinyin": "rōu",
+            "character": ""
+          },
+          {
+            "pinyin": "róu",
+            "character": ""
+          },
+          {
+            "pinyin": "rǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "ròu",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "ran",
+        "tones": [
+          {
+            "pinyin": "rān",
+            "character": ""
+          },
+          {
+            "pinyin": "rán",
+            "character": ""
+          },
+          {
+            "pinyin": "rǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "ràn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "ren",
+        "tones": [
+          {
+            "pinyin": "rēn",
+            "character": ""
+          },
+          {
+            "pinyin": "rén",
+            "character": ""
+          },
+          {
+            "pinyin": "rěn",
+            "character": ""
+          },
+          {
+            "pinyin": "rèn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "run",
+        "tones": [
+          {
+            "pinyin": "rūn",
+            "character": ""
+          },
+          {
+            "pinyin": "rún",
+            "character": ""
+          },
+          {
+            "pinyin": "rǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "rùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "rang",
+        "tones": [
+          {
+            "pinyin": "rāng",
+            "character": ""
+          },
+          {
+            "pinyin": "ráng",
+            "character": ""
+          },
+          {
+            "pinyin": "rǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "ràng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "reng",
+        "tones": [
+          {
+            "pinyin": "rēng",
+            "character": ""
+          },
+          {
+            "pinyin": "réng",
+            "character": ""
+          },
+          {
+            "pinyin": "rěng",
+            "character": ""
+          },
+          {
+            "pinyin": "rèng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "rong",
+        "tones": [
+          {
+            "pinyin": "rōng",
+            "character": ""
+          },
+          {
+            "pinyin": "róng",
+            "character": ""
+          },
+          {
+            "pinyin": "rǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "ròng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "z": {
+      "a": {
+        "base": "za",
+        "tones": [
+          {
+            "pinyin": "zā",
+            "character": ""
+          },
+          {
+            "pinyin": "zá",
+            "character": ""
+          },
+          {
+            "pinyin": "zǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "zà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "ze",
+        "tones": [
+          {
+            "pinyin": "zē",
+            "character": ""
+          },
+          {
+            "pinyin": "zé",
+            "character": ""
+          },
+          {
+            "pinyin": "zě",
+            "character": ""
+          },
+          {
+            "pinyin": "zè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "zi",
+        "tones": [
+          {
+            "pinyin": "zī",
+            "character": ""
+          },
+          {
+            "pinyin": "zí",
+            "character": ""
+          },
+          {
+            "pinyin": "zǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "zì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "zu",
+        "tones": [
+          {
+            "pinyin": "zū",
+            "character": ""
+          },
+          {
+            "pinyin": "zú",
+            "character": ""
+          },
+          {
+            "pinyin": "zǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "zù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "zai",
+        "tones": [
+          {
+            "pinyin": "zāi",
+            "character": ""
+          },
+          {
+            "pinyin": "zái",
+            "character": ""
+          },
+          {
+            "pinyin": "zǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "zài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "zei",
+        "tones": [
+          {
+            "pinyin": "zēi",
+            "character": ""
+          },
+          {
+            "pinyin": "zéi",
+            "character": ""
+          },
+          {
+            "pinyin": "zěi",
+            "character": ""
+          },
+          {
+            "pinyin": "zèi",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "zui",
+        "tones": [
+          {
+            "pinyin": "zuī",
+            "character": ""
+          },
+          {
+            "pinyin": "zuí",
+            "character": ""
+          },
+          {
+            "pinyin": "zuǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "zuì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "zao",
+        "tones": [
+          {
+            "pinyin": "zāo",
+            "character": ""
+          },
+          {
+            "pinyin": "záo",
+            "character": ""
+          },
+          {
+            "pinyin": "zǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "zào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "zou",
+        "tones": [
+          {
+            "pinyin": "zōu",
+            "character": ""
+          },
+          {
+            "pinyin": "zóu",
+            "character": ""
+          },
+          {
+            "pinyin": "zǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "zòu",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "zan",
+        "tones": [
+          {
+            "pinyin": "zān",
+            "character": ""
+          },
+          {
+            "pinyin": "zán",
+            "character": ""
+          },
+          {
+            "pinyin": "zǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "zàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "zen",
+        "tones": [
+          {
+            "pinyin": "zēn",
+            "character": ""
+          },
+          {
+            "pinyin": "zén",
+            "character": ""
+          },
+          {
+            "pinyin": "zěn",
+            "character": ""
+          },
+          {
+            "pinyin": "zèn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "zun",
+        "tones": [
+          {
+            "pinyin": "zūn",
+            "character": ""
+          },
+          {
+            "pinyin": "zún",
+            "character": ""
+          },
+          {
+            "pinyin": "zǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "zùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "zang",
+        "tones": [
+          {
+            "pinyin": "zāng",
+            "character": ""
+          },
+          {
+            "pinyin": "záng",
+            "character": ""
+          },
+          {
+            "pinyin": "zǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "zàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "zeng",
+        "tones": [
+          {
+            "pinyin": "zēng",
+            "character": ""
+          },
+          {
+            "pinyin": "zéng",
+            "character": ""
+          },
+          {
+            "pinyin": "zěng",
+            "character": ""
+          },
+          {
+            "pinyin": "zèng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "zong",
+        "tones": [
+          {
+            "pinyin": "zōng",
+            "character": ""
+          },
+          {
+            "pinyin": "zóng",
+            "character": ""
+          },
+          {
+            "pinyin": "zǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "zòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "c": {
+      "a": {
+        "base": "ca",
+        "tones": [
+          {
+            "pinyin": "cā",
+            "character": ""
+          },
+          {
+            "pinyin": "cá",
+            "character": ""
+          },
+          {
+            "pinyin": "cǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "cà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "ce",
+        "tones": [
+          {
+            "pinyin": "cē",
+            "character": ""
+          },
+          {
+            "pinyin": "cé",
+            "character": ""
+          },
+          {
+            "pinyin": "cě",
+            "character": ""
+          },
+          {
+            "pinyin": "cè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "ci",
+        "tones": [
+          {
+            "pinyin": "cī",
+            "character": ""
+          },
+          {
+            "pinyin": "cí",
+            "character": ""
+          },
+          {
+            "pinyin": "cǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "cì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "cu",
+        "tones": [
+          {
+            "pinyin": "cū",
+            "character": ""
+          },
+          {
+            "pinyin": "cú",
+            "character": ""
+          },
+          {
+            "pinyin": "cǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "cù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "cai",
+        "tones": [
+          {
+            "pinyin": "cāi",
+            "character": ""
+          },
+          {
+            "pinyin": "cái",
+            "character": ""
+          },
+          {
+            "pinyin": "cǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "cài",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "cui",
+        "tones": [
+          {
+            "pinyin": "cuī",
+            "character": ""
+          },
+          {
+            "pinyin": "cuí",
+            "character": ""
+          },
+          {
+            "pinyin": "cuǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "cuì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "cao",
+        "tones": [
+          {
+            "pinyin": "cāo",
+            "character": ""
+          },
+          {
+            "pinyin": "cáo",
+            "character": ""
+          },
+          {
+            "pinyin": "cǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "cào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "cou",
+        "tones": [
+          {
+            "pinyin": "cōu",
+            "character": ""
+          },
+          {
+            "pinyin": "cóu",
+            "character": ""
+          },
+          {
+            "pinyin": "cǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "còu",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "can",
+        "tones": [
+          {
+            "pinyin": "cān",
+            "character": ""
+          },
+          {
+            "pinyin": "cán",
+            "character": ""
+          },
+          {
+            "pinyin": "cǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "càn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "cen",
+        "tones": [
+          {
+            "pinyin": "cēn",
+            "character": ""
+          },
+          {
+            "pinyin": "cén",
+            "character": ""
+          },
+          {
+            "pinyin": "cěn",
+            "character": ""
+          },
+          {
+            "pinyin": "cèn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "cun",
+        "tones": [
+          {
+            "pinyin": "cūn",
+            "character": ""
+          },
+          {
+            "pinyin": "cún",
+            "character": ""
+          },
+          {
+            "pinyin": "cǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "cùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "cang",
+        "tones": [
+          {
+            "pinyin": "cāng",
+            "character": ""
+          },
+          {
+            "pinyin": "cáng",
+            "character": ""
+          },
+          {
+            "pinyin": "cǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "càng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "ceng",
+        "tones": [
+          {
+            "pinyin": "cēng",
+            "character": ""
+          },
+          {
+            "pinyin": "céng",
+            "character": ""
+          },
+          {
+            "pinyin": "cěng",
+            "character": ""
+          },
+          {
+            "pinyin": "cèng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "cong",
+        "tones": [
+          {
+            "pinyin": "cōng",
+            "character": ""
+          },
+          {
+            "pinyin": "cóng",
+            "character": ""
+          },
+          {
+            "pinyin": "cǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "còng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "s": {
+      "a": {
+        "base": "sa",
+        "tones": [
+          {
+            "pinyin": "sā",
+            "character": ""
+          },
+          {
+            "pinyin": "sá",
+            "character": ""
+          },
+          {
+            "pinyin": "sǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "sà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "se",
+        "tones": [
+          {
+            "pinyin": "sē",
+            "character": ""
+          },
+          {
+            "pinyin": "sé",
+            "character": ""
+          },
+          {
+            "pinyin": "sě",
+            "character": ""
+          },
+          {
+            "pinyin": "sè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "si",
+        "tones": [
+          {
+            "pinyin": "sī",
+            "character": ""
+          },
+          {
+            "pinyin": "sí",
+            "character": ""
+          },
+          {
+            "pinyin": "sǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "sì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "su",
+        "tones": [
+          {
+            "pinyin": "sū",
+            "character": ""
+          },
+          {
+            "pinyin": "sú",
+            "character": ""
+          },
+          {
+            "pinyin": "sǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "sù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "sai",
+        "tones": [
+          {
+            "pinyin": "sāi",
+            "character": ""
+          },
+          {
+            "pinyin": "sái",
+            "character": ""
+          },
+          {
+            "pinyin": "sǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "sài",
+            "character": ""
+          }
+        ]
+      },
+      "ui": {
+        "base": "sui",
+        "tones": [
+          {
+            "pinyin": "suī",
+            "character": ""
+          },
+          {
+            "pinyin": "suí",
+            "character": ""
+          },
+          {
+            "pinyin": "suǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "suì",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "sao",
+        "tones": [
+          {
+            "pinyin": "sāo",
+            "character": ""
+          },
+          {
+            "pinyin": "sáo",
+            "character": ""
+          },
+          {
+            "pinyin": "sǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "sào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "sou",
+        "tones": [
+          {
+            "pinyin": "sōu",
+            "character": ""
+          },
+          {
+            "pinyin": "sóu",
+            "character": ""
+          },
+          {
+            "pinyin": "sǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "sòu",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "san",
+        "tones": [
+          {
+            "pinyin": "sān",
+            "character": ""
+          },
+          {
+            "pinyin": "sán",
+            "character": ""
+          },
+          {
+            "pinyin": "sǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "sàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "sen",
+        "tones": [
+          {
+            "pinyin": "sēn",
+            "character": ""
+          },
+          {
+            "pinyin": "sén",
+            "character": ""
+          },
+          {
+            "pinyin": "sěn",
+            "character": ""
+          },
+          {
+            "pinyin": "sèn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "sun",
+        "tones": [
+          {
+            "pinyin": "sūn",
+            "character": ""
+          },
+          {
+            "pinyin": "sún",
+            "character": ""
+          },
+          {
+            "pinyin": "sǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "sùn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "sang",
+        "tones": [
+          {
+            "pinyin": "sāng",
+            "character": ""
+          },
+          {
+            "pinyin": "sáng",
+            "character": ""
+          },
+          {
+            "pinyin": "sǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "sàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "seng",
+        "tones": [
+          {
+            "pinyin": "sēng",
+            "character": ""
+          },
+          {
+            "pinyin": "séng",
+            "character": ""
+          },
+          {
+            "pinyin": "sěng",
+            "character": ""
+          },
+          {
+            "pinyin": "sèng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "song",
+        "tones": [
+          {
+            "pinyin": "sōng",
+            "character": ""
+          },
+          {
+            "pinyin": "sóng",
+            "character": ""
+          },
+          {
+            "pinyin": "sǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "sòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "y": {
+      "a": {
+        "base": "ya",
+        "tones": [
+          {
+            "pinyin": "yā",
+            "character": ""
+          },
+          {
+            "pinyin": "yá",
+            "character": ""
+          },
+          {
+            "pinyin": "yǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "yà",
+            "character": ""
+          }
+        ]
+      },
+      "e": {
+        "base": "ye",
+        "tones": [
+          {
+            "pinyin": "yē",
+            "character": ""
+          },
+          {
+            "pinyin": "yé",
+            "character": ""
+          },
+          {
+            "pinyin": "yě",
+            "character": ""
+          },
+          {
+            "pinyin": "yè",
+            "character": ""
+          }
+        ]
+      },
+      "i": {
+        "base": "yi",
+        "tones": [
+          {
+            "pinyin": "yī",
+            "character": ""
+          },
+          {
+            "pinyin": "yí",
+            "character": ""
+          },
+          {
+            "pinyin": "yǐ",
+            "character": ""
+          },
+          {
+            "pinyin": "yì",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "yu",
+        "tones": [
+          {
+            "pinyin": "yū",
+            "character": ""
+          },
+          {
+            "pinyin": "yú",
+            "character": ""
+          },
+          {
+            "pinyin": "yǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "yù",
+            "character": ""
+          }
+        ]
+      },
+      "ü": {
+        "base": "yu",
+        "tones": [
+          {
+            "pinyin": "yǖ",
+            "character": ""
+          },
+          {
+            "pinyin": "yǘ",
+            "character": ""
+          },
+          {
+            "pinyin": "yǚ",
+            "character": ""
+          },
+          {
+            "pinyin": "yǜ",
+            "character": ""
+          }
+        ]
+      },
+      "ao": {
+        "base": "yao",
+        "tones": [
+          {
+            "pinyin": "yāo",
+            "character": ""
+          },
+          {
+            "pinyin": "yáo",
+            "character": ""
+          },
+          {
+            "pinyin": "yǎo",
+            "character": ""
+          },
+          {
+            "pinyin": "yào",
+            "character": ""
+          }
+        ]
+      },
+      "ou": {
+        "base": "you",
+        "tones": [
+          {
+            "pinyin": "yōu",
+            "character": ""
+          },
+          {
+            "pinyin": "yóu",
+            "character": ""
+          },
+          {
+            "pinyin": "yǒu",
+            "character": ""
+          },
+          {
+            "pinyin": "yòu",
+            "character": ""
+          }
+        ]
+      },
+      "üe": {
+        "base": "yue",
+        "tones": [
+          {
+            "pinyin": "yüē",
+            "character": ""
+          },
+          {
+            "pinyin": "yüé",
+            "character": ""
+          },
+          {
+            "pinyin": "yüě",
+            "character": ""
+          },
+          {
+            "pinyin": "yüè",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "yan",
+        "tones": [
+          {
+            "pinyin": "yān",
+            "character": ""
+          },
+          {
+            "pinyin": "yán",
+            "character": ""
+          },
+          {
+            "pinyin": "yǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "yàn",
+            "character": ""
+          }
+        ]
+      },
+      "in": {
+        "base": "yin",
+        "tones": [
+          {
+            "pinyin": "yīn",
+            "character": ""
+          },
+          {
+            "pinyin": "yín",
+            "character": ""
+          },
+          {
+            "pinyin": "yǐn",
+            "character": ""
+          },
+          {
+            "pinyin": "yìn",
+            "character": ""
+          }
+        ]
+      },
+      "un": {
+        "base": "yun",
+        "tones": [
+          {
+            "pinyin": "yūn",
+            "character": ""
+          },
+          {
+            "pinyin": "yún",
+            "character": ""
+          },
+          {
+            "pinyin": "yǔn",
+            "character": ""
+          },
+          {
+            "pinyin": "yùn",
+            "character": ""
+          }
+        ]
+      },
+      "ün": {
+        "base": "yun",
+        "tones": [
+          {
+            "pinyin": "yǖn",
+            "character": ""
+          },
+          {
+            "pinyin": "yǘn",
+            "character": ""
+          },
+          {
+            "pinyin": "yǚn",
+            "character": ""
+          },
+          {
+            "pinyin": "yǜn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "yang",
+        "tones": [
+          {
+            "pinyin": "yāng",
+            "character": ""
+          },
+          {
+            "pinyin": "yáng",
+            "character": ""
+          },
+          {
+            "pinyin": "yǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "yàng",
+            "character": ""
+          }
+        ]
+      },
+      "ing": {
+        "base": "ying",
+        "tones": [
+          {
+            "pinyin": "yīng",
+            "character": ""
+          },
+          {
+            "pinyin": "yíng",
+            "character": ""
+          },
+          {
+            "pinyin": "yǐng",
+            "character": ""
+          },
+          {
+            "pinyin": "yìng",
+            "character": ""
+          }
+        ]
+      },
+      "ong": {
+        "base": "yong",
+        "tones": [
+          {
+            "pinyin": "yōng",
+            "character": ""
+          },
+          {
+            "pinyin": "yóng",
+            "character": ""
+          },
+          {
+            "pinyin": "yǒng",
+            "character": ""
+          },
+          {
+            "pinyin": "yòng",
+            "character": ""
+          }
+        ]
+      }
+    },
+    "w": {
+      "a": {
+        "base": "wa",
+        "tones": [
+          {
+            "pinyin": "wā",
+            "character": ""
+          },
+          {
+            "pinyin": "wá",
+            "character": ""
+          },
+          {
+            "pinyin": "wǎ",
+            "character": ""
+          },
+          {
+            "pinyin": "wà",
+            "character": ""
+          }
+        ]
+      },
+      "o": {
+        "base": "wo",
+        "tones": [
+          {
+            "pinyin": "wō",
+            "character": ""
+          },
+          {
+            "pinyin": "wó",
+            "character": ""
+          },
+          {
+            "pinyin": "wǒ",
+            "character": ""
+          },
+          {
+            "pinyin": "wò",
+            "character": ""
+          }
+        ]
+      },
+      "u": {
+        "base": "wu",
+        "tones": [
+          {
+            "pinyin": "wū",
+            "character": ""
+          },
+          {
+            "pinyin": "wú",
+            "character": ""
+          },
+          {
+            "pinyin": "wǔ",
+            "character": ""
+          },
+          {
+            "pinyin": "wù",
+            "character": ""
+          }
+        ]
+      },
+      "ai": {
+        "base": "wai",
+        "tones": [
+          {
+            "pinyin": "wāi",
+            "character": ""
+          },
+          {
+            "pinyin": "wái",
+            "character": ""
+          },
+          {
+            "pinyin": "wǎi",
+            "character": ""
+          },
+          {
+            "pinyin": "wài",
+            "character": ""
+          }
+        ]
+      },
+      "ei": {
+        "base": "wei",
+        "tones": [
+          {
+            "pinyin": "wēi",
+            "character": ""
+          },
+          {
+            "pinyin": "wéi",
+            "character": ""
+          },
+          {
+            "pinyin": "wěi",
+            "character": ""
+          },
+          {
+            "pinyin": "wèi",
+            "character": ""
+          }
+        ]
+      },
+      "an": {
+        "base": "wan",
+        "tones": [
+          {
+            "pinyin": "wān",
+            "character": ""
+          },
+          {
+            "pinyin": "wán",
+            "character": ""
+          },
+          {
+            "pinyin": "wǎn",
+            "character": ""
+          },
+          {
+            "pinyin": "wàn",
+            "character": ""
+          }
+        ]
+      },
+      "en": {
+        "base": "wen",
+        "tones": [
+          {
+            "pinyin": "wēn",
+            "character": ""
+          },
+          {
+            "pinyin": "wén",
+            "character": ""
+          },
+          {
+            "pinyin": "wěn",
+            "character": ""
+          },
+          {
+            "pinyin": "wèn",
+            "character": ""
+          }
+        ]
+      },
+      "ang": {
+        "base": "wang",
+        "tones": [
+          {
+            "pinyin": "wāng",
+            "character": ""
+          },
+          {
+            "pinyin": "wáng",
+            "character": ""
+          },
+          {
+            "pinyin": "wǎng",
+            "character": ""
+          },
+          {
+            "pinyin": "wàng",
+            "character": ""
+          }
+        ]
+      },
+      "eng": {
+        "base": "weng",
+        "tones": [
+          {
+            "pinyin": "wēng",
+            "character": ""
+          },
+          {
+            "pinyin": "wéng",
+            "character": ""
+          },
+          {
+            "pinyin": "wěng",
+            "character": ""
+          },
+          {
+            "pinyin": "wèng",
+            "character": ""
+          }
+        ]
+      }
+    }
+  }
+}

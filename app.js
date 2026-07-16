@@ -1,54 +1,43 @@
 /**
- * HanPath - Core Application Engine
- * Manages state, diagnostic test, 1-hour study countdown,
- * Web Speech API text-to-speech, interactive exercises, and progress tracking.
+ * HanPath - Core Application Engine (4-Stage Layout)
  */
 
-// Application State
 const state = {
-  userLevel: null,          // 'hsk1', 'hsk2', 'hsk3'
-  completedLessons: [],     // Array of completed lesson IDs (e.g., ['hsk1_day1'])
+  userLevel: null,
+  completedLessons: [],
   streakCount: 0,
-  lastStudyDate: null,      // 'YYYY-MM-DD'
   score: 0,
   timeSpentMinutes: 0,
+  reminderTime: "09:00",
   
-  // Navigation / Routing
   currentView: "welcome-view",
   currentLesson: null,
   currentPane: "vocab-pane",
   
-  // Timer variables (60-minute lesson blocks = 3600 seconds)
   timerSeconds: 3600,
   timerInterval: null,
   timerPaused: false,
   
-  // Vocabulary State
   vocabIndex: 0,
-  cardFlipped: false,
   
-  // Grammar State
-  grammarPracticeAnswers: {}, // Maps index to user-selected word array
-  
-  // Dialogue State
-  pinyinVisible: true,
-  
-  // Lesson Quiz State
   quizIndex: 0,
   quizScore: 0,
   quizAnswers: [],
-  
-  // Diagnostic Pre-Test State
+
+  // Pre-test diagnostic state
   pretestIndex: 0,
   pretestScore: 0,
   pretestAnswers: [],
-  
-  // Daily reminder configurations
-  reminderTime: "09:00",
-  notificationGranted: false
+  recommendedLevel: "hsk1",
+
+  hasTakenPlacementTest: false,
+  lessonPretestIndex: 0,
+  lessonPretestScore: 0,
+  lessonPretestQuestions: [],
+  pretestLesson: null,
+  currentLessonId: null
 };
 
-// CSS Class mapping for timeline active/completed states
 const timelineStages = ["vocab-pane", "grammar-pane", "dialogue-pane", "quiz-pane"];
 
 // Speech Synthesis setup
@@ -56,8 +45,7 @@ let speechVoice = null;
 function loadSpeechVoices() {
   if (typeof speechSynthesis === 'undefined') return;
   const voices = speechSynthesis.getVoices();
-  // Try to find a Chinese voice (Mandarin)
-  speechVoice = voices.find(voice => voice.lang.includes('zh-CN') || voice.lang.includes('zh-')) || null;
+  speechVoice = voices.find(v => v.lang.includes('zh-CN') || v.lang.includes('zh-')) || null;
 }
 if (typeof speechSynthesis !== 'undefined') {
   if (speechSynthesis.onvoiceschanged !== undefined) {
@@ -66,52 +54,51 @@ if (typeof speechSynthesis !== 'undefined') {
   loadSpeechVoices();
 }
 
-/**
- * Text-to-Speech Helper
- * @param {string} text - Chinese text to speak
- */
 function speakText(text) {
   if (typeof speechSynthesis === 'undefined') return;
-  speechSynthesis.cancel(); // Stop any active speech
-  
+  speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'zh-CN';
-  utterance.rate = 0.85; // Slightly slower for language learners
-  
-  if (speechVoice) {
-    utterance.voice = speechVoice;
-  }
+  utterance.rate = 0.85;
+  if (speechVoice) utterance.voice = speechVoice;
   speechSynthesis.speak(utterance);
 }
 
-// Initialize Application
+// HanziWriter instance
+let writer = null;
+
 document.addEventListener("DOMContentLoaded", () => {
-  loadProgress();
-  setupEventListeners();
-  updateHeaderControls();
-  
-  // Switch to the appropriate starting view
-  if (state.userLevel) {
-    switchView("dashboard-view");
+  const token = localStorage.getItem("hanpath_token");
+  if (!token) {
+    switchView("auth-view");
   } else {
-    switchView("welcome-view");
+    loadProgress();
   }
+  setupEventListeners();
+  setInterval(checkDailyReminder, 30000);
 });
 
-// Load progress from LocalStorage and sync with server
 function loadProgress() {
-  const saved = localStorage.getItem("hanpath_student_data");
+  const saved = localStorage.getItem("hanpath_data_v2");
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
       applyProgressState(parsed);
+      if (state.userLevel) {
+        state.currentView = "dashboard-view";
+      }
     } catch (e) {
-      console.error("Error loading saved student progress from localStorage", e);
+      console.error(e);
     }
   }
   
+  const token = localStorage.getItem("hanpath_token");
+  if (!token) return;
+
   // Fetch from server to sync
-  fetch("/api/progress")
+  fetch("/api/progress", {
+    headers: { "Authorization": "Bearer " + token }
+  })
     .then(response => {
       if (response.ok) return response.json();
       throw new Error("Server response not ok");
@@ -119,32 +106,73 @@ function loadProgress() {
     .then(serverData => {
       if (serverData && Object.keys(serverData).length > 0) {
         applyProgressState(serverData);
-        // Save back to localStorage to keep in sync
-        localStorage.setItem("hanpath_student_data", JSON.stringify(serverData));
-        updateHeaderControls();
-        if (state.currentView === "dashboard-view") {
-          renderDashboard();
+        localStorage.setItem("hanpath_data_v2", JSON.stringify(serverData));
+        if (state.userLevel) {
+          switchView("dashboard-view");
+        } else {
+          switchView("welcome-view");
         }
+      } else if (state.userLevel) {
+        switchView("dashboard-view");
+      } else {
+        switchView("welcome-view");
       }
     })
     .catch(err => {
       console.log("Could not sync with server, using local data:", err.message);
+      if (state.userLevel) {
+        switchView("dashboard-view");
+      } else {
+        switchView("welcome-view");
+      }
     });
+}
 
-  // Check notification permission status
-  if (typeof Notification !== 'undefined') {
-    state.notificationGranted = Notification.permission === "granted";
-  }
+function fetchCurriculumAndRender(level) {
+  fetch(`/api/lessons?level=${level}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!window.CHINESE_LESSONS) {
+        window.CHINESE_LESSONS = {
+          lessons: {},
+          preTestQuestions: [
+            { id: "q1", level: 1, question: "Identify the correct meaning of '医生 (yīshēng)':", options: ["Doctor", "Teacher", "Student", "Hospital"], answer: "Doctor", explanation: "'医生' (yīshēng) means doctor. Hospital is 医院 (yīyuàn)." },
+            { id: "q2", level: 1, question: "Which sentence is grammatically correct?", options: ["我明天去北京", "我去北京明天", "北京去我明天", "去北京我明天"], answer: "我明天去北京", explanation: "In Chinese, time words (like 明天) come before or immediately after the subject (我)." },
+            { id: "q3", level: 1, question: "How do you read this time: '8:00'?", options: ["八点 (bā diǎn)", "八天 (bā tiān)", "八号 (bā hào)", "八月 (bā yuè)"], answer: "八点 (bā diǎn)", explanation: "'点' (diǎn) is used for o'clock. '天' is day, '号' is date, '月' is month." },
+            { id: "q4", level: 2, question: "Fill in the blank: 你觉得这件衣服____？", options: ["怎么", "怎么样", "怎么了", "为什么"], answer: "怎么样", explanation: "'怎么样' (zěnmeyàng) means 'how is it?' and is used to ask for opinions." },
+            { id: "q5", level: 2, question: "What does '生病 (shēngbìng)' mean?", options: ["To be sick", "To be angry", "To be happy", "To sleep"], answer: "To be sick", explanation: "'生病' means to fall ill or get sick." },
+            { id: "q6", level: 2, question: "Fill in the blank: 我每天早上六点____起床。(I wake up as early as 6 AM every day.)", options: ["就", "才", "也", "都"], answer: "就", explanation: "'就' (jiù) implies that the action happens early or easily." },
+            { id: "q7", level: 3, question: "Fill in the blank: ____外面在下雨，但是我还是要去跑步。", options: ["虽然", "因为", "如果", "所以"], answer: "虽然", explanation: "虽然...但是... (suīrán... dànshì...) is a fixed structure meaning 'Although... but...'." },
+            { id: "q8", level: 3, question: "Choose the correct grammar usage for the '被' (bèi) passive structure:", options: ["我的咖啡被他喝了", "他被喝了我的咖啡", "咖啡把他喝了", "我的咖啡把他喝了"], answer: "我的咖啡被他喝了", explanation: "The structure is: [Receiver] + 被 + [Doer] + [Verb]. My coffee (receiver) was drunk by him (doer)." }
+          ]
+        };
+      }
+      window.CHINESE_LESSONS.lessons[level] = data;
+      renderDashboard();
+    })
+    .catch(err => console.error("Failed to fetch curriculum:", err));
 }
 
 function applyProgressState(data) {
   state.userLevel = data.userLevel || null;
   state.completedLessons = data.completedLessons || [];
   state.streakCount = data.streakCount || 0;
-  state.lastStudyDate = data.lastStudyDate || null;
   state.score = data.score || 0;
   state.timeSpentMinutes = data.timeSpentMinutes || 0;
   state.reminderTime = data.reminderTime || "09:00";
+  state.lastReminderDate = data.lastReminderDate || null;
+  state.lastStudiedDate = data.lastStudiedDate || null;
+  state.hasTakenPlacementTest = data.hasTakenPlacementTest || false;
+  
+  if (state.lastStudiedDate) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    if (state.lastStudiedDate !== todayStr && state.lastStudiedDate !== yesterdayStr) {
+      state.streakCount = 0;
+    }
+  }
   
   // Sync the reminder UI
   const timeInput = document.getElementById("reminder-time-input");
@@ -153,80 +181,99 @@ function applyProgressState(data) {
   }
 }
 
-// Save progress to LocalStorage and Server
 function saveProgress() {
   const dataToSave = {
     userLevel: state.userLevel,
     completedLessons: state.completedLessons,
     streakCount: state.streakCount,
-    lastStudyDate: state.lastStudyDate,
     score: state.score,
     timeSpentMinutes: state.timeSpentMinutes,
-    reminderTime: state.reminderTime
+    reminderTime: state.reminderTime,
+    lastReminderDate: state.lastReminderDate,
+    lastStudiedDate: state.lastStudiedDate,
+    hasTakenPlacementTest: state.hasTakenPlacementTest
   };
-  localStorage.setItem("hanpath_student_data", JSON.stringify(dataToSave));
-  updateHeaderControls();
+  localStorage.setItem("hanpath_data_v2", JSON.stringify(dataToSave));
   
+  const token = localStorage.getItem("hanpath_token");
+  if (!token) return;
+
   // Send to server
   fetch("/api/progress", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
     body: JSON.stringify(dataToSave)
   }).catch(err => {
     console.error("Failed to sync progress with server:", err);
   });
 }
 
-// Update Top Bar & Badges
-function updateHeaderControls() {
-  // Level badge
-  const levelBadge = document.getElementById("user-level-badge");
-  if (levelBadge) {
-    if (state.userLevel) {
-      levelBadge.style.display = "block";
-      levelBadge.textContent = state.userLevel.toUpperCase();
-      levelBadge.className = `tag tag-${state.userLevel}`;
-    } else {
-      levelBadge.style.display = "none";
-    }
-  }
-  
-  // Streak counter
-  const streakCountVal = document.getElementById("streak-count-val");
-  if (streakCountVal) {
-    streakCountVal.textContent = state.streakCount;
-  }
-  
-  // Score display
-  const scoreVal = document.getElementById("score-val");
-  if (scoreVal) {
-    scoreVal.textContent = state.score;
-  }
-}
-
-// Centralized View Router
 function switchView(viewId) {
+  document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
   state.currentView = viewId;
   
-  // Hide all sections
-  document.querySelectorAll(".view-section").forEach(sec => {
-    sec.classList.remove("active");
-  });
-  
-  // Show target section
-  const target = document.getElementById(viewId);
-  if (target) {
-    target.classList.add("active");
-  }
-  
-  // Trigger sub-renderers if needed
   if (viewId === "dashboard-view") {
-    renderDashboard();
+    if (state.userLevel) {
+      fetchCurriculumAndRender(state.userLevel);
+    } else {
+      renderDashboard();
+    }
   }
 }
 
-// Event Listeners Setup
 function setupEventListeners() {
+  // Auth Form Listeners
+  let isLogin = true;
+  const toggleLink = document.getElementById("auth-toggle-link");
+  if (toggleLink) {
+    toggleLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      isLogin = !isLogin;
+      document.getElementById("auth-title").textContent = isLogin ? "Login to HanPath" : "Create Account";
+      document.getElementById("auth-submit-btn").textContent = isLogin ? "Login" : "Sign Up";
+      document.getElementById("auth-toggle-text").textContent = isLogin ? "Don't have an account?" : "Already have an account?";
+      toggleLink.textContent = isLogin ? "Sign Up" : "Login";
+      document.getElementById("auth-name").style.display = isLogin ? "none" : "block";
+      document.getElementById("auth-error").style.display = "none";
+    });
+  }
+
+  const authForm = document.getElementById("auth-form");
+  if (authForm) {
+    authForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("auth-email").value;
+      const password = document.getElementById("auth-password").value;
+      const name = document.getElementById("auth-name").value;
+      const errorDiv = document.getElementById("auth-error");
+      
+      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, name })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          localStorage.setItem("hanpath_token", data.token);
+          loadProgress();
+        } else {
+          errorDiv.textContent = data.error || "An error occurred";
+          errorDiv.style.display = "block";
+        }
+      } catch (err) {
+        errorDiv.textContent = "Network error. Please try again.";
+        errorDiv.style.display = "block";
+      }
+    });
+  }
+
   // Pre-test triggers
   document.getElementById("start-pretest-btn").addEventListener("click", () => {
     switchView("pretest-view");
@@ -238,140 +285,705 @@ function setupEventListeners() {
     document.getElementById("pretest-quiz-screen").style.display = "block";
     loadPretestQuestion();
   });
+
+  document.getElementById("skip-pretest-btn").addEventListener("click", () => {
+    state.hasTakenPlacementTest = true;
+    state.userLevel = "hsk1"; // Default level
+    saveProgress();
+    switchView("dashboard-view");
+  });
   
   document.getElementById("pretest-next-btn").addEventListener("click", nextPretestQuestion);
   document.getElementById("claim-placement-btn").addEventListener("click", () => {
     switchView("dashboard-view");
   });
-  
-  // Manual level buttons
-  document.querySelectorAll(".manual-level-btn").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      const level = e.target.getAttribute("data-level");
-      state.userLevel = level;
+
+  // Banner pretest trigger
+  const bannerPretestBtn = document.getElementById("banner-pretest-btn");
+  if (bannerPretestBtn) {
+    bannerPretestBtn.addEventListener("click", () => {
+      switchView("pretest-view");
+      initPretest();
+    });
+  }
+
+  // Pinyin Chart triggers
+  const pinyinChartBtn = document.getElementById("pinyin-chart-btn");
+  if (pinyinChartBtn) {
+    pinyinChartBtn.addEventListener("click", () => {
+      switchView("pinyin-chart-view");
+      initPinyinChart();
+    });
+  }
+
+  const pinyinBackBtn = document.getElementById("pinyin-back-btn");
+  if (pinyinBackBtn) {
+    pinyinBackBtn.addEventListener("click", () => {
+      switchView("dashboard-view");
+    });
+  }
+
+  // Lesson pretest triggers
+  document.getElementById("begin-lesson-test-btn").addEventListener("click", () => {
+    document.getElementById("lesson-pretest-intro-screen").style.display = "none";
+    document.getElementById("lesson-pretest-quiz-screen").style.display = "block";
+    startLessonPretestQuiz();
+  });
+
+  document.getElementById("skip-lesson-test-entirely-btn").addEventListener("click", () => {
+    startLesson(state.currentLessonId);
+  });
+
+  document.getElementById("lesson-pretest-next-btn").addEventListener("click", nextLessonPretestQuestion);
+
+  document.getElementById("lesson-pretest-start-study-btn").addEventListener("click", () => {
+    startLesson(state.currentLessonId);
+  });
+
+  document.getElementById("lesson-pretest-skip-lesson-btn").addEventListener("click", () => {
+    if (!state.completedLessons.includes(state.currentLessonId)) {
+      state.completedLessons.push(state.currentLessonId);
+      state.score += 30; // Bonus points for skipping via pre-test mastery!
+      saveProgress();
+    }
+    switchView("dashboard-view");
+  });
+
+  document.getElementById("lesson-pretest-exit-btn").addEventListener("click", () => {
+    switchView("dashboard-view");
+  });
+
+  // Reminder configurator
+  document.getElementById("set-reminder-btn").addEventListener("click", setupDailyReminders);
+
+  // Welcome & Level Select
+  document.querySelectorAll('.manual-level-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      state.userLevel = e.target.getAttribute('data-level');
       saveProgress();
       switchView("dashboard-view");
     });
   });
   
-  // Reminder configurator
-  document.getElementById("set-reminder-btn").addEventListener("click", setupDailyReminders);
+  document.getElementById('change-level-select').addEventListener('change', (e) => {
+    state.userLevel = e.target.value;
+    saveProgress();
+    fetchCurriculumAndRender(state.userLevel);
+  });
   
-  // Settings level dropdown
-  const selectLevel = document.getElementById("change-level-select");
-  if (selectLevel) {
-    selectLevel.addEventListener("change", (e) => {
-      state.userLevel = e.target.value;
-      saveProgress();
-      renderDashboard();
-    });
-  }
-  
-  // Reset Progress trigger
-  document.getElementById("reset-progress-btn").addEventListener("click", () => {
-    if (confirm("Are you sure you want to reset all your progress, streak, and level placement? This cannot be undone.")) {
-      localStorage.removeItem("hanpath_student_data");
+  document.getElementById('reset-progress-btn').addEventListener('click', () => {
+    if (confirm("Reset all progress?")) {
       state.userLevel = null;
       state.completedLessons = [];
-      state.streakCount = 0;
-      state.lastStudyDate = null;
       state.score = 0;
       state.timeSpentMinutes = 0;
       saveProgress();
-      location.reload();
+      switchView("welcome-view");
+    }
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', () => {
+    if (confirm("Are you sure you want to log out?")) {
+      localStorage.removeItem("hanpath_token");
+      localStorage.removeItem("hanpath_progress");
+      state = {
+        currentView: "welcome-view",
+        userLevel: null,
+        completedLessons: [],
+        score: 0,
+        timeSpentMinutes: 0,
+        streakDays: 0,
+        lastStudyDate: null,
+        hasTakenPlacementTest: false
+      };
+      switchView("welcome-view");
+    }
+  });
+
+  // Lesson Nav
+  document.getElementById('lesson-exit-btn').addEventListener('click', () => {
+    if (confirm("Exit lesson? Progress will be lost.")) {
+      clearInterval(state.timerInterval);
+      switchView("dashboard-view");
+    }
+  });
+
+  document.getElementById('timer-pause-btn').addEventListener('click', () => {
+    state.timerPaused = !state.timerPaused;
+    document.getElementById('timer-pause-icon').textContent = state.timerPaused ? '▶️' : '⏸️';
+  });
+  
+  document.getElementById('pane-next-btn').addEventListener('click', () => {
+    const idx = timelineStages.indexOf(state.currentPane);
+    if (idx < timelineStages.length - 1) {
+      switchPane(timelineStages[idx + 1]);
+    }
+  });
+  document.getElementById('pane-back-btn').addEventListener('click', () => {
+    const idx = timelineStages.indexOf(state.currentPane);
+    if (idx > 0) {
+      switchPane(timelineStages[idx - 1]);
+    }
+  });
+
+  document.querySelectorAll('.timeline-step').forEach(step => {
+    step.addEventListener('click', (e) => {
+      const pane = e.target.getAttribute('data-pane');
+      if (pane) switchPane(pane);
+    });
+  });
+
+  // Vocab Flashcards & Audio
+  document.getElementById('vocab-flashcard').addEventListener('click', () => {
+    document.getElementById('vocab-flashcard').classList.toggle('flipped');
+  });
+  document.getElementById('vocab-speak-btn').addEventListener('click', () => {
+    const v = state.currentLesson.vocab[state.vocabIndex];
+    if (v) speakText(v.character);
+  });
+  document.getElementById('vocab-ex-speak-btn').addEventListener('click', () => {
+    const v = state.currentLesson.vocab[state.vocabIndex];
+    if (v) speakText(v.exampleCn);
+  });
+  document.getElementById('vocab-next-btn').addEventListener('click', () => {
+    if (state.vocabIndex < state.currentLesson.vocab.length - 1) {
+      state.vocabIndex++;
+      renderVocabPane();
+    }
+  });
+  document.getElementById('vocab-prev-btn').addEventListener('click', () => {
+    if (state.vocabIndex > 0) {
+      state.vocabIndex--;
+      renderVocabPane();
     }
   });
   
-  // Timer buttons
-  document.getElementById("timer-pause-btn").addEventListener("click", toggleTimer);
+  // Writing Pad Controls
+  document.getElementById('btn-writing-play').addEventListener('click', () => {
+    if (writer) writer.animateCharacter();
+  });
+  document.getElementById('btn-writing-reset').addEventListener('click', () => {
+    if (writer) {
+      const char = state.currentLesson.vocab[state.vocabIndex].character;
+      writer.setCharacter(char.charAt(0)); 
+    }
+  });
+  document.getElementById('mode-animate-btn').addEventListener('click', (e) => {
+    document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    document.getElementById('free-write-canvas').style.display = 'none';
+    if(writer) { writer.cancelQuiz(); writer.animateCharacter(); }
+  });
+  document.getElementById('mode-trace-btn').addEventListener('click', (e) => {
+    document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    document.getElementById('free-write-canvas').style.display = 'none';
+    if(writer) writer.quiz({showHintAfterMisses: 1});
+  });
+  document.getElementById('mode-freewrite-btn').addEventListener('click', (e) => {
+    document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    document.getElementById('free-write-canvas').style.display = 'block';
+    if(writer) writer.cancelQuiz();
+    initFreeWriteCanvas();
+  });
   
-  // Lesson pane navigations (Back/Next/Timeline Steps)
-  document.getElementById("pane-back-btn").addEventListener("click", paneGoBack);
-  document.getElementById("pane-next-btn").addEventListener("click", paneGoNext);
+  let isDrawing = false;
+  let ctx = null;
+  function initFreeWriteCanvas() {
+    const canvas = document.getElementById('free-write-canvas');
+    if(!ctx) {
+      ctx = canvas.getContext('2d');
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#ff3366';
+      
+      canvas.addEventListener('mousedown', startDraw);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', endDraw);
+      canvas.addEventListener('mouseout', endDraw);
+      
+      canvas.addEventListener('touchstart', handleTouch, {passive: false});
+      canvas.addEventListener('touchmove', handleTouch, {passive: false});
+      canvas.addEventListener('touchend', endDraw);
+      
+      document.getElementById('btn-writing-clear').addEventListener('click', () => {
+         ctx.clearRect(0, 0, canvas.width, canvas.height);
+      });
+    }
+    document.getElementById('btn-writing-clear').style.display = 'inline-block';
+  }
   
-  document.querySelectorAll(".timeline-step").forEach((step, idx) => {
-    step.addEventListener("click", () => {
-      // Allow navigation to completed sections, or the current section
-      const targetPane = step.getAttribute("data-pane");
-      switchLessonPane(targetPane);
+  function handleTouch(e) {
+    if (e.touches && e.touches.length > 0) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      });
+      e.target.dispatchEvent(mouseEvent);
+    }
+  }
+  
+  function startDraw(e) { isDrawing = true; draw(e); }
+  function draw(e) {
+    if(!isDrawing || !ctx) return;
+    const rect = e.target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  }
+  function endDraw() { isDrawing = false; if(ctx) ctx.beginPath(); }
+  
+  // Dialogue Audio & Toggles
+  document.getElementById('dialogue-play-all-btn').addEventListener('click', () => {
+    let fullText = state.currentLesson.dialogue.lines.map(l => l.cn).join(" ");
+    speakText(fullText);
+  });
+  document.getElementById('pinyin-visibility-toggle').addEventListener('click', () => {
+    const pyElements = document.querySelectorAll('.dialogue-py-text');
+    pyElements.forEach(el => {
+      el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+    });
+  });
+
+  // Quiz Navigation
+  document.getElementById('lesson-quiz-next-btn').addEventListener('click', nextQuizQuestion);
+  document.getElementById('finish-to-dashboard-btn').addEventListener('click', () => {
+    switchView("dashboard-view");
+  });
+}
+
+function getLevelName(level) {
+  if (level === 'hsk1') return 'HSK 1 (Beginner)';
+  if (level === 'hsk2') return 'HSK 2 (Elementary)';
+  if (level === 'hsk3') return 'HSK 3 (Intermediate)';
+  return level ? level.toUpperCase() : '';
+}
+
+function renderDashboard() {
+  document.getElementById('dashboard-level-badge').textContent = getLevelName(state.userLevel);
+  document.getElementById('change-level-select').value = state.userLevel;
+  
+  document.getElementById('stat-lessons-completed').textContent = state.completedLessons.length;
+  // Let's also update the daily streak value here!
+  document.getElementById('stat-streak').textContent = state.streakCount;
+  document.getElementById('stat-time-spent').textContent = Math.round(state.timeSpentMinutes / 60) + "h";
+  document.getElementById('score-val').textContent = state.score;
+
+  // Toggle placement test warning banner
+  const warningBanner = document.getElementById('placement-warning-banner');
+  if (warningBanner) {
+    warningBanner.style.display = state.hasTakenPlacementTest ? 'none' : 'flex';
+  }
+  
+  const container = document.getElementById('dashboard-lessons-container');
+  container.innerHTML = '';
+  
+  const lessons = CHINESE_LESSONS.lessons[state.userLevel] || [];
+  
+  // Update Today's Recommended Lesson Panel
+  const activeLesson = lessons.find(l => !state.completedLessons.includes(l.id));
+  const todayPanel = document.getElementById('today-lesson-panel');
+  if (todayPanel) {
+    if (activeLesson) {
+      todayPanel.style.display = 'block';
+      document.getElementById('today-lesson-title').textContent = activeLesson.title;
+      
+      let desc = "Learn essential vocabulary, build core sentences, participate in interactive dialogue, and complete the review quiz.";
+      if (state.userLevel === 'hsk2') {
+        desc = "Expand your vocabulary, understand modals and helper verbs, practice everyday dialogues, and take your test.";
+      } else if (state.userLevel === 'hsk3') {
+        desc = "Deepen your knowledge with complex structures like 把, practice intermediate dialogues, and test your comprehension.";
+      }
+      document.getElementById('today-lesson-desc').textContent = desc;
+      
+      const todayTag = document.getElementById('today-lesson-tag');
+      todayTag.textContent = `TODAY'S LESSON • ${state.userLevel.toUpperCase()}`;
+      todayTag.className = `tag tag-${state.userLevel}`;
+      
+      const startBtn = document.getElementById('today-lesson-start-btn');
+      startBtn.textContent = "🚀 Start Today's 1-Hour Lesson";
+      startBtn.onclick = () => routeToLesson(activeLesson.id);
+    } else {
+      if (lessons.length > 0) {
+        todayPanel.style.display = 'block';
+        document.getElementById('today-lesson-title').textContent = "🎉 Level Complete!";
+        document.getElementById('today-lesson-desc').textContent = `Congratulations! You have completed all lessons for ${state.userLevel.toUpperCase()}. You are ready to move on to the next level or review your lessons below.`;
+        
+        const todayTag = document.getElementById('today-lesson-tag');
+        todayTag.textContent = "COMPLETE";
+        todayTag.className = "tag tag-hsk1";
+        todayTag.style.background = "var(--success)";
+        
+        const startBtn = document.getElementById('today-lesson-start-btn');
+        startBtn.textContent = "Explore Next Level";
+        startBtn.onclick = () => {
+          if (state.userLevel === 'hsk1') {
+            state.userLevel = 'hsk2';
+          } else if (state.userLevel === 'hsk2') {
+            state.userLevel = 'hsk3';
+          } else {
+            document.getElementById('today-lesson-desc').textContent = "Outstanding! You've mastered all available HSK 1-3 levels!";
+            document.getElementById('today-lesson-desc').style.color = "var(--success)";
+            startBtn.style.display = "none";
+            return;
+          }
+          saveProgress();
+          renderDashboard();
+        };
+      } else {
+        todayPanel.style.display = 'none';
+      }
+    }
+  }
+
+  lessons.forEach(l => {
+    const isCompleted = state.completedLessons.includes(l.id);
+    const div = document.createElement('div');
+    div.className = `lesson-row glass-panel ${isCompleted ? 'completed' : ''}`;
+    div.innerHTML = `
+      <div class="lesson-info">
+        <h4 style="margin-bottom: 0.25rem;">${l.title}</h4>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+          4 Stages • 60 Minutes
+        </div>
+      </div>
+      <div>
+        ${isCompleted ? 
+          `<span style="color: var(--success); font-weight: bold;">✔ Done</span>` : 
+          `<button class="btn btn-primary btn-sm start-lesson-btn" data-id="${l.id}">Start Lesson</button>`
+        }
+      </div>
+    `;
+    container.appendChild(div);
+  });
+  
+  document.querySelectorAll('.start-lesson-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.target.getAttribute('data-id');
+      routeToLesson(id);
+    });
+  });
+}
+
+function startLesson(id) {
+  fetch(`/api/lessons/${id}`)
+    .then(res => res.json())
+    .then(data => {
+      state.currentLesson = data;
+      
+      document.getElementById('lesson-level-badge').textContent = getLevelName(state.userLevel);
+      document.getElementById('lesson-title-display').textContent = state.currentLesson.title;
+      
+      state.timerSeconds = 3600;
+      state.timerPaused = false;
+      
+      const pauseIcon = document.getElementById('timer-pause-icon');
+      if (pauseIcon) pauseIcon.textContent = '⏸️';
+      
+      clearInterval(state.timerInterval);
+      state.timerInterval = setInterval(() => {
+        if (state.timerPaused) return;
+        state.timerSeconds--;
+        if(state.timerSeconds <= 0) {
+          clearInterval(state.timerInterval);
+          finishLesson();
+        }
+        const m = Math.floor(state.timerSeconds / 60);
+        const s = state.timerSeconds % 60;
+        document.getElementById('lesson-timer-display').textContent = `${m}:${s < 10 ? '0'+s : s}`;
+      }, 1000);
+      
+      state.vocabIndex = 0;
+      switchPane("vocab-pane");
+      switchView("lesson-view");
+    })
+    .catch(err => {
+      console.error("Failed to load full lesson data:", err);
+      alert("Error loading lesson from database.");
+    });
+}
+
+function switchPane(paneId) {
+  state.currentPane = paneId;
+  document.querySelectorAll('.lesson-pane-content').forEach(el => el.style.display = 'none');
+  document.getElementById(paneId).style.display = 'block';
+  
+  document.querySelectorAll('.timeline-step').forEach(el => el.classList.remove('active'));
+  const stepEl = document.querySelector(`.timeline-step[data-pane="${paneId}"]`);
+  if(stepEl) stepEl.classList.add('active');
+  
+  const idx = timelineStages.indexOf(paneId);
+  document.getElementById('pane-back-btn').style.visibility = idx === 0 ? 'hidden' : 'visible';
+  document.getElementById('pane-next-btn').style.display = idx === timelineStages.length - 1 ? 'none' : 'block';
+  
+  if (paneId === "vocab-pane") renderVocabPane();
+  if (paneId === "grammar-pane") renderGrammarPane();
+  if (paneId === "dialogue-pane") renderDialoguePane();
+  if (paneId === "quiz-pane") renderQuizPane();
+}
+
+function renderVocabPane() {
+  if (!state.currentLesson || !state.currentLesson.vocab) return;
+  const v = state.currentLesson.vocab[state.vocabIndex];
+  if (!v) return;
+  
+  document.getElementById('vocab-char').textContent = v.character;
+  document.getElementById('vocab-meaning').textContent = v.meaning;
+  document.getElementById('vocab-pinyin').textContent = v.pinyin;
+  
+  document.getElementById('vocab-detail-pinyin').textContent = v.pinyin;
+  document.getElementById('vocab-ex-cn').textContent = v.exampleCn;
+  document.getElementById('vocab-ex-py').textContent = v.examplePy;
+  document.getElementById('vocab-ex-en').textContent = v.exampleEn;
+  document.getElementById('vocab-deconstruct-text').textContent = v.deconstruct || "Basic radical combination.";
+  
+  document.getElementById('vocab-flashcard').classList.remove('flipped');
+  document.getElementById('vocab-index-indicator').textContent = `Word ${state.vocabIndex + 1} of ${state.currentLesson.vocab.length}`;
+  
+  // HanziWriter init
+  if (typeof HanziWriter !== "undefined") {
+    document.getElementById('hanzi-writer-target').innerHTML = '';
+    writer = HanziWriter.create('hanzi-writer-target', v.character.charAt(0), {
+      width: 200,
+      height: 200,
+      padding: 15,
+      strokeColor: '#ff3366',
+      radicalColor: '#00f5d4',
+      delayBetweenStrokes: 150
+    });
+  }
+}
+
+function renderGrammarPane() {
+  const container = document.getElementById('grammar-topics-container');
+  container.innerHTML = '';
+  
+  state.currentLesson.grammar.forEach((g, idx) => {
+    const div = document.createElement('div');
+    div.className = 'glass-panel';
+    div.style.padding = '1.5rem';
+    div.style.marginBottom = '1.5rem';
+    
+    let html = `<h4 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem;">${g.title}</h4>`;
+    html += `<p style="margin-bottom: 1rem;">${g.explanation}</p>`;
+    
+    g.examples.forEach(ex => {
+      html += `<div class="example-box" style="margin-bottom: 0.5rem;">
+        <div class="example-cn">${ex.cn}</div>
+        <div class="example-py">${ex.py}</div>
+        <div class="example-en">${ex.en}</div>
+      </div>`;
+    });
+    
+    if (g.practice && g.practice.prompt) {
+       const pId = `grammar-prac-${idx}`;
+       let wordsHtml = '';
+       if(g.practice.words && g.practice.words.length > 0) {
+         wordsHtml = `
+           <div class="grammar-practice-area" id="${pId}-area">
+             <div class="grammar-answer-box" id="${pId}-answer-box" style="min-height: 40px; padding: 0.5rem; margin: 0.5rem 0; border: 2px dashed var(--glass-border-focus); border-radius: 8px; display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+             <div class="grammar-word-bank" id="${pId}-word-bank" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+               ${g.practice.words.map((w, wIdx) => `<button class="btn btn-secondary btn-sm prac-word-btn" data-word="${w}">${w}</button>`).join('')}
+             </div>
+             <button class="btn btn-primary btn-sm check-prac-btn" data-pid="${pId}" data-answer='${JSON.stringify(g.practice.answer)}'>Check Answer</button>
+             <span class="prac-feedback" id="${pId}-feedback" style="margin-left: 1rem; font-weight: bold;"></span>
+           </div>
+         `;
+       }
+       
+       html += `
+         <div style="margin-top: 1rem; padding: 1rem; background: rgba(0,245,212,0.05); border: 1px solid rgba(0,245,212,0.2); border-radius: 8px;">
+           <strong style="color: var(--primary);">📝 ${g.practice.prompt}</strong>
+           ${wordsHtml}
+           <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Tap the words to build the correct sentence.</p>
+         </div>
+       `;
+    }
+    
+    div.innerHTML = html;
+    container.appendChild(div);
+  });
+  
+  // Attach event listeners for practice areas
+  document.querySelectorAll('.prac-word-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const b = e.target;
+      const bank = b.closest('.grammar-practice-area').querySelector('.grammar-word-bank');
+      const ansBox = b.closest('.grammar-practice-area').querySelector('.grammar-answer-box');
+      if (b.parentElement === bank) {
+        ansBox.appendChild(b);
+      } else {
+        bank.appendChild(b);
+      }
     });
   });
   
-  // Vocab interactive flashcard flips
-  const flashcard = document.getElementById("vocab-flashcard");
-  flashcard.addEventListener("click", () => {
-    flashcard.classList.toggle("flipped");
-    state.cardFlipped = flashcard.classList.contains("flipped");
-  });
-  
-  // Vocab audio buttons
-  document.getElementById("vocab-speak-btn").addEventListener("click", (e) => {
-    e.stopPropagation();
-    const word = window.CHINESE_LESSONS.lessons[state.userLevel][state.currentLessonIndex].vocab[state.vocabIndex];
-    speakText(word.character);
-  });
-  
-  document.getElementById("vocab-ex-speak-btn").addEventListener("click", (e) => {
-    e.stopPropagation();
-    const word = window.CHINESE_LESSONS.lessons[state.userLevel][state.currentLessonIndex].vocab[state.vocabIndex];
-    speakText(word.exampleCn);
-  });
-  
-  document.getElementById("vocab-prev-btn").addEventListener("click", vocabPrev);
-  document.getElementById("vocab-next-btn").addEventListener("click", vocabNext);
-  
-  // Dialogue play all
-  document.getElementById("dialogue-play-all-btn").addEventListener("click", playFullDialogue);
-  
-  // Dialogue Pinyin toggler
-  document.getElementById("pinyin-visibility-toggle").addEventListener("click", () => {
-    state.pinyinVisible = !state.pinyinVisible;
-    const container = document.getElementById("dialogue-bubbles-container");
-    if (state.pinyinVisible) {
-      container.classList.remove("pinyin-toggle-hide");
-    } else {
-      container.classList.add("pinyin-toggle-hide");
-    }
-  });
-  
-  // Lesson quiz button
-  document.getElementById("lesson-quiz-next-btn").addEventListener("click", nextLessonQuizQuestion);
-  
-  // Return from congrats to dashboard
-  document.getElementById("finish-to-dashboard-btn").addEventListener("click", () => {
-    switchView("dashboard-view");
-  });
-
-  // Writing mode switches
-  document.getElementById("mode-animate-btn").addEventListener("click", () => switchWritingMode("animate"));
-  document.getElementById("mode-trace-btn").addEventListener("click", () => switchWritingMode("trace"));
-  document.getElementById("mode-freewrite-btn").addEventListener("click", () => switchWritingMode("freewrite"));
-
-  // Writing controls
-  document.getElementById("btn-writing-play").addEventListener("click", () => {
-    if (writerInstance && currentWritingMode === "animate") {
-      writerInstance.animateCharacter();
-    }
-  });
-
-  document.getElementById("btn-writing-clear").addEventListener("click", () => {
-    if (currentWritingMode === "freewrite") {
-      clearFreeWriteCanvas();
-    }
-  });
-
-  document.getElementById("btn-writing-reset").addEventListener("click", () => {
-    if (writerInstance) {
-      if (currentWritingMode === "animate") {
-        writerInstance.animateCharacter();
-      } else if (currentWritingMode === "trace") {
-        writerInstance.quiz();
+  document.querySelectorAll('.check-prac-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const pId = e.target.getAttribute('data-pid');
+      const ansArr = JSON.parse(e.target.getAttribute('data-answer'));
+      const ansBox = document.getElementById(`${pId}-answer-box`);
+      const feedback = document.getElementById(`${pId}-feedback`);
+      
+      const userArr = Array.from(ansBox.children).map(b => b.getAttribute('data-word'));
+      
+      if (userArr.join('') === ansArr.join('')) {
+        feedback.textContent = '✅ Correct!';
+        feedback.style.color = 'var(--success)';
+      } else {
+        feedback.textContent = '❌ Try again!';
+        feedback.style.color = 'var(--error)';
       }
-    }
+    });
   });
+}
 
-  // Initialize free-write canvas drawing logic
-  initFreeWriteCanvas();
+function renderDialoguePane() {
+  document.getElementById('dialogue-title-lbl').textContent = state.currentLesson.dialogue.title;
+  const container = document.getElementById('dialogue-bubbles-container');
+  container.innerHTML = '';
+  
+  state.currentLesson.dialogue.lines.forEach((l, idx) => {
+    const isRight = idx % 2 !== 0;
+    const alignClass = isRight ? "right" : "left";
+    
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.flexDirection = 'column';
+    div.style.alignItems = isRight ? 'flex-end' : 'flex-start';
+    div.style.marginBottom = '1.5rem';
+    
+    div.innerHTML = `
+      <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem; padding: 0 0.5rem;">${l.speaker}</div>
+      <div class="glass-panel" style="padding: 1rem 1.5rem; max-width: 80%; border-color: ${isRight ? 'rgba(0, 245, 212, 0.3)' : 'var(--glass-border)'}; border-bottom-${isRight ? 'right' : 'left'}-radius: 4px;">
+        <div style="font-size: 1.4rem; font-weight: 500; margin-bottom: 0.5rem;">${l.cn}</div>
+        <div class="dialogue-py-text" style="color: var(--primary); font-size: 0.95rem; margin-bottom: 0.25rem;">${l.py}</div>
+        <div style="color: var(--text-secondary); font-size: 0.9rem;">${l.en}</div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function renderQuizPane() {
+  state.quizIndex = 0;
+  state.quizScore = 0;
+  state.quizAnswers = [];
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const q = state.currentLesson.quiz[state.quizIndex];
+  document.getElementById('lesson-quiz-question-lbl').innerHTML = `<span>Question ${state.quizIndex + 1} of ${state.currentLesson.quiz.length}</span>`;
+  
+  if (q.type === 'listening') {
+    document.getElementById('lesson-quiz-text').innerHTML = `
+      <div style="text-align: center; margin-bottom: 1rem;">
+        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem;">Listen and select the correct option:</p>
+        <button id="quiz-audio-trigger-btn" class="audio-btn" style="width:60px; height:60px; font-size:1.5rem;">🔊</button>
+      </div>
+    `;
+    setTimeout(() => {
+      const btn = document.getElementById('quiz-audio-trigger-btn');
+      if (btn) {
+        btn.addEventListener('click', () => speakText(q.testWord));
+        speakText(q.testWord);
+      }
+    }, 10);
+  } else {
+    document.getElementById('lesson-quiz-text').textContent = q.question;
+  }
+  
+  const opts = document.getElementById('lesson-quiz-options');
+  opts.innerHTML = '';
+  document.getElementById('lesson-quiz-explanation-box').style.display = 'none';
+  document.getElementById('lesson-quiz-next-btn').style.display = 'none';
+  
+  // Progress bar
+  const pct = (state.quizIndex / state.currentLesson.quiz.length) * 100;
+  document.getElementById('lesson-quiz-progress-fill').style.width = `${pct}%`;
+  
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-secondary';
+    btn.style.width = '100%';
+    btn.style.textAlign = 'left';
+    btn.textContent = opt;
+    btn.onclick = () => handleQuizAnswer(opt, btn);
+    opts.appendChild(btn);
+  });
+}
+
+function handleQuizAnswer(selectedOpt, btnEl) {
+  const q = state.currentLesson.quiz[state.quizIndex];
+  const isCorrect = selectedOpt === q.answer;
+  
+  const opts = document.getElementById('lesson-quiz-options').querySelectorAll('button');
+  opts.forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.answer) b.style.borderColor = "var(--success)";
+  });
+  
+  if (isCorrect) {
+    btnEl.classList.add("correct");
+    state.quizScore++;
+    document.getElementById('lesson-quiz-correctness').textContent = "Correct!";
+    document.getElementById('lesson-quiz-correctness').style.color = "var(--success)";
+  } else {
+    btnEl.classList.add("incorrect");
+    document.getElementById('lesson-quiz-correctness').textContent = "Incorrect";
+    document.getElementById('lesson-quiz-correctness').style.color = "var(--error)";
+  }
+  
+  document.getElementById('lesson-quiz-explanation-text').textContent = q.explanation;
+  document.getElementById('lesson-quiz-explanation-box').style.display = 'block';
+  
+  const nextBtn = document.getElementById('lesson-quiz-next-btn');
+  nextBtn.style.display = 'inline-block';
+  if (state.quizIndex === state.currentLesson.quiz.length - 1) {
+    nextBtn.textContent = "Finish Lesson ➔";
+  } else {
+    nextBtn.textContent = "Next Question ➔";
+  }
+}
+
+function nextQuizQuestion() {
+  if (state.quizIndex < state.currentLesson.quiz.length - 1) {
+    state.quizIndex++;
+    renderQuizQuestion();
+  } else {
+    finishLesson();
+  }
+}
+
+function finishLesson() {
+  clearInterval(state.timerInterval);
+  const timeSpent = 3600 - state.timerSeconds;
+  state.timeSpentMinutes += Math.round(timeSpent / 60);
+  
+  const today = new Date().toISOString().split('T')[0];
+  if (state.lastStudiedDate !== today) {
+    state.streakCount++;
+    state.lastStudiedDate = today;
+  }
+  
+  if (!state.completedLessons.includes(state.currentLesson.id)) {
+    state.completedLessons.push(state.currentLesson.id);
+    state.score += (state.quizScore * 10);
+  }
+  
+  saveProgress();
+  
+  document.getElementById('congrats-quiz-score').textContent = `${state.quizScore} / ${state.currentLesson.quiz.length}`;
+  document.getElementById('congrats-time').textContent = `${Math.floor(timeSpent/60)}m ${timeSpent%60}s`;
+  
+  switchView('congrats-view');
 }
 
 // ----------------------------------------------------
@@ -388,35 +1000,20 @@ function initPretest() {
 }
 
 function loadPretestQuestion() {
-  const question = window.CHINESE_LESSONS.preTestQuestions[state.pretestIndex];
+  const questionsList = window.CHINESE_LESSONS.preTestQuestions;
+  const totalCount = questionsList.length;
+  const question = questionsList[state.pretestIndex];
   
-  // Update progress UI
-  document.getElementById("pretest-question-number").textContent = `Question ${state.pretestIndex + 1} of 12`;
+  document.getElementById("pretest-question-number").textContent = `Question ${state.pretestIndex + 1} of ${totalCount}`;
   document.getElementById("pretest-question-level").textContent = `HSK level benchmark: Level ${question.level}`;
-  document.getElementById("pretest-progress-fill").style.width = `${((state.pretestIndex) / 12) * 100}%`;
+  document.getElementById("pretest-progress-fill").style.width = `${((state.pretestIndex) / totalCount) * 100}%`;
   
-  // Display Question
   const qText = document.getElementById("pretest-question-text");
   qText.textContent = question.question;
   
-  // If it's a listening type question, add audio speaker trigger
-  if (question.type === "listening") {
-    qText.innerHTML = `👂 Listen to the word: <button id="pretest-audio-trigger-btn" class="audio-btn" style="width:36px; height:36px; font-size:0.85rem;">🔊</button><br><span style="font-size:0.9rem; color:var(--text-muted); font-weight: normal; margin-top:0.5rem; display:block;">Tap the speaker to hear the word pronounced before making your choice.</span>`;
-    
-    // Determine word to play based on answer options
-    let testWord = "";
-    if (question.id === "q7") testWord = "准备"; // HSK 2: To prepare
-    
-    document.getElementById("pretest-audio-trigger-btn").addEventListener("click", () => speakText(testWord));
-    // Proactively speak once
-    setTimeout(() => speakText(testWord), 500);
-  }
-  
-  // Clear explanation and hide next button
   document.getElementById("pretest-explanation-box").style.display = "none";
   document.getElementById("pretest-next-btn").style.display = "none";
   
-  // Populate options
   const optionsBox = document.getElementById("pretest-options-container");
   optionsBox.innerHTML = "";
   
@@ -424,6 +1021,9 @@ function loadPretestQuestion() {
     const btn = document.createElement("button");
     btn.className = "quiz-option";
     btn.textContent = opt;
+    btn.style.width = "100%";
+    btn.style.textAlign = "left";
+    btn.style.marginBottom = "0.5rem";
     btn.addEventListener("click", () => selectPretestAnswer(btn, opt));
     optionsBox.appendChild(btn);
   });
@@ -433,11 +1033,10 @@ function selectPretestAnswer(button, selectedVal) {
   const question = window.CHINESE_LESSONS.preTestQuestions[state.pretestIndex];
   const optionsList = document.getElementById("pretest-options-container").querySelectorAll(".quiz-option");
   
-  // Disable options so user cannot change answer
   optionsList.forEach(optBtn => {
     optBtn.disabled = true;
     if (optBtn.textContent === question.answer) {
-      optBtn.classList.add("correct");
+      optBtn.style.borderColor = "var(--success)";
     }
   });
   
@@ -451,7 +1050,6 @@ function selectPretestAnswer(button, selectedVal) {
   
   state.pretestAnswers.push({ questionId: question.id, correct: isCorrect });
   
-  // Show explanation
   const expBox = document.getElementById("pretest-explanation-box");
   const expText = document.getElementById("pretest-explanation-text");
   expText.textContent = question.explanation;
@@ -460,13 +1058,13 @@ function selectPretestAnswer(button, selectedVal) {
   expBox.querySelector("strong").style.color = isCorrect ? "var(--success)" : "var(--error)";
   expBox.querySelector("strong").textContent = isCorrect ? "✓ Correct!" : "✗ Incorrect";
   
-  // Show Next button
   document.getElementById("pretest-next-btn").style.display = "inline-block";
 }
 
 function nextPretestQuestion() {
+  const totalCount = window.CHINESE_LESSONS.preTestQuestions.length;
   state.pretestIndex++;
-  if (state.pretestIndex < 12) {
+  if (state.pretestIndex < totalCount) {
     loadPretestQuestion();
   } else {
     document.getElementById("pretest-progress-fill").style.width = "100%";
@@ -475,21 +1073,21 @@ function nextPretestQuestion() {
 }
 
 function finishPretest() {
+  const totalCount = window.CHINESE_LESSONS.preTestQuestions.length;
   document.getElementById("pretest-quiz-screen").style.display = "none";
   document.getElementById("pretest-result-screen").style.display = "block";
   
-  document.getElementById("pretest-score-display").textContent = `${state.pretestScore} / 12`;
+  document.getElementById("pretest-score-display").textContent = `${state.pretestScore} / ${totalCount}`;
   
-  // Determine placement based on thresholds
   let finalLevel = "hsk1";
   let levelName = "HSK 1 (Beginner)";
   let levelDesc = "This level is designed for complete beginners. It focuses on essential words (like greetings, numbers, family members), simple verbs, and foundational sentence templates (questions with 吗).";
   
-  if (state.pretestScore >= 5 && state.pretestScore <= 8) {
+  if (state.pretestScore >= 5 && state.pretestScore <= 6) {
     finalLevel = "hsk2";
     levelName = "HSK 2 (Elementary)";
     levelDesc = "Perfect for learners who know basic vocabulary and want to structure their sentences. You'll learn to handle time keywords, transport modes, weather details, hobby terms, and bargain items.";
-  } else if (state.pretestScore >= 9) {
+  } else if (state.pretestScore >= 7) {
     finalLevel = "hsk3";
     levelName = "HSK 3 (Intermediate)";
     levelDesc = "Great for intermediate learners ready for advanced sentence connectives. Focuses on passive markers (被), concession arguments (虽然...但是...), duration expressions, and workplace contexts.";
@@ -498,935 +1096,443 @@ function finishPretest() {
   document.getElementById("recommended-level-name").textContent = levelName;
   document.getElementById("recommended-level-desc").textContent = levelDesc;
   
-  // Save result
   state.userLevel = finalLevel;
-  state.score += (state.pretestScore * 10); // 10 pts per correct answer
+  state.score += (state.pretestScore * 10);
+  state.hasTakenPlacementTest = true;
   saveProgress();
   
-  // Update change level dropdown in Settings
   const selectLevel = document.getElementById("change-level-select");
   if (selectLevel) selectLevel.value = finalLevel;
 }
 
 // ----------------------------------------------------
-// STUDENT DASHBOARD CURRICULUM
-// ----------------------------------------------------
-function renderDashboard() {
-  // Sync title and levels
-  const levelTag = document.getElementById("dashboard-level-badge");
-  let levelString = "HSK 1 (Beginner)";
-  if (state.userLevel === "hsk2") levelString = "HSK 2 (Elementary)";
-  if (state.userLevel === "hsk3") levelString = "HSK 3 (Intermediate)";
-  levelTag.textContent = levelString;
-  levelTag.className = `student-level-tag tag-${state.userLevel}`;
-  
-  // Sync stats numbers
-  document.getElementById("stat-streak").textContent = state.streakCount;
-  
-  const hskLessons = window.CHINESE_LESSONS.lessons[state.userLevel] || [];
-  const completedCount = hskLessons.filter(l => state.completedLessons.includes(l.id)).length;
-  document.getElementById("stat-lessons-completed").textContent = `${completedCount} / ${hskLessons.length}`;
-  
-  // Approximate total hours study
-  const totalHours = Math.round(completedCount * 1.0);
-  document.getElementById("stat-time-spent").textContent = `${totalHours}h`;
-  
-  // Populate the lesson list rows
-  const listContainer = document.getElementById("dashboard-lessons-container");
-  listContainer.innerHTML = "";
-  
-  hskLessons.forEach((lesson, index) => {
-    const isCompleted = state.completedLessons.includes(lesson.id);
-    
-    const row = document.createElement("div");
-    row.className = `glass-panel glass-panel-hover lesson-row ${isCompleted ? 'completed' : ''}`;
-    
-    // Auto flag first incomplete lesson as active
-    const isNextAvailable = index === 0 || state.completedLessons.includes(hskLessons[index - 1].id);
-    if (!isCompleted && isNextAvailable) {
-      row.classList.add("active-lesson");
-    }
-    
-    row.innerHTML = `
-      <div class="lesson-row-info">
-        <h3>${lesson.title}</h3>
-        <span>🎯 Target: Vocab, Grammar, Reading, Review • ⏱️ 1-Hour Session</span>
-      </div>
-      <div class="lesson-status-icon">
-        ${isCompleted ? "✓" : "▶"}
-      </div>
-    `;
-    
-    row.addEventListener("click", () => {
-      launchLesson(lesson, index);
-    });
-    listContainer.appendChild(row);
-  });
-}
-
-// ----------------------------------------------------
-// 1-HOUR STUDY TIMER AND LESSON INTERFACE
-// ----------------------------------------------------
-function launchLesson(lesson, index) {
-  state.currentLesson = lesson;
-  state.currentLessonIndex = index;
-  state.timerSeconds = 3600; // Reset to 60 minutes
-  state.timerPaused = false;
-  
-  // Level badge on top
-  const levelBadge = document.getElementById("lesson-level-badge");
-  levelBadge.textContent = lesson.level;
-  levelBadge.className = `tag tag-${state.userLevel}`;
-  
-  // Set title
-  document.getElementById("lesson-title-display").textContent = lesson.title;
-  
-  // Clean other states
-  state.vocabIndex = 0;
-  state.cardFlipped = false;
-  state.grammarPracticeAnswers = {};
-  state.quizIndex = 0;
-  state.quizScore = 0;
-  state.quizAnswers = [];
-  
-  // UI setups
-  switchView("lesson-view");
-  switchLessonPane("vocab-pane");
-  
-  // Run 1-hour study timer
-  clearInterval(state.timerInterval);
-  state.timerInterval = setInterval(updateTimerTick, 1000);
-  updateTimerUI();
-  
-  // Trigger speech synthesis warning occasionally
-  speakText(`开始学习：${lesson.title.split(":")[1]}`);
-}
-
-function updateTimerTick() {
-  if (state.timerPaused) return;
-  
-  if (state.timerSeconds > 0) {
-    state.timerSeconds--;
-    updateTimerUI();
-    
-    // Milestones warning check:
-    // Suggest 15 mins per stage. Let's send notifications/warnings when stages should transition
-    // Stage 1 (Vocab): 0 - 15 mins (timer: 3600 to 2700)
-    // Stage 2 (Grammar): 15 - 30 mins (timer: 2700 to 1800)
-    // Stage 3 (Dialogue): 30 - 45 mins (timer: 1800 to 900)
-    // Stage 4 (Quiz): 45 - 60 mins (timer: 900 to 0)
-    
-    if (state.timerSeconds === 2700) {
-      showCurriculumMilestoneNotification("Vocab time is up!", "Time to proceed to Stage 2: Grammar explanations and builders.");
-      speakText("词汇学习时间到，请进入语法学习。");
-    } else if (state.timerSeconds === 1800) {
-      showCurriculumMilestoneNotification("Grammar time is up!", "Time to proceed to Stage 3: Conversational reading and listening dialogues.");
-      speakText("语法学习时间到，请进入对话阅读。");
-    } else if (state.timerSeconds === 900) {
-      showCurriculumMilestoneNotification("Dialogue reading is up!", "Time to proceed to Stage 4: Review quiz to wrap up your 1-hour session.");
-      speakText("对话学习时间到，请进入单元复习测试。");
-    }
-  } else {
-    // 1 hour finished!
-    clearInterval(state.timerInterval);
-    showCurriculumMilestoneNotification("1 Hour Complete!", "Congratulations, you hit your full 1-hour study goal! Finish your quiz to save progress.");
-    speakText("一小时学习目标已达成，祝贺你！");
-  }
-}
-
-function updateTimerUI() {
-  const display = document.getElementById("lesson-timer-display");
-  const mins = Math.floor(state.timerSeconds / 60);
-  const secs = state.timerSeconds % 60;
-  
-  const minStr = mins < 10 ? `0${mins}` : mins;
-  const secStr = secs < 10 ? `0${secs}` : secs;
-  display.textContent = `${minStr}:${secStr}`;
-}
-
-function toggleTimer() {
-  state.timerPaused = !state.timerPaused;
-  const pauseIcon = document.getElementById("timer-pause-icon");
-  if (state.timerPaused) {
-    pauseIcon.textContent = "▶️";
-    clearInterval(state.timerInterval);
-  } else {
-    pauseIcon.textContent = "⏸️";
-    state.timerInterval = setInterval(updateTimerTick, 1000);
-  }
-}
-
-// Stage Panes Switched
-function switchLessonPane(paneId) {
-  state.currentPane = paneId;
-  
-  // Hide all panes
-  document.querySelectorAll(".lesson-pane-content").forEach(p => {
-    p.style.display = "none";
-  });
-  
-  // Show active pane
-  document.getElementById(paneId).style.display = "block";
-  
-  // Update timeline CSS indicators
-  document.querySelectorAll(".timeline-step").forEach(step => {
-    step.classList.remove("active");
-    const stepPane = step.getAttribute("data-pane");
-    
-    // Complete indicator
-    const currentIdx = timelineStages.indexOf(paneId);
-    const stepIdx = timelineStages.indexOf(stepPane);
-    
-    if (stepIdx < currentIdx) {
-      step.classList.add("completed");
-    } else {
-      step.classList.remove("completed");
-    }
-    
-    if (stepPane === paneId) {
-      step.classList.add("active");
-    }
-  });
-  
-  // Initialize content specific to that pane
-  if (paneId === "vocab-pane") {
-    loadVocabWord();
-  } else if (paneId === "grammar-pane") {
-    loadGrammarSection();
-  } else if (paneId === "dialogue-pane") {
-    loadDialogueSection();
-  } else if (paneId === "quiz-pane") {
-    loadQuizSection();
-  }
-  
-  // Adjust footer buttons based on pane
-  const backBtn = document.getElementById("pane-back-btn");
-  const nextBtn = document.getElementById("pane-next-btn");
-  
-  if (paneId === "vocab-pane") {
-    backBtn.style.visibility = "hidden";
-    nextBtn.textContent = "Proceed to Grammar ➔";
-    nextBtn.style.background = "var(--primary)";
-    nextBtn.style.color = "var(--text-primary)";
-    nextBtn.style.boxShadow = "0 4px 14px var(--primary-glow)";
-  } else {
-    backBtn.style.visibility = "visible";
-    
-    if (paneId === "grammar-pane") {
-      nextBtn.textContent = "Proceed to Dialogue ➔";
-      nextBtn.style.background = "var(--primary)";
-      nextBtn.style.color = "var(--text-primary)";
-      nextBtn.style.boxShadow = "0 4px 14px var(--primary-glow)";
-    } else if (paneId === "dialogue-pane") {
-      nextBtn.textContent = "Take Review Quiz ➔";
-      nextBtn.style.background = "var(--primary)";
-      nextBtn.style.color = "var(--text-primary)";
-      nextBtn.style.boxShadow = "0 4px 14px var(--primary-glow)";
-    } else if (paneId === "quiz-pane") {
-      nextBtn.textContent = "Finish 1-Hour Lesson ✓";
-      nextBtn.style.background = "var(--success)";
-      nextBtn.style.color = "var(--bg-darker)";
-      nextBtn.style.boxShadow = "0 4px 14px rgba(0, 245, 212, 0.35)";
-    }
-  }
-}
-
-function paneGoBack() {
-  const currentIdx = timelineStages.indexOf(state.currentPane);
-  if (currentIdx > 0) {
-    switchLessonPane(timelineStages[currentIdx - 1]);
-  }
-}
-
-function paneGoNext() {
-  const currentIdx = timelineStages.indexOf(state.currentPane);
-  if (currentIdx < timelineStages.length - 1) {
-    switchLessonPane(timelineStages[currentIdx + 1]);
-  } else {
-    // Finish lesson entirely
-    finishLessonSession();
-  }
-}
-
-// ----------------------------------------------------
-// STAGE 1: VOCABULARY CARD DRAWING
-// ----------------------------------------------------
-let writerInstance = null;
-let currentWritingMode = "animate"; // 'animate', 'trace', 'freewrite'
-let isDrawing = false;
-let lastX = 0;
-let lastY = 0;
-let canvasCtx = null;
-
-function loadVocabWord() {
-  const vocabList = state.currentLesson.vocab;
-  const word = vocabList[state.vocabIndex];
-  
-  // Card UI resets
-  const flashcard = document.getElementById("vocab-flashcard");
-  flashcard.classList.remove("flipped");
-  state.cardFlipped = false;
-  
-  document.getElementById("vocab-char").textContent = word.character;
-  document.getElementById("vocab-meaning").textContent = word.meaning;
-  document.getElementById("vocab-pinyin").textContent = word.pinyin;
-  
-  // Details pane sync
-  document.getElementById("vocab-detail-pinyin").textContent = word.pinyin;
-  document.getElementById("vocab-ex-cn").textContent = word.exampleCn;
-  document.getElementById("vocab-ex-py").textContent = word.examplePy;
-  document.getElementById("vocab-ex-en").textContent = word.exampleEn;
-  
-  // Indicator
-  document.getElementById("vocab-index-indicator").textContent = `Word ${state.vocabIndex + 1} of ${vocabList.length}`;
-  
-  // Deconstruction
-  const deconstructText = document.getElementById("vocab-deconstruct-text");
-  if (deconstructText) {
-    deconstructText.textContent = word.deconstruct || "No deconstruction data available.";
-  }
-
-  // Initialize or update writing mode for the current character
-  if (currentWritingMode === "freewrite") {
-    clearFreeWriteCanvas();
-  } else {
-    initHanziWriter(word.character);
-  }
-}
-
-function vocabPrev() {
-  if (state.vocabIndex > 0) {
-    state.vocabIndex--;
-    loadVocabWord();
-  }
-}
-
-function vocabNext() {
-  const vocabList = state.currentLesson.vocab;
-  if (state.vocabIndex < vocabList.length - 1) {
-    state.vocabIndex++;
-    loadVocabWord();
-  }
-}
-
-// Hanzi Writer & Drawing Canvas Handlers
-function initHanziWriter(character) {
-  const target = document.getElementById("hanzi-writer-target");
-  if (!target) return;
-  target.innerHTML = ""; // Clear existing SVG
-  
-  if (typeof HanziWriter === "undefined") {
-    target.innerHTML = `<div style="color:var(--text-muted);font-size:0.85rem;padding:2rem;text-align:center;">HanziWriter not loaded</div>`;
-    return;
-  }
-
-  writerInstance = HanziWriter.create("hanzi-writer-target", character, {
-    width: 220,
-    height: 220,
-    padding: 10,
-    showOutline: true,
-    strokeColor: "#ff3366",      // Rose Red (--primary)
-    outlineColor: "rgba(255, 255, 255, 0.08)",
-    drawingColor: "#00f5d4",     // Teal (--success)
-    drawingWidth: 4,
-    strokeAnimationSpeed: 1.5,
-    delayBetweenStrokes: 400
-  });
-
-  if (currentWritingMode === "animate") {
-    setTimeout(() => {
-      if (writerInstance && currentWritingMode === "animate") {
-        writerInstance.animateCharacter();
-      }
-    }, 450);
-  } else if (currentWritingMode === "trace") {
-    setTimeout(() => {
-      if (writerInstance && currentWritingMode === "trace") {
-        writerInstance.quiz();
-      }
-    }, 450);
-  }
-}
-
-function switchWritingMode(mode) {
-  currentWritingMode = mode;
-  
-  document.querySelectorAll(".writing-modes-header .btn-mode").forEach(btn => {
-    if (btn.getAttribute("data-mode") === mode) {
-      btn.classList.add("active");
-    } else {
-      btn.classList.remove("active");
-    }
-  });
-
-  const writerTarget = document.getElementById("hanzi-writer-target");
-  const canvas = document.getElementById("free-write-canvas");
-  const playBtn = document.getElementById("btn-writing-play");
-  const clearBtn = document.getElementById("btn-writing-clear");
-  const resetBtn = document.getElementById("btn-writing-reset");
-
-  if (mode === "freewrite") {
-    writerTarget.style.display = "none";
-    canvas.style.display = "block";
-    
-    playBtn.style.display = "none";
-    clearBtn.style.display = "inline-flex";
-    resetBtn.style.display = "none";
-    
-    clearFreeWriteCanvas();
-  } else {
-    writerTarget.style.display = "flex";
-    canvas.style.display = "none";
-    
-    playBtn.style.display = "inline-flex";
-    clearBtn.style.display = "none";
-    resetBtn.style.display = "inline-flex";
-
-    const vocabList = state.currentLesson.vocab;
-    const word = vocabList[state.vocabIndex];
-    initHanziWriter(word.character);
-  }
-}
-
-function initFreeWriteCanvas() {
-  const canvas = document.getElementById("free-write-canvas");
-  if (!canvas) return;
-  canvasCtx = canvas.getContext("2d");
-  
-  canvas.width = 260;
-  canvas.height = 260;
-  
-  canvasCtx.strokeStyle = "#00f5d4"; // Teal drawing color
-  canvasCtx.lineWidth = 4;
-  canvasCtx.lineCap = "round";
-  canvasCtx.lineJoin = "round";
-
-  canvas.addEventListener("mousedown", startDrawing);
-  canvas.addEventListener("mousemove", draw);
-  canvas.addEventListener("mouseup", stopDrawing);
-  canvas.addEventListener("mouseleave", stopDrawing);
-
-  canvas.addEventListener("touchstart", (e) => {
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent("mousedown", {
-      clientX: touch.clientX,
-      clientY: touch.clientY
-    });
-    canvas.dispatchEvent(mouseEvent);
-    e.preventDefault();
-  }, { passive: false });
-
-  canvas.addEventListener("touchmove", (e) => {
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent("mousemove", {
-      clientX: touch.clientX,
-      clientY: touch.clientY
-    });
-    canvas.dispatchEvent(mouseEvent);
-    e.preventDefault();
-  }, { passive: false });
-
-  canvas.addEventListener("touchend", (e) => {
-    const mouseEvent = new MouseEvent("mouseup", {});
-    canvas.dispatchEvent(mouseEvent);
-  });
-}
-
-function startDrawing(e) {
-  isDrawing = true;
-  const rect = e.target.getBoundingClientRect();
-  lastX = e.clientX - rect.left;
-  lastY = e.clientY - rect.top;
-}
-
-function draw(e) {
-  if (!isDrawing) return;
-  const rect = e.target.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  canvasCtx.beginPath();
-  canvasCtx.moveTo(lastX, lastY);
-  canvasCtx.lineTo(x, y);
-  canvasCtx.stroke();
-  
-  lastX = x;
-  lastY = y;
-}
-
-function stopDrawing() {
-  isDrawing = false;
-}
-
-function clearFreeWriteCanvas() {
-  if (canvasCtx) {
-    canvasCtx.clearRect(0, 0, 260, 260);
-  }
-}
-
-// ----------------------------------------------------
-// STAGE 2: GRAMMAR BUILDER GENERATOR
-// ----------------------------------------------------
-function loadGrammarSection() {
-  const container = document.getElementById("grammar-topics-container");
-  container.innerHTML = "";
-  
-  state.currentLesson.grammar.forEach((gm, idx) => {
-    const section = document.createElement("div");
-    section.className = "grammar-block";
-    
-    // Build Examples html string
-    let exHtml = "";
-    gm.examples.forEach(ex => {
-      exHtml += `
-        <div class="grammar-example-item">
-          <div>
-            <div class="example-cn" style="font-size:1.15rem;">${ex.cn}</div>
-            <div class="example-py" style="font-size:0.85rem;">${ex.py}</div>
-            <div class="example-en" style="font-size:0.85rem;">${ex.en}</div>
-          </div>
-          <button class="audio-btn" style="width: 32px; height: 32px; font-size: 0.8rem;" onclick="speakText('${ex.cn}')">🔊</button>
-        </div>
-      `;
-    });
-    
-    // Sentence Reordering construction
-    section.innerHTML = `
-      <div class="grammar-header">${gm.title}</div>
-      <div class="grammar-explanation">${gm.explanation}</div>
-      <div style="font-weight: 600; margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--text-secondary); text-transform:uppercase;">Structures in action:</div>
-      <div class="grammar-examples">
-        ${exHtml}
-      </div>
-      
-      <!-- Interactive Sentence Builder -->
-      <div class="reorder-container">
-        <div class="reorder-prompt">🧩 Reordering Challenge: ${gm.practice.prompt}</div>
-        <div class="reorder-workspace" id="workspace-${idx}">
-          <!-- Selected words appear here -->
-        </div>
-        <div class="word-chips-pool" id="pool-${idx}">
-          <!-- Shuffled chips pool -->
-        </div>
-        <div style="display: flex; gap: 0.75rem;">
-          <button class="btn btn-secondary" onclick="resetReorderChallenge(${idx})">Reset</button>
-          <button class="btn btn-primary" style="padding:0.5rem 1rem;" onclick="checkReorderChallenge(${idx})">Check Answer</button>
-        </div>
-        <div class="reorder-result" id="result-${idx}"></div>
-      </div>
-    `;
-    
-    container.appendChild(section);
-    initReorderChallenge(idx, gm.practice);
-  });
-}
-
-function initReorderChallenge(index, practiceData) {
-  // Store user answer state
-  state.grammarPracticeAnswers[index] = [];
-  
-  const poolContainer = document.getElementById(`pool-${index}`);
-  const workspace = document.getElementById(`workspace-${index}`);
-  
-  workspace.innerHTML = `<span style="color:var(--text-muted); font-size:0.85rem;">Click words below to construct the sentence...</span>`;
-  poolContainer.innerHTML = "";
-  
-  // Shuffle words pool
-  const shuffledWords = [...practiceData.words].sort(() => Math.random() - 0.5);
-  
-  shuffledWords.forEach((word, wordIdx) => {
-    const chip = document.createElement("div");
-    chip.className = "word-chip";
-    chip.textContent = word;
-    chip.id = `chip-${index}-${wordIdx}`;
-    
-    chip.addEventListener("click", () => {
-      if (!chip.classList.contains("selected")) {
-        chip.classList.add("selected");
-        addWordToWorkspace(index, word, chip.id);
-      }
-    });
-    
-    poolContainer.appendChild(chip);
-  });
-}
-
-function addWordToWorkspace(index, word, chipId) {
-  const workspace = document.getElementById(`workspace-${index}`);
-  
-  // Clean default text
-  if (state.grammarPracticeAnswers[index].length === 0) {
-    workspace.innerHTML = "";
-  }
-  
-  state.grammarPracticeAnswers[index].push({ word, chipId });
-  
-  const item = document.createElement("div");
-  item.className = "word-chip";
-  item.textContent = word;
-  item.style.borderColor = "var(--primary)";
-  item.style.background = "var(--primary-glow)";
-  
-  // Click workspace item to remove it
-  item.addEventListener("click", () => {
-    // Remove from array
-    state.grammarPracticeAnswers[index] = state.grammarPracticeAnswers[index].filter(x => x.chipId !== chipId);
-    
-    // Enable pool chip back
-    const poolChip = document.getElementById(chipId);
-    if (poolChip) poolChip.classList.remove("selected");
-    
-    // Redraw workspace
-    redrawWorkspace(index);
-  });
-  
-  workspace.appendChild(item);
-}
-
-function redrawWorkspace(index) {
-  const workspace = document.getElementById(`workspace-${index}`);
-  workspace.innerHTML = "";
-  
-  if (state.grammarPracticeAnswers[index].length === 0) {
-    workspace.innerHTML = `<span style="color:var(--text-muted); font-size:0.85rem;">Click words below to construct the sentence...</span>`;
-    return;
-  }
-  
-  state.grammarPracticeAnswers[index].forEach(x => {
-    const item = document.createElement("div");
-    item.className = "word-chip";
-    item.textContent = x.word;
-    item.style.borderColor = "var(--primary)";
-    item.style.background = "var(--primary-glow)";
-    
-    item.addEventListener("click", () => {
-      state.grammarPracticeAnswers[index] = state.grammarPracticeAnswers[index].filter(y => y.chipId !== x.chipId);
-      const poolChip = document.getElementById(x.chipId);
-      if (poolChip) poolChip.classList.remove("selected");
-      redrawWorkspace(index);
-    });
-    
-    workspace.appendChild(item);
-  });
-}
-
-window.resetReorderChallenge = function(index) {
-  const gm = state.currentLesson.grammar[index];
-  initReorderChallenge(index, gm.practice);
-  const resultDiv = document.getElementById(`result-${index}`);
-  resultDiv.textContent = "";
-  resultDiv.className = "reorder-result";
-};
-
-window.checkReorderChallenge = function(index) {
-  const gm = state.currentLesson.grammar[index];
-  const userArr = state.grammarPracticeAnswers[index].map(x => x.word);
-  const correctArr = gm.practice.answer;
-  
-  const resultDiv = document.getElementById(`result-${index}`);
-  
-  if (userArr.length === 0) {
-    resultDiv.textContent = "Please select some words first!";
-    resultDiv.className = "reorder-result incorrect";
-    return;
-  }
-  
-  const isCorrect = userArr.length === correctArr.length && userArr.every((v, i) => v === correctArr[i]);
-  
-  if (isCorrect) {
-    resultDiv.textContent = "✓ Excellent! Sentence matches perfectly.";
-    resultDiv.className = "reorder-result correct";
-    speakText(userArr.join(""));
-  } else {
-    resultDiv.textContent = `✗ Incorrect. Try rearranging. Hint: Correct character order starts with "${correctArr[0]}".`;
-    resultDiv.className = "reorder-result incorrect";
-  }
-};
-
-// ----------------------------------------------------
-// STAGE 3: CONVERSATIONAL DIALOGUE
-// ----------------------------------------------------
-function loadDialogueSection() {
-  const dl = state.currentLesson.dialogue;
-  
-  document.getElementById("dialogue-title-lbl").textContent = dl.title;
-  
-  const container = document.getElementById("dialogue-bubbles-container");
-  container.innerHTML = "";
-  
-  dl.lines.forEach((line, idx) => {
-    const bubble = document.createElement("div");
-    bubble.className = "dialogue-bubble";
-    
-    bubble.innerHTML = `
-      <div class="dialogue-speaker">${line.speaker}:</div>
-      <div class="dialogue-text-block">
-        <div class="dialogue-cn">${line.cn}</div>
-        <div class="dialogue-py">${line.py}</div>
-        <div class="dialogue-en">${line.en}</div>
-      </div>
-      <button class="audio-btn" style="width: 32px; height: 32px; font-size: 0.8rem;" onclick="speakText('${line.cn}')">🔊</button>
-    `;
-    container.appendChild(bubble);
-  });
-  
-  // Set default visibility based on state
-  if (state.pinyinVisible) {
-    container.classList.remove("pinyin-toggle-hide");
-  } else {
-    container.classList.add("pinyin-toggle-hide");
-  }
-}
-
-function playFullDialogue() {
-  const lines = state.currentLesson.dialogue.lines;
-  let lineIdx = 0;
-  
-  function playNextBubble() {
-    if (lineIdx < lines.length) {
-      speakText(lines[lineIdx].cn);
-      
-      // Flash speaking bubble visually
-      const bubbles = document.querySelectorAll(".dialogue-bubble");
-      bubbles.forEach((b, i) => {
-        if (i === lineIdx) {
-          b.style.borderColor = "var(--primary)";
-          b.style.background = "rgba(255, 51, 102, 0.05)";
-        } else {
-          b.style.borderColor = "var(--glass-border)";
-          b.style.background = "rgba(255, 255, 255, 0.01)";
-        }
-      });
-      
-      // Delay to play next line (roughly estimating line reading time based on character count)
-      const delay = Math.max(2500, lines[lineIdx].cn.length * 400);
-      lineIdx++;
-      setTimeout(playNextBubble, delay);
-    } else {
-      // Clear visual highlighted lines
-      const bubbles = document.querySelectorAll(".dialogue-bubble");
-      bubbles.forEach(b => {
-        b.style.borderColor = "var(--glass-border)";
-        b.style.background = "rgba(255, 255, 255, 0.01)";
-      });
-    }
-  }
-  
-  playNextBubble();
-}
-
-// ----------------------------------------------------
-// STAGE 4: UNIT QUIZ EXAMINATIONS
-// ----------------------------------------------------
-function loadQuizSection() {
-  state.quizIndex = 0;
-  state.quizScore = 0;
-  state.quizAnswers = [];
-  
-  loadLessonQuizQuestion();
-}
-
-function loadLessonQuizQuestion() {
-  const quiz = state.currentLesson.quiz;
-  const question = quiz[state.quizIndex];
-  
-  // Update progress
-  document.getElementById("lesson-quiz-progress-fill").style.width = `${(state.quizIndex / quiz.length) * 100}%`;
-  document.getElementById("lesson-quiz-question-lbl").innerHTML = `
-    <span>Question ${state.quizIndex + 1} of ${quiz.length}</span>
-    <span style="color:var(--accent);">⭐ +10 pts for correct answer</span>
-  `;
-  
-  // Display text
-  const textContainer = document.getElementById("lesson-quiz-text");
-  textContainer.textContent = question.question;
-  
-  // Check if it's a listening type question
-  const isListening = question.question.includes("pronunciation") || question.question.includes("audio") || question.question.includes("hear");
-  if (isListening) {
-    let wordToSay = "";
-    if (question.id || true) {
-      // Pull answer word
-      const optionsClean = question.options.map(o => o.split(" ")[0]);
-      const idxAnswer = question.options.indexOf(question.answer);
-      wordToSay = optionsClean[idxAnswer];
-    }
-    textContainer.innerHTML = `👂 Listening Challenge: <button id="quiz-audio-trigger" class="audio-btn" style="width:36px; height:36px; font-size:0.85rem;">🔊</button><br><span style="font-size:0.95rem; font-weight:normal; color:var(--text-secondary); margin-top:0.5rem; display:block;">Click speaker to listen, then select matching option.</span>`;
-    
-    document.getElementById("quiz-audio-trigger").addEventListener("click", () => speakText(wordToSay));
-    setTimeout(() => speakText(wordToSay), 500);
-  }
-  
-  // Reset feedback & next button
-  document.getElementById("lesson-quiz-explanation-box").style.display = "none";
-  document.getElementById("lesson-quiz-next-btn").style.display = "none";
-  
-  // Populate options list
-  const optionsList = document.getElementById("lesson-quiz-options");
-  optionsList.innerHTML = "";
-  
-  question.options.forEach(opt => {
-    const btn = document.createElement("button");
-    btn.className = "quiz-option";
-    btn.textContent = opt;
-    btn.addEventListener("click", () => selectLessonQuizAnswer(btn, opt));
-    optionsList.appendChild(btn);
-  });
-}
-
-function selectLessonQuizAnswer(button, optionVal) {
-  const question = state.currentLesson.quiz[state.quizIndex];
-  const options = document.getElementById("lesson-quiz-options").querySelectorAll(".quiz-option");
-  
-  // Disable all options
-  options.forEach(oBtn => {
-    oBtn.disabled = true;
-    if (oBtn.textContent === question.answer) {
-      oBtn.classList.add("correct");
-    }
-  });
-  
-  const isCorrect = optionVal === question.answer;
-  if (isCorrect) {
-    state.quizScore++;
-    button.classList.add("correct");
-    state.score += 10; // 10 pts per correct quiz answer
-  } else {
-    button.classList.add("incorrect");
-  }
-  
-  state.quizAnswers.push({ index: state.quizIndex, correct: isCorrect });
-  
-  // Feedback
-  const expBox = document.getElementById("lesson-quiz-explanation-box");
-  const expText = document.getElementById("lesson-quiz-explanation-text");
-  const expTitle = document.getElementById("lesson-quiz-correctness");
-  
-  expText.textContent = question.explanation;
-  expBox.style.display = "block";
-  expBox.style.borderColor = isCorrect ? "var(--success)" : "var(--error)";
-  expTitle.style.color = isCorrect ? "var(--success)" : "var(--error)";
-  expTitle.textContent = isCorrect ? "✓ Correct! (+10 pts)" : "✗ Incorrect";
-  
-  // Show next question button
-  document.getElementById("lesson-quiz-next-btn").style.display = "inline-block";
-}
-
-function nextLessonQuizQuestion() {
-  state.quizIndex++;
-  const quiz = state.currentLesson.quiz;
-  
-  if (state.quizIndex < quiz.length) {
-    loadLessonQuizQuestion();
-  } else {
-    document.getElementById("lesson-quiz-progress-fill").style.width = "100%";
-    
-    // Complete lesson sequence
-    finishLessonSession();
-  }
-}
-
-// ----------------------------------------------------
-// STUDY COMPLETE & PERSISTENCE PROCESSES
-// ----------------------------------------------------
-function finishLessonSession() {
-  clearInterval(state.timerInterval);
-  
-  // Add to completed lessons if not already present
-  if (!state.completedLessons.includes(state.currentLesson.id)) {
-    state.completedLessons.push(state.currentLesson.id);
-    state.score += 50; // 50 pts completion bonus
-  }
-  
-  // Update streak count
-  updateStreak();
-  
-  // Add to time spent (1 hour = 60 minutes)
-  state.timeSpentMinutes += 60;
-  
-  saveProgress();
-  
-  // Congratulate page
-  switchView("congrats-view");
-  
-  // Sync congrats stats
-  const minsSpent = Math.floor((3600 - state.timerSeconds) / 60);
-  const secsSpent = (3600 - state.timerSeconds) % 60;
-  document.getElementById("congrats-time").textContent = `${minsSpent}m ${secsSpent}s`;
-  document.getElementById("congrats-quiz-score").textContent = `${state.quizScore} / ${state.currentLesson.quiz.length}`;
-}
-
-function updateStreak() {
-  const today = new Date().toISOString().split('T')[0];
-  
-  if (state.lastStudyDate === today) {
-    // Already studied today, keep streak
-    return;
-  }
-  
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split('T')[0];
-  
-  if (state.lastStudyDate === yesterdayStr) {
-    // Studied yesterday, increment streak
-    state.streakCount++;
-  } else if (!state.lastStudyDate) {
-    // First time studying ever
-    state.streakCount = 1;
-  } else {
-    // Streak broken, reset to 1
-    state.streakCount = 1;
-  }
-  
-  state.lastStudyDate = today;
-}
-
-// ----------------------------------------------------
-// REMINDERS AND DAILY SCHEDULER
+// REMINDERS & DESKTOP NOTIFICATIONS
 // ----------------------------------------------------
 function setupDailyReminders() {
   const timeInput = document.getElementById("reminder-time-input");
-  const selectedTime = timeInput.value;
+  const statusMsg = document.getElementById("reminder-status-msg");
   
-  state.reminderTime = selectedTime;
+  if (!timeInput) return;
+  state.reminderTime = timeInput.value;
   saveProgress();
   
-  // Request notifications
-  if (typeof Notification !== 'undefined') {
-    Notification.requestPermission().then(permission => {
-      state.notificationGranted = permission === "granted";
+  if (typeof Notification === 'undefined') {
+    statusMsg.textContent = `⏰ Study reminder set daily for ${state.reminderTime}! (Notifications unsupported in browser fallback to alert)`;
+    statusMsg.className = "reminder-status-alert text-success";
+    return;
+  }
+  
+  Notification.requestPermission().then(permission => {
+    state.notificationGranted = permission === "granted";
+    if (state.notificationGranted) {
+      statusMsg.textContent = `⏰ Active study reminder scheduled daily at ${state.reminderTime}!`;
+      statusMsg.className = "reminder-status-alert text-success";
       
-      const statusMsg = document.getElementById("reminder-status-msg");
-      statusMsg.style.display = "block";
+      const tempNotif = new Notification("HanPath Reminders Configured!", {
+        body: `We will remind you daily at ${state.reminderTime} to complete your 1-hour study block.`,
+        icon: "favicon.ico"
+      });
+    } else {
+      statusMsg.textContent = `⏰ Reminder saved for ${state.reminderTime}, but notification permission was denied. We will use fallback alerts.`;
+      statusMsg.className = "reminder-status-alert text-warning";
+    }
+  });
+}
+
+function checkDailyReminder() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const currentTimeStr = `${hours}:${minutes}`;
+  
+  const todayDateStr = now.toISOString().split('T')[0];
+  
+  if (currentTimeStr === state.reminderTime) {
+    if (state.lastReminderDate !== todayDateStr) {
+      state.lastReminderDate = todayDateStr;
+      saveProgress();
       
-      if (state.notificationGranted) {
-        statusMsg.textContent = `🔔 Reminder set for ${selectedTime} daily!`;
-        statusMsg.style.color = "var(--success)";
-      } else {
-        statusMsg.textContent = `⚠️ Set for ${selectedTime}, but browser notifications are blocked.`;
-        statusMsg.style.color = "var(--warning)";
-      }
+      showCurriculumMilestoneNotification(
+        "HanPath Chinese Study Time! 📚",
+        "It's time for your daily 1-hour Chinese lesson. Let's keep your streak active!"
+      );
       
-      // Proactively notify the AI system to trigger a scheduled notification
-      console.log(`[HANPATH_SCHEDULER] User requested a study reminder at ${selectedTime}.`);
-      
-      setTimeout(() => {
-        statusMsg.style.display = "none";
-      }, 5000);
-    });
+      speakText("该学习中文了，让我们开始今天的课程吧。");
+    }
   }
 }
 
-// Browser notification wrapper
 function showCurriculumMilestoneNotification(title, message) {
   if (state.notificationGranted && typeof Notification !== 'undefined') {
-    new Notification(title, {
-      body: message,
-      icon: "https://cdn-icons-png.flaticon.com/512/3251/3251521.png"
-    });
-  } else {
-    // Fallback to JS Alert inside app
-    alert(`${title}\n${message}`);
+    try {
+      new Notification(title, {
+        body: message,
+        icon: "favicon.ico"
+      });
+      return;
+    } catch (e) {
+      console.warn("Notification constructor failed, falling back to alert: ", e);
+    }
   }
+  
+  alert(`${title}\n\n${message}`);
+}
+
+// ----------------------------------------------------
+// LESSON-SPECIFIC PRE-TEST LOGIC
+// ----------------------------------------------------
+function routeToLesson(id) {
+  if (!state.hasTakenPlacementTest) {
+    if (confirm("We recommend taking the level placement pre-test first so the lessons match your level. Would you like to take the placement pre-test now?")) {
+      switchView("pretest-view");
+      initPretest();
+      return;
+    }
+  }
+  startLessonPretest(id);
+}
+
+function startLessonPretest(id) {
+  state.currentLessonId = id;
+  
+  // Fetch full lesson data from server so we have the vocab array for generating questions
+  fetch(`/api/lessons/${id}`)
+    .then(res => res.json())
+    .then(data => {
+      state.pretestLesson = data;
+      
+      if (!state.pretestLesson || !state.pretestLesson.vocab) {
+        alert("Lesson data could not be loaded properly.");
+        return;
+      }
+
+      document.getElementById("lesson-pretest-intro-screen").style.display = "block";
+      document.getElementById("lesson-pretest-quiz-screen").style.display = "none";
+      document.getElementById("lesson-pretest-result-screen").style.display = "none";
+
+      document.getElementById("lesson-pretest-intro-title").textContent = `Pre-Test: ${state.pretestLesson.title}`;
+
+      switchView("lesson-pretest-view");
+    })
+    .catch(err => {
+      console.error("Failed to load full lesson data for pretest:", err);
+      alert("Error loading lesson from database.");
+    });
+}
+
+function startLessonPretestQuiz() {
+  state.lessonPretestIndex = 0;
+  state.lessonPretestScore = 0;
+  state.lessonPretestQuestions = [];
+
+  const vocab = state.pretestLesson.vocab;
+  const qCount = Math.min(3, vocab.length);
+
+  // Generate 3 unique questions based on vocab
+  for (let i = 0; i < qCount; i++) {
+    const target = vocab[i];
+    const qType = Math.floor(Math.random() * 4); // 0 = meaning, 1 = pinyin, 2 = character, 3 = listening
+    let questionText = "";
+    let answerVal = "";
+    let explanationText = "";
+    let options = [];
+    let qTypeStr = "text";
+    let testWordStr = "";
+
+    if (qType === 0) {
+      questionText = `What is the meaning of the character "${target.character}"?`;
+      answerVal = target.meaning;
+      explanationText = `"${target.character}" (${target.pinyin}) means "${target.meaning}".`;
+      options.push(target.meaning);
+      vocab.forEach(v => {
+        if (v.meaning !== target.meaning && options.length < 4) {
+          options.push(v.meaning);
+        }
+      });
+      while (options.length < 4) {
+        options.push("To listen " + options.length);
+      }
+    } else if (qType === 1) {
+      questionText = `What is the correct pinyin for "${target.character}" (${target.meaning})?`;
+      answerVal = target.pinyin;
+      explanationText = `The pronunciation for "${target.character}" is "${target.pinyin}".`;
+      options.push(target.pinyin);
+      vocab.forEach(v => {
+        if (v.pinyin !== target.pinyin && options.length < 4) {
+          options.push(v.pinyin);
+        }
+      });
+      while (options.length < 4) {
+        options.push("pīn" + options.length);
+      }
+    } else if (qType === 2) {
+      questionText = `Which character matches the meaning "${target.meaning}"?`;
+      answerVal = target.character;
+      explanationText = `"${target.character}" is the character for "${target.meaning}".`;
+      options.push(target.character);
+      vocab.forEach(v => {
+        if (v.character !== target.character && options.length < 4) {
+          options.push(v.character);
+        }
+      });
+      while (options.length < 4) {
+        options.push("字" + options.length);
+      }
+    } else {
+      qTypeStr = "listening";
+      testWordStr = target.character;
+      questionText = `Listen and select the correct meaning:`;
+      answerVal = target.meaning;
+      explanationText = `You heard "${target.pinyin}" (${target.character}), which means "${target.meaning}".`;
+      options.push(target.meaning);
+      vocab.forEach(v => {
+        if (v.meaning !== target.meaning && options.length < 4) {
+          options.push(v.meaning);
+        }
+      });
+      while (options.length < 4) {
+        options.push("Meaning " + options.length);
+      }
+    }
+
+    // Shuffle options
+    options.sort(() => Math.random() - 0.5);
+
+    state.lessonPretestQuestions.push({
+      type: qTypeStr,
+      testWord: testWordStr,
+      question: questionText,
+      answer: answerVal,
+      explanation: explanationText,
+      options: options
+    });
+  }
+
+  loadLessonPretestQuestion();
+}
+
+function loadLessonPretestQuestion() {
+  const q = state.lessonPretestQuestions[state.lessonPretestIndex];
+  const totalCount = state.lessonPretestQuestions.length;
+
+  document.getElementById("lesson-pretest-question-number").textContent = `Question ${state.lessonPretestIndex + 1} of ${totalCount}`;
+  document.getElementById("lesson-pretest-progress-fill").style.width = `${(state.lessonPretestIndex / totalCount) * 100}%`;
+
+  const qText = document.getElementById("lesson-pretest-question-text");
+  
+  if (q.type === 'listening') {
+    qText.innerHTML = `
+      <div style="text-align: center; margin-bottom: 1rem;">
+        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem;">${q.question}</p>
+        <button id="lesson-pretest-audio-btn" class="audio-btn" style="width:60px; height:60px; font-size:1.5rem;">🔊</button>
+      </div>
+    `;
+    setTimeout(() => {
+      const btn = document.getElementById('lesson-pretest-audio-btn');
+      if (btn) {
+        btn.addEventListener('click', () => speakText(q.testWord));
+        speakText(q.testWord);
+      }
+    }, 10);
+  } else {
+    qText.textContent = q.question;
+  }
+
+  const container = document.getElementById("lesson-pretest-options-container");
+  container.innerHTML = "";
+
+  document.getElementById("lesson-pretest-explanation-box").style.display = "none";
+  document.getElementById("lesson-pretest-next-btn").style.display = "none";
+
+  q.options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "quiz-option";
+    btn.textContent = opt;
+    btn.style.width = "100%";
+    btn.style.textAlign = "left";
+    btn.style.marginBottom = "0.5rem";
+    btn.onclick = () => selectLessonPretestAnswer(btn, opt);
+    container.appendChild(btn);
+  });
+}
+
+function selectLessonPretestAnswer(button, selectedVal) {
+  const q = state.lessonPretestQuestions[state.lessonPretestIndex];
+  const options = document.getElementById("lesson-pretest-options-container").querySelectorAll(".quiz-option");
+
+  options.forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === q.answer) {
+      btn.style.borderColor = "var(--success)";
+    }
+  });
+
+  const isCorrect = selectedVal === q.answer;
+  if (isCorrect) {
+    state.lessonPretestScore++;
+    button.style.background = "rgba(0, 245, 212, 0.1)";
+    button.style.borderColor = "var(--success)";
+  } else {
+    button.style.background = "rgba(255, 77, 109, 0.1)";
+    button.style.borderColor = "var(--error)";
+  }
+
+  const expBox = document.getElementById("lesson-pretest-explanation-box");
+  const expText = document.getElementById("lesson-pretest-explanation-text");
+  expText.textContent = q.explanation;
+  expBox.style.display = "block";
+  expBox.style.borderColor = isCorrect ? "var(--success)" : "var(--error)";
+  expBox.querySelector("strong").style.color = isCorrect ? "var(--success)" : "var(--error)";
+  expBox.querySelector("strong").textContent = isCorrect ? "✓ Correct!" : "✗ Incorrect";
+
+  const nextBtn = document.getElementById("lesson-pretest-next-btn");
+  nextBtn.style.display = "inline-block";
+  if (state.lessonPretestIndex === state.lessonPretestQuestions.length - 1) {
+    nextBtn.textContent = "See Results ➔";
+  } else {
+    nextBtn.textContent = "Next Question ➔";
+  }
+}
+
+function nextLessonPretestQuestion() {
+  if (state.lessonPretestIndex < state.lessonPretestQuestions.length - 1) {
+    state.lessonPretestIndex++;
+    loadLessonPretestQuestion();
+  } else {
+    finishLessonPretest();
+  }
+}
+
+function finishLessonPretest() {
+  document.getElementById("lesson-pretest-quiz-screen").style.display = "none";
+  document.getElementById("lesson-pretest-result-screen").style.display = "block";
+
+  const score = state.lessonPretestScore;
+  const total = state.lessonPretestQuestions.length;
+
+  document.getElementById("lesson-pretest-score-display").textContent = `${score} / ${total}`;
+
+  const recTitle = document.getElementById("lesson-pretest-recommendation-title");
+  const recDesc = document.getElementById("lesson-pretest-recommendation-desc");
+  const skipBtn = document.getElementById("lesson-pretest-skip-lesson-btn");
+
+  if (score === total) {
+    recTitle.textContent = "Outstanding mastery! 🌟";
+    recTitle.style.color = "var(--success)";
+    recDesc.textContent = "You answered all pre-test questions correctly! You already know the vocabulary and grammar covered here. You can skip this lesson to save time, or study anyway to lock in your score.";
+    skipBtn.style.display = "inline-block";
+  } else {
+    recTitle.textContent = "Ready to learn! 📚";
+    recTitle.style.color = "var(--primary)";
+    recDesc.textContent = `You scored ${score}/${total}. This is the perfect level for you to study! Start the 1-hour study block to master these words and grammar rules.`;
+    skipBtn.style.display = "none";
+  }
+}
+
+// --- PINYIN CHART LOGIC ---
+let pinyinMatrixData = null;
+
+async function initPinyinChart() {
+  try {
+    // Load Rules
+    const rulesRes = await fetch('/api/lessons/hsk1_day0');
+    if (rulesRes.ok) {
+      const lessonData = await rulesRes.json();
+      renderPinyinRules(lessonData.grammar);
+    }
+
+    // Load Matrix if not loaded
+    if (!pinyinMatrixData) {
+      const matrixRes = await fetch('/pinyin_data.json');
+      if (matrixRes.ok) {
+        pinyinMatrixData = await matrixRes.json();
+        renderPinyinMatrix(pinyinMatrixData);
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load Pinyin chart data', err);
+  }
+}
+
+function renderPinyinRules(rules) {
+  const container = document.getElementById('pinyin-rules-container');
+  container.innerHTML = '';
+  
+  rules.forEach(rule => {
+    const card = document.createElement('div');
+    card.className = 'rule-card';
+    card.innerHTML = `
+      <h4>${rule.title}</h4>
+      <p>${rule.explanation.replace(/\n/g, '<br>')}</p>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderPinyinMatrix(data) {
+  const container = document.getElementById('pinyin-matrix');
+  container.innerHTML = '';
+  
+  // +1 for the initials column
+  container.style.gridTemplateColumns = `repeat(${data.finals.length + 1}, minmax(40px, 1fr))`;
+  
+  // Header Row
+  let html = '<div class="pinyin-cell header-cell"></div>';
+  data.finals.forEach(f => {
+    html += `<div class="pinyin-cell header-cell">${f}</div>`;
+  });
+  
+  // Rows
+  data.initials.forEach(i => {
+    html += `<div class="pinyin-cell header-cell">${i || '-'}</div>`;
+    
+    data.finals.forEach(f => {
+      const cellData = data.matrix[i] && data.matrix[i][f];
+      if (cellData) {
+        const base = cellData.base;
+        let popupHtml = `<div class="tones-popup">`;
+        cellData.tones.forEach(tone => {
+          popupHtml += `<button class="popup-tone-btn" onclick="event.stopPropagation(); playTone('${tone.pinyin}')">${tone.pinyin}</button>`;
+        });
+        popupHtml += `</div>`;
+        html += `<div class="pinyin-cell" onclick="playTone('${cellData.tones[0].pinyin}')">${base}${popupHtml}</div>`;
+      } else {
+        html += '<div class="pinyin-cell empty-cell"></div>';
+      }
+    });
+  });
+  
+  container.innerHTML = html;
+}
+
+function playTone(text) {
+  // Convert accented Pinyin to base+tone number (e.g. bā -> ba1)
+  const toneMap = {
+    'ā': { char: 'a', tone: '1' }, 'á': { char: 'a', tone: '2' }, 'ǎ': { char: 'a', tone: '3' }, 'à': { char: 'a', tone: '4' },
+    'ē': { char: 'e', tone: '1' }, 'é': { char: 'e', tone: '2' }, 'ě': { char: 'e', tone: '3' }, 'è': { char: 'e', tone: '4' },
+    'ī': { char: 'i', tone: '1' }, 'í': { char: 'i', tone: '2' }, 'ǐ': { char: 'i', tone: '3' }, 'ì': { char: 'i', tone: '4' },
+    'ō': { char: 'o', tone: '1' }, 'ó': { char: 'o', tone: '2' }, 'ǒ': { char: 'o', tone: '3' }, 'ò': { char: 'o', tone: '4' },
+    'ū': { char: 'u', tone: '1' }, 'ú': { char: 'u', tone: '2' }, 'ǔ': { char: 'u', tone: '3' }, 'ù': { char: 'u', tone: '4' },
+    'ǖ': { char: 'v', tone: '1' }, 'ǘ': { char: 'v', tone: '2' }, 'ǚ': { char: 'v', tone: '3' }, 'ǜ': { char: 'v', tone: '4' },
+    'ü': { char: 'v', tone: '5' }
+  };
+
+  let base = text.toLowerCase();
+  let toneNumber = '5';
+
+  for (const [accented, data] of Object.entries(toneMap)) {
+    if (base.includes(accented)) {
+      base = base.replace(accented, data.char);
+      toneNumber = data.tone;
+      break;
+    }
+  }
+
+  // Use real human-recorded MP3s for flawless pronunciation!
+  const url = `https://www.purpleculture.net/mp3/${base}${toneNumber}.mp3`;
+  const audio = new Audio(url);
+  audio.play().catch(err => {
+    console.error("Audio playback failed:", err);
+    alert('Audio playback failed. Make sure your volume is up and you are connected to the internet.');
+  });
 }

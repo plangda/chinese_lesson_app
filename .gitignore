@@ -1,0 +1,14 @@
+node_modules/
+.env
+*.db
+*.sqlite
+*.sqlite3
+*.zip
+*.png
+*.jpg
+*.pdf
+.agents/
+temp_hsk/
+generation_log.txt
+server_lines.txt
+Screenshot*.png
