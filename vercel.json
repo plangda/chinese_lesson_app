@@ -1,9 +1,24 @@
 {
   "version": 2,
   "builds": [
-    { "src": "server.js", "use": "@vercel/node" }
+    {
+      "src": "server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "index.html",
+          "app.js",
+          "style.css",
+          "i18n.js",
+          "hanzi-writer.min.js",
+          "pinyin_data.json",
+          "favicon.svg",
+          "favicon.png"
+        ]
+      }
+    }
   ],
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/server.js" }
+  "routes": [
+    { "src": "/(.*)", "dest": "server.js" }
   ]
 }
