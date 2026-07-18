@@ -56,7 +56,7 @@ app.get('/api/lessons/:id', async (req, res) => {
     }
     
     // Fetch relations
-    const vocab = await db.all('SELECT * FROM vocab WHERE lesson_id = ? ORDER BY sort_order ASC', [lessonId]);
+    const vocab = await db.all('SELECT *, example_cn as exampleCn, example_py as examplePy, example_en as exampleEn FROM vocab WHERE lesson_id = ? ORDER BY sort_order ASC', [lessonId]);
     
     // Process grammar and nested examples/practice
     const rawGrammar = await db.all('SELECT * FROM grammar WHERE lesson_id = ? ORDER BY sort_order ASC', [lessonId]);
