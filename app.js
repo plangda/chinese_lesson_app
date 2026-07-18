@@ -1720,6 +1720,12 @@ function playTone(text) {
     }
   }
 
+  // Orthography fix: j, q, x, y combined with ü (mapped to v) 
+  // must use 'u' in standard Pinyin file names (ju, qu, xu, yu)
+  if (/^[jqxy]/.test(base)) {
+    base = base.replace(/v/g, 'u');
+  }
+
   // Use real human-recorded MP3s for flawless pronunciation!
   const url = `https://www.purpleculture.net/mp3/${base}${toneNumber}.mp3`;
   const audio = new Audio(url);
