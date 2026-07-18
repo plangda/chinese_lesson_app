@@ -20,6 +20,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Express API & Server Routes** | Phase 1: Database & Backend | `Complete` | 100% | Implemented in `server.js` with routes for lessons, full curricula, and user progress backup. |
 | **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `Complete` | 100% | 21 lessons generated and seeded containing all 150 HSK 1 words, grammar, dialogues, and quizzes. |
 | **HSK 2 & 3 Curriculum Seeding** | Phase 1: Database & Backend | `In Progress` | 20% | 5 mock/structural lessons seeded for HSK 2 and HSK 3; requires full curriculum data generation. |
+| **HSK 4, 5, 6 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Advanced content generation and database seeding for higher proficiency levels. |
 | **Level Placement Pre-Test System** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 12-question diagnostic test that maps results to recommended start levels. |
 | **Lesson Pre-test (Gating)** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 3-question diagnostic pre-test for each lesson with an option to skip if scored 100%. |
 | **Stage 1: Vocabulary & Tracing** | Phase 3: Core Learning Engine | `Complete` | 100% | Flashcards with click-to-flip animations and an interactive drawing canvas using `hanzi-writer.min.js`. |
@@ -34,7 +35,10 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Kid-friendly styling & animations** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Tailored kid-friendly theme with smooth bouncy spring-like physics and transitions; mobile layout refined. |
 | **Thai Localization Expansion** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Integrated a structural language-selection modal with full Turso DB translations for Thai (Vocab, Grammar, Dialogues). |
 | **Pronunciation Assessment** | Phase 6: Future Enhancements | `Not Started` | 0% | Planned integration of speech recognition API to analyze and score user speech input. |
-| **Production Deployment & DevOps** | Phase 6: Future Enhancements | `Not Started` | 0% | Docker containerization and setup on cloud platform (e.g. Vercel/Render). |
+| **Multi-Character Writing Pad** | Phase 6: Future Enhancements | `Not Started` | 0% | Expand `hanzi-writer` logic to allow drawing multiple characters sequentially for vocabularies longer than one character. |
+| **Full HSK Mock Exams (2026 Format)** | Phase 6: Future Enhancements | `Not Started` | 0% | Add comprehensive end-of-level exams simulating the latest official HSK format. |
+| **Contextual LLM Translation Pipeline** | Phase 6: Future Enhancements | `Not Started` | 0% | Build a free-tier LLM data generation script for future curriculum seeding to avoid literal word-by-word translations. |
+| **Production Deployment & Custom Domains** | Phase 6: Future Enhancements | `Not Started` | 0% | Docker containerization, Vercel deployment, and setup of a clean, branded custom domain. |
 | **Automated Test Suite** | Phase 6: Future Enhancements | `Not Started` | 0% | Mock backend API testing (Jest/Supertest) and frontend component testing. |
 | **Authentication Stability Fix** | Maintenance & Bug Fixes | `Complete` | 100% | Resolved case-sensitivity login failures in `auth.js` and removed syntax errors in `app.js` blocking session loads. |
 | **Pre-Test Data Injection** | Maintenance & Bug Fixes | `Complete` | 100% | Restored missing `preTestQuestions` array into `app.js` to unblock user progression to the dashboard. |
@@ -68,7 +72,7 @@ gantt
 
 1. **Phase 1: Database & Backend** (SQLite, REST API, Seeding)
    - **Progress**: 80%
-   - *Next Action*: Expand curriculum files to fully populate HSK 2 (150 words) and HSK 3 (300 words).
+   - *Next Action*: Expand curriculum files to fully populate HSK 2, 3, 4, 5, and 6.
 2. **Phase 2: Diagnostic & Assessment** (Placement & Gating)
    - **Progress**: 100%
    - *Next Action*: Complete.

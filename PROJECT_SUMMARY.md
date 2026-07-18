@@ -57,8 +57,12 @@ HanPath operates as a Single Page Application (SPA) with a lightweight Node.js b
 - ✅ **Phase 5: UX & Localization:** Kid-friendly styling applied, inline styles refactored to CSS utility classes. Complete Thai translation injected across both the frontend UI and Turso database records.
 
 **Pending / Next Steps:**
-- ⏳ **HSK 2 & 3 Seeding:** Content generation and database seeding for the remaining intermediate curriculums.
+- ⏳ **HSK 2 & 3 Seeding:** Content generation and database seeding for the intermediate curriculums.
+- ⏳ **HSK 4, 5 & 6 Seeding:** Advanced content generation and database seeding for higher proficiency levels.
 - ⏳ **Phase 6: Future Enhancements:**
+  - *Multi-Character Writing Pad:* Expanding the `hanzi-writer` integration to support writing multiple characters sequentially for vocabularies longer than one character.
+  - *Full HSK Mock Exams:* Adding comprehensive end-of-level exams that accurately simulate the latest official HSK exam formats (2026 version) for formal test preparation.
+  - *Contextual LLM Translation Pipeline:* Utilizing a free-tier LLM (e.g., Gemini) to generate high-quality, context-aware Thai translations for future curriculum seeding, avoiding awkward word-by-word literal translations.
   - *Pronunciation Assessment:* Integrating a speech-to-text API (e.g., Web Speech API or external service) to score user pronunciation accuracy.
-  - *DevOps:* Docker containerization and formal production deployment (e.g., Vercel, Render, or AWS).
+  - *DevOps & Custom Domains:* Docker containerization, formal production deployment on Vercel, and configuration of a clean, branded custom domain (avoiding phishing-like URLs).
   - *Automated Testing:* Implementing a test suite (Jest/Supertest) to guard against regressions in the API and UI state.
