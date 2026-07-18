@@ -464,18 +464,20 @@ function setupEventListeners() {
   document.getElementById('logout-btn').addEventListener('click', () => {
     showConfirmModal("title_confirm", "msg_logout", () => {
       localStorage.removeItem("hanpath_token");
-      localStorage.removeItem("hanpath_progress");
-      state = {
-        currentView: "welcome-view",
+      localStorage.removeItem("hanpath_data_v2");
+      Object.assign(state, {
+        currentView: "auth-view",
         userLevel: null,
         completedLessons: [],
         score: 0,
         timeSpentMinutes: 0,
         streakDays: 0,
         lastStudyDate: null,
-        hasTakenPlacementTest: false
-      };
-      switchView("welcome-view");
+        hasTakenPlacementTest: false,
+        currentLesson: null,
+        currentLessonId: null
+      });
+      switchView("auth-view");
     });
   });
 
