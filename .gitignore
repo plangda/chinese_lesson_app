@@ -36,6 +36,7 @@ student_progress.json
 # Media and zips
 *.zip
 *.png
+!favicon.png
 *.jpg
 *.pdf
 Screenshot*.png
