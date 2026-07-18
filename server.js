@@ -68,6 +68,7 @@ app.get('/api/lessons/:id', async (req, res) => {
       const gItem = {
         title: g.title,
         explanation: g.explanation,
+        explanation_th: g.explanation_th,
         examples: examples
       };
       
@@ -134,7 +135,7 @@ app.get('/api/curriculum/:level', async (req, res) => {
     console.log("Vocab fetched:", allVocab.length);
     
     // Bulk fetch grammar
-    const allGrammar = await db.all(`SELECT id, lesson_id, title, explanation FROM grammar WHERE lesson_id IN (${placeholders}) ORDER BY sort_order ASC`, lessonIds);
+    const allGrammar = await db.all(`SELECT id, lesson_id, title, explanation, explanation_th FROM grammar WHERE lesson_id IN (${placeholders}) ORDER BY sort_order ASC`, lessonIds);
     const grammarIds = allGrammar.map(g => g.id);
     let allGrammarExamples = [];
     let allGrammarPractice = [];
