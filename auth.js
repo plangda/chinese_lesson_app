@@ -5,7 +5,11 @@ const { getDb } = require('./database');
 const crypto = require('crypto');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'hanpath-secret-key-12345';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error("FATAL ERROR: JWT_SECRET environment variable is missing.");
+  process.exit(1);
+}
 
 // Register User
 router.post('/register', async (req, res) => {

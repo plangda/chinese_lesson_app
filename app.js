@@ -108,6 +108,17 @@ function loadProgress() {
     })
     .then(serverData => {
       if (serverData && Object.keys(serverData).length > 0) {
+        // Smart merge: take max score and time, union of completed lessons
+        if (state.score > serverData.score) serverData.score = state.score;
+        if (state.timeSpentMinutes > serverData.timeSpentMinutes) serverData.timeSpentMinutes = state.timeSpentMinutes;
+        
+        const mergedLessons = new Set([...(state.completedLessons || []), ...(serverData.completedLessons || [])]);
+        serverData.completedLessons = Array.from(mergedLessons);
+        
+        if (!serverData.userLevel && state.userLevel) {
+           serverData.userLevel = state.userLevel;
+        }
+
         applyProgressState(serverData);
         localStorage.setItem("hanpath_data_v2", JSON.stringify(serverData));
         if (state.userLevel) {
@@ -132,8 +143,11 @@ function loadProgress() {
 }
 
 function fetchCurriculumAndRender(level) {
-  fetch(`/api/lessons?level=${level}`)
-    .then(res => res.json())
+  fetch(`/api/curriculum/${level}`)
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    })
     .then(data => {
       if (!window.CHINESE_LESSONS) {
         window.CHINESE_LESSONS = {
@@ -153,7 +167,13 @@ function fetchCurriculumAndRender(level) {
       window.CHINESE_LESSONS.lessons[level] = data;
       renderDashboard();
     })
-    .catch(err => console.error("Failed to fetch curriculum:", err));
+    .catch(err => {
+      console.error("Failed to fetch curriculum:", err);
+      const container = document.getElementById('dashboard-lessons-container');
+      if (container) {
+         container.innerHTML = '<div class="error text-center mt-3" style="color: var(--danger);">Failed to load lessons. Please check your connection and try again.</div>';
+      }
+    });
 }
 
 function applyProgressState(data) {
@@ -216,12 +236,17 @@ function saveProgress() {
 
 
 
-function translateUI() {
+let _i18nNodesCache = null;
+function translateUI(forceRequery = false) {
   const currentLang = state.currentLanguage || "en";
   const dict = i18nDictionary[currentLang];
   if (!dict) return;
   
-  document.querySelectorAll("[data-i18n]").forEach(el => {
+  if (!_i18nNodesCache || forceRequery) {
+      _i18nNodesCache = document.querySelectorAll("[data-i18n]");
+  }
+  
+  _i18nNodesCache.forEach(el => {
     const key = el.getAttribute("data-i18n");
     if (dict[key]) {
       if (el.tagName === 'INPUT' && el.hasAttribute('placeholder')) {
@@ -638,7 +663,7 @@ function renderDashboard() {
   const container = document.getElementById('dashboard-lessons-container');
   container.innerHTML = '';
   
-  const lessons = CHINESE_LESSONS.lessons[state.userLevel] || [];
+  const lessons = (window.CHINESE_LESSONS && window.CHINESE_LESSONS.lessons) ? (window.CHINESE_LESSONS.lessons[state.userLevel] || []) : [];
   
   // Update Today's Recommended Lesson Panel
   const activeLesson = lessons.find(l => !state.completedLessons.includes(l.id));
@@ -699,14 +724,14 @@ function renderDashboard() {
     div.className = `lesson-row glass-panel ${isCompleted ? 'completed' : ''}`;
     div.innerHTML = `
       <div class="lesson-info">
-        <h4 style="margin-bottom: 0.25rem;">${(state.currentLanguage === 'th' && l.title_th) ? l.title_th : l.title}</h4>
-        <div style="font-size: 0.85rem; color: var(--text-muted);">
+        <h4 class="mb-1">${(state.currentLanguage === 'th' && l.title_th) ? l.title_th : l.title}</h4>
+        <div class="text-sm text-muted">
           ${state.currentLanguage === 'th' ? '4 ด่าน • 60 นาที' : '4 Stages • 60 Minutes'}
         </div>
       </div>
       <div>
         ${isCompleted ? 
-          `<span style="color: var(--success); font-weight: bold;">✔ ${state.currentLanguage === 'th' ? 'เสร็จแล้ว' : 'Done'}</span>` : 
+          `<span class="text-success fw-bold">✔ ${state.currentLanguage === 'th' ? 'เสร็จแล้ว' : 'Done'}</span>` : 
           `<button class="btn btn-primary btn-sm start-lesson-btn" data-id="${l.id}">${state.currentLanguage === 'th' ? 'เริ่มบทเรียน' : 'Start Lesson'}</button>`
         }
       </div>
@@ -999,8 +1024,19 @@ function renderQuizPane() {
 }
 
 function renderQuizQuestion() {
+  const isThai = state.currentLanguage === 'th';
+  document.getElementById('quiz-progress').textContent = isThai ? 
+    `คำถามที่ ${state.quizIndex + 1} จาก ${state.currentLesson.quiz.length}` : 
+    `Question ${state.quizIndex + 1} of ${state.currentLesson.quiz.length}`;
+  
   const q = state.currentLesson.quiz[state.quizIndex];
-  document.getElementById('lesson-quiz-question-lbl').innerHTML = `<span>Question ${state.quizIndex + 1} of ${state.currentLesson.quiz.length}</span>`;
+  const qText = document.getElementById('quiz-question-text');
+  
+  if (q.type === 'audio') {
+    qText.innerHTML = `<span style="font-size: 2rem;">🔊</span> <br/> ${isThai ? 'ฟังและเลือกคำตอบที่ถูกต้อง:' : 'Listen and select the correct option:'}`;
+  } else {
+    qText.textContent = (isThai && q.question_th) ? q.question_th : q.question;
+  }
   
   if (q.type === 'listening') {
     document.getElementById('lesson-quiz-text').innerHTML = `
@@ -1123,6 +1159,12 @@ function initPretest() {
 }
 
 function loadPretestQuestion() {
+  const isThai = state.currentLanguage === 'th';
+  document.getElementById('pretest-quiz-progress').textContent = isThai ? 
+    `คำถามที่ ${state.pretestIndex + 1} จาก ${window.CHINESE_LESSONS.preTestQuestions.length}` : 
+    `Question ${state.pretestIndex + 1} of ${window.CHINESE_LESSONS.preTestQuestions.length}`;
+  
+  const qText = document.getElementById('pretest-question-text');
   const questionsList = window.CHINESE_LESSONS.preTestQuestions;
   const totalCount = questionsList.length;
   const question = questionsList[state.pretestIndex];
@@ -1140,8 +1182,7 @@ function loadPretestQuestion() {
   document.getElementById("pretest-question-level").textContent = hskLevelText;
   document.getElementById("pretest-progress-fill").style.width = `${((state.pretestIndex) / totalCount) * 100}%`;
   
-  const qText = document.getElementById("pretest-question-text");
-  qText.textContent = question.question;
+  qText.textContent = question.question; // Ideally this comes from a localized source as well options
   
   document.getElementById("pretest-explanation-box").style.display = "none";
   document.getElementById("pretest-next-btn").style.display = "none";

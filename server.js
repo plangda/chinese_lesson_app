@@ -15,14 +15,13 @@ app.use(express.static(path.join(__dirname, '')));
 // Global DB instance
 let db;
 
-// Initialize DB connection
-async function init() {
-  db = await getDb();
-  
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+// Ensure DB is initialized before handling any requests (Serverless pattern)
+app.use(async (req, res, next) => {
+  if (!db) {
+    db = await getDb();
+  }
+  next();
+});
 
 // API Routes
 app.use('/api/auth', authRouter);
@@ -121,52 +120,87 @@ app.get('/api/lessons/:id', async (req, res) => {
 app.get('/api/curriculum/:level', async (req, res) => {
   try {
     const level = req.params.level;
-    const lessons = await db.all('SELECT id FROM lessons WHERE hsk_level = ? ORDER BY day_number ASC', [level]);
+    console.log("Fetching curriculum for level:", level);
+    const lessons = await db.all('SELECT * FROM lessons WHERE hsk_level = ? AND day_number > 0 ORDER BY day_number ASC', [level]);
+    console.log("Found lessons:", lessons.length);
+    if (lessons.length === 0) return res.json([]);
+
+    const lessonIds = lessons.map(l => l.id);
+    const placeholders = lessonIds.map(() => '?').join(',');
+
+    // Bulk fetch vocab
+    console.log("Fetching vocab for lessons...");
+    const allVocab = await db.all(`SELECT lesson_id, character, pinyin, meaning, meaning_th, deconstruct, deconstruct_th, example_cn as exampleCn, example_py as examplePy, example_en as exampleEn, example_th FROM vocab WHERE lesson_id IN (${placeholders}) ORDER BY sort_order ASC`, lessonIds);
+    console.log("Vocab fetched:", allVocab.length);
     
-    // Fetch full data for each lesson.
-    // In a real app we might paginate or only fetch active lesson, but to maintain
-    // compatibility with the old app.js, we return everything at once.
-    const curriculum = [];
+    // Bulk fetch grammar
+    const allGrammar = await db.all(`SELECT id, lesson_id, title, explanation FROM grammar WHERE lesson_id IN (${placeholders}) ORDER BY sort_order ASC`, lessonIds);
+    const grammarIds = allGrammar.map(g => g.id);
+    let allGrammarExamples = [];
+    let allGrammarPractice = [];
     
-    for (const l of lessons) {
-      // (This is n+1 queries, but okay for trial/local usage. For prod, we'd use JOINs)
-      const lesson = await db.get('SELECT * FROM lessons WHERE id = ?', [l.id]);
-      const vocab = await db.all('SELECT character, pinyin, meaning, meaning_th, deconstruct, deconstruct_th, example_cn as exampleCn, example_py as examplePy, example_en as exampleEn, example_th FROM vocab WHERE lesson_id = ? ORDER BY sort_order ASC', [l.id]);
+    if (grammarIds.length > 0) {
+        const gPlaceholders = grammarIds.map(() => '?').join(',');
+        allGrammarExamples = await db.all(`SELECT grammar_id, cn, py, en, th FROM grammar_examples WHERE grammar_id IN (${gPlaceholders}) ORDER BY sort_order ASC`, grammarIds);
+        allGrammarPractice = await db.all(`SELECT grammar_id, prompt, words, answer FROM grammar_practice WHERE grammar_id IN (${gPlaceholders})`, grammarIds);
+    }
+
+    // Bulk fetch dialogues
+    console.log("Fetching dialogues...");
+    const allDialogues = await db.all(`SELECT id, lesson_id, title FROM dialogues WHERE lesson_id IN (${placeholders})`, lessonIds);
+    const dialogueIds = allDialogues.map(d => d.id);
+    let allDialogueLines = [];
+    
+    if (dialogueIds.length > 0) {
+        const dPlaceholders = dialogueIds.map(() => '?').join(',');
+        console.log("Fetching dialogue lines...");
+        allDialogueLines = await db.all(`SELECT dialogue_id, speaker, cn, py, en, th FROM dialogue_lines WHERE dialogue_id IN (${dPlaceholders}) ORDER BY sort_order ASC`, dialogueIds);
+    }
+
+    // Bulk fetch quizzes
+    console.log("Fetching quizzes...");
+    const allQuizzes = await db.all(`SELECT lesson_id, type, testWord, question, question_th, options, answer, explanation, explanation_th FROM quizzes WHERE lesson_id IN (${placeholders}) ORDER BY sort_order ASC`, lessonIds);
+
+    console.log("Assembling curriculum...");
+    const curriculum = lessons.map(lesson => {
+      const lid = lesson.id;
       
-      const rawGrammar = await db.all('SELECT * FROM grammar WHERE lesson_id = ? ORDER BY sort_order ASC', [l.id]);
-      const grammar = [];
-      for (const g of rawGrammar) {
-        const examples = await db.all('SELECT cn, py, en, th FROM grammar_examples WHERE grammar_id = ? ORDER BY sort_order ASC', [g.id]);
-        const practice = await db.get('SELECT prompt, words, answer FROM grammar_practice WHERE grammar_id = ?', [g.id]);
-        
+      const lessonVocab = allVocab.filter(v => v.lesson_id === lid).map(({lesson_id, ...rest}) => rest);
+      
+      const lessonGrammarRaw = allGrammar.filter(g => g.lesson_id === lid);
+      const lessonGrammar = lessonGrammarRaw.map(g => {
+        const examples = allGrammarExamples.filter(ex => ex.grammar_id === g.id).map(({grammar_id, ...rest}) => rest);
+        const practiceRow = allGrammarPractice.find(p => p.grammar_id === g.id);
         const gItem = { title: g.title, explanation: g.explanation, examples: examples };
-        if (practice) {
-          gItem.practice = { prompt: practice.prompt, words: JSON.parse(practice.words), answer: JSON.parse(practice.answer) };
+        if (practiceRow) {
+          gItem.practice = { prompt: practiceRow.prompt, words: JSON.parse(practiceRow.words), answer: JSON.parse(practiceRow.answer) };
         }
-        grammar.push(gItem);
-      }
-      
-      const dialogueRaw = await db.get('SELECT id, title FROM dialogues WHERE lesson_id = ?', [l.id]);
+        return gItem;
+      });
+
+      const lessonDialogueRaw = allDialogues.find(d => d.lesson_id === lid);
       let dialogue = null;
-      if (dialogueRaw) {
-        const lines = await db.all('SELECT speaker, cn, py, en, th FROM dialogue_lines WHERE dialogue_id = ? ORDER BY sort_order ASC', [dialogueRaw.id]);
-        dialogue = { title: dialogueRaw.title, lines: lines };
+      if (lessonDialogueRaw) {
+        const lines = allDialogueLines.filter(l => l.dialogue_id === lessonDialogueRaw.id).map(({dialogue_id, ...rest}) => rest);
+        dialogue = { title: lessonDialogueRaw.title, lines: lines };
       }
-      
-      const quizzesRaw = await db.all('SELECT type, testWord, question, question_th, options, answer, explanation, explanation_th FROM quizzes WHERE lesson_id = ? ORDER BY sort_order ASC', [l.id]);
-      const quiz = quizzesRaw.map(q => ({ ...q, options: JSON.parse(q.options) }));
-      
-      curriculum.push({
+
+      const lessonQuiz = allQuizzes.filter(q => q.lesson_id === lid).map(({lesson_id, ...rest}) => ({
+        ...rest,
+        options: JSON.parse(rest.options)
+      }));
+
+      return {
         id: lesson.id,
         title: lesson.title,
-      title_th: lesson.title_th,
-        vocab: vocab,
-        grammar: grammar,
+        title_th: lesson.title_th,
+        vocab: lessonVocab,
+        grammar: lessonGrammar,
         dialogue: dialogue,
-        quiz: quiz
-      });
-    }
-    
+        quiz: lessonQuiz
+      };
+    });
+
     res.json(curriculum);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -181,15 +215,14 @@ app.get('/api/user/:userId/progress', async (req, res) => {
 
     // 1. Try to read from student_progress.json first to sync with local file state
     let fileProgress = null;
-    if (fs.existsSync(progressFilePath)) {
-      try {
-        const fileContent = fs.readFileSync(progressFilePath, 'utf8');
-        if (fileContent.trim()) {
-          fileProgress = JSON.parse(fileContent);
-        }
-      } catch (fileErr) {
-        console.error('Error reading student_progress.json:', fileErr);
+    try {
+      await fs.promises.access(progressFilePath);
+      const fileContent = await fs.promises.readFile(progressFilePath, 'utf8');
+      if (fileContent.trim()) {
+        fileProgress = JSON.parse(fileContent);
       }
+    } catch (fileErr) {
+      // File does not exist or cannot be read, which is fine
     }
 
     // 2. Query database progress
@@ -242,8 +275,12 @@ app.get('/api/user/:userId/progress', async (req, res) => {
         hasTakenPlacementTest: progress.has_taken_placement_test === 1,
         lastReminderDate: progress.last_reminder_date || null
       };
-      
-      fs.writeFileSync(progressFilePath, JSON.stringify(newFileProgress, null, 2), 'utf8');
+      try {
+        await fs.promises.writeFile(progressFilePath, JSON.stringify(newFileProgress, null, 2), 'utf8');
+      } catch (err) {
+        // Ignore file write errors in production (read-only filesystem)
+        if (!process.env.VERCEL) console.error("Local file write failed:", err.message);
+      }
     }
 
     // Map snake_case database fields to camelCase client properties
@@ -300,8 +337,11 @@ app.post('/api/user/:userId/progress', async (req, res) => {
       hasTakenPlacementTest: body.hasTakenPlacementTest || false,
       lastReminderDate: body.lastReminderDate || null
     };
-    
-    fs.writeFileSync(progressFilePath, JSON.stringify(fileProgress, null, 2), 'utf8');
+    try {
+      await fs.promises.writeFile(progressFilePath, JSON.stringify(fileProgress, null, 2), 'utf8');
+    } catch (err) {
+      if (!process.env.VERCEL) console.error("Local file write failed:", err.message);
+    }
     
     res.json({ success: true });
   } catch (err) {
@@ -368,4 +408,11 @@ app.post('/api/progress', requireAuth, async (req, res) => {
   }
 });
 
-init().catch(console.error);
+// Start server locally (Vercel will ignore this and use module.exports)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
