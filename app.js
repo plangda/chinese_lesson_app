@@ -1650,9 +1650,10 @@ function renderPinyinRules(rules) {
   rules.forEach(rule => {
     const card = document.createElement('div');
     card.className = 'rule-card';
+    const explanation = (state.currentLanguage === 'th' && rule.explanation_th) ? rule.explanation_th : rule.explanation;
     card.innerHTML = `
       <h4>${rule.title}</h4>
-      <p>${rule.explanation.replace(/\n/g, '<br>')}</p>
+      <p>${explanation.replace(/\n/g, '<br>')}</p>
     `;
     container.appendChild(card);
   });
