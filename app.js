@@ -1162,8 +1162,7 @@ function renderQuizPane() {
 function renderQuizQuestion() {
   const questionLbl = document.getElementById('lesson-quiz-question-lbl');
   
-  // Restore the normal nextBtn onclick behavior if we have a quiz
-  document.getElementById('lesson-quiz-next-btn').onclick = nextQuizQuestion;
+  // The click listener is already added in initEvents(), no need to re-assign onclick here.
 
   if (questionLbl) {
     questionLbl.innerHTML = `<span>${t('question_progress', { current: state.quizIndex + 1, total: state.currentLesson.quiz.length })}</span>`;
