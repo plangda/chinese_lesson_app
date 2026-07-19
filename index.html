@@ -57,15 +57,15 @@
       <div class="glass-panel congrats-card" style="max-width: 450px; margin: 4rem auto; text-align: left;">
         <h2 id="auth-title" style="font-size: 2rem; margin-bottom: 1.5rem; font-family: var(--font-serif); text-align: center; color: var(--primary);"><span data-i18n="login_title">Login to HanPath</span></h2>
         <form id="auth-form" style="display: flex; flex-direction: column; gap: 1rem;">
-          <input type="email" id="auth-email" placeholder="Email Address" data-i18n="placeholder_email" data-i18n="placeholder_email" required class="quiz-q-text" style="padding: 0.75rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
-          <input type="password" id="auth-password" placeholder="Password" data-i18n="placeholder_password" data-i18n="placeholder_password" required class="quiz-q-text" style="padding: 0.75rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
-          <input type="text" id="auth-name" placeholder="Your Name (Optional)" data-i18n="placeholder_name" data-i18n="placeholder_name" class="quiz-q-text" style="display: none; padding: 0.75rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
-          <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="margin-top: 1rem; padding: 0.75rem;" data-i18n="btn_login"><span data-i18n="btn_login">Login</span></button>
+          <input type="email" id="auth-email" placeholder="Email Address" data-i18n="placeholder_email" required class="quiz-q-text" style="padding: 0.75rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
+          <input type="password" id="auth-password" placeholder="Password" data-i18n="placeholder_password" required class="quiz-q-text" style="padding: 0.75rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
+          <input type="text" id="auth-name" placeholder="Your Name (Optional)" data-i18n="placeholder_name" class="quiz-q-text" style="display: none; padding: 0.75rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
+          <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="margin-top: 1rem; padding: 0.75rem;" data-i18n="btn_login">Login</button>
         </form>
         <div id="auth-error" style="color: #ff6b6b; font-size: 0.9rem; margin-top: 1rem; text-align: center; display: none;"></div>
         <p style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;">
-          <span id="auth-toggle-text" data-i18n="auth_no_account">Don\'t have an account?</span> 
-          <a href="#" id="auth-toggle-link" style="color: var(--primary); font-weight: bold; text-decoration: none;" data-i18n="auth_sign_up"><span data-i18n="auth_sign_up">Sign Up</span></a>
+          <span id="auth-toggle-text" data-i18n="auth_no_account">Don't have an account?</span> 
+          <a href="#" id="auth-toggle-link" style="color: var(--primary); font-weight: bold; text-decoration: none;" data-i18n="auth_sign_up">Sign Up</a>
         </p>
       </div>
     </section>
@@ -74,7 +74,7 @@
     <section id="welcome-view" class="view-section">
       <div class="glass-panel congrats-card" style="max-width: 700px; margin: 2rem auto;">
         <div class="congrats-icon" style="animation: none; font-size: 5rem;">👋</div>
-        <h1 style="font-size: 2.5rem; margin-bottom: 1rem; font-family: var(--font-serif);" data-i18n="welcome_title"><span data-i18n="welcome_title">Welcome to HanPath</span></h1>
+        <h1 style="font-size: 2.2rem; margin-bottom: 1rem; font-family: var(--font-serif);" data-i18n="welcome_title">Welcome to HanPath</h1>
         <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem;">
           <span data-i18n="welcome_desc">Mastering Chinese requires daily consistency. Not sure where to start? Take our diagnostic pre-test to find your current level, or pick one manually!</span>
         </p>
@@ -102,7 +102,7 @@
         <!-- 1. Intro Screen -->
         <div id="pretest-intro-screen" class="pretest-intro">
           <div class="congrats-icon" style="animation: none; font-size: 5rem;">📝</div>
-          <h2 style="font-family: var(--font-serif); margin-bottom: 1rem;" data-i18n="pretest_placement_title"><span data-i18n="pretest_placement_title">Level Placement Test</span></h2>
+          <h2 style="font-family: var(--font-serif); margin-bottom: 1.5rem; color: var(--primary);" data-i18n="pretest_placement_title">Level Placement Test</h2>
           <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem;">
             <span data-i18n="pretest_placement_desc">This diagnostic test contains questions covering vocabulary, pronunciation, and grammar from HSK 1, 2, and 3. It will place you in the optimal daily study level.</span>
           </p>
@@ -201,7 +201,7 @@
           <div class="glass-panel student-card">
             <div class="student-welcome">
               <span id="dashboard-level-badge" class="student-level-tag">HSK 1 (Beginner)</span>
-              <h1 data-i18n="welcome_back"><span data-i18n="welcome_back">Welcome Back, Scholar!</span></h1>
+              <h1 data-i18n="welcome_back">Welcome Back, Scholar!</h1>
               <p style="color: var(--text-secondary);"><span data-i18n="study_program_desc">Your study program consists of structured daily lessons of 1 hour each.</span></p>
             </div>
             
@@ -224,7 +224,7 @@
           <!-- Pinyin Chart Banner -->
           <div class="glass-panel" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent); cursor: pointer;" id="pinyin-chart-btn">
             <div>
-              <h3 style="margin-bottom: 0.25rem;" data-i18n="lesson0_title"><span data-i18n="lesson0_title">Lesson 0: Interactive Pinyin Chart</span></h3>
+              <h3 style="margin-bottom: 0.25rem;" data-i18n="lesson0_title">Lesson 0: Interactive Pinyin Chart</h3>
               <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;"><span data-i18n="lesson0_desc">Master the 4 tones and pronunciation rules before starting Day 1.</span></p>
             </div>
             <span style="font-size: 1.5rem;">🗣️</span>
@@ -234,7 +234,7 @@
           <div id="today-lesson-panel" class="glass-panel" style="padding: 2rem; border-color: var(--primary); background: linear-gradient(135deg, rgba(255, 51, 102, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
               <span class="tag tag-hsk1" id="today-lesson-tag" style="background: var(--primary); color: white; border: none; font-size: 0.8rem;" data-i18n="todays_lesson_tag">TODAY\'S LESSON</span>
-              <span id="today-lesson-duration" style="font-size: 0.85rem; color: var(--accent); font-weight: bold; display: flex; align-items: center; gap: 0.25rem;" data-i18n="minute_block_tag"><span data-i18n="minute_block_tag">⏳ 60-Minute Block</span></span>
+              <span id="today-lesson-duration" style="font-size: 0.85rem; color: var(--accent); font-weight: bold; display: flex; align-items: center; gap: 0.25rem;" data-i18n="minute_block_tag">⏳ 60-Minute Block</span>
             </div>
             <h2 id="today-lesson-title" style="font-family: var(--font-serif); margin-bottom: 0.5rem;">Day 1: Greetings & Basics</h2>
             <p id="today-lesson-desc" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;">
@@ -246,7 +246,7 @@
           </div>
           
           <div class="glass-panel" style="padding: 2rem;">
-            <h2 style="margin-bottom: 0.5rem; font-family: var(--font-serif);" data-i18n="your_curriculum"><span data-i18n="your_curriculum">Your Curriculum</span></h2>
+            <h2 style="margin-bottom: 0.5rem; font-family: var(--font-serif);" data-i18n="your_curriculum">Your Curriculum</h2>
             <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;"><span data-i18n="curriculum_desc">Complete these daily lessons in order. Each lesson requires 1 hour of study.</span></p>
             
             <div id="dashboard-lessons-container" class="lessons-list">
@@ -281,22 +281,22 @@
           
           <!-- Options / Level Configurator -->
           <div class="glass-panel" style="padding: 2rem;">
-            <h3 style="margin-bottom: 1rem; font-family: var(--font-serif);" data-i18n="account_settings"><span data-i18n="account_settings">Account & Settings</span></h3>
+            <h3 style="margin-bottom: 1rem; font-family: var(--font-serif);" data-i18n="account_settings">Account & Settings</h3>
             <div style="display: flex; flex-direction: column; gap: 1rem;">
               <div class="config-item">
                 <label for="change-level-select" data-i18n="change_hsk_level">Change HSK Level</label>
                 <select id="change-level-select">
-                  <option value="hsk1">HSK 1 (Beginner)</option>
-                  <option value="hsk2">HSK 2 (Elementary)</option>
-                  <option value="hsk3">HSK 3 (Intermediate)</option>
+                  <option value="hsk1" data-i18n="hsk1_level_name">HSK 1 (Beginner)</option>
+                  <option value="hsk2" data-i18n="hsk2_level_name">HSK 2 (Elementary)</option>
+                  <option value="hsk3" data-i18n="hsk3_level_name">HSK 3 (Intermediate)</option>
                 </select>
               </div>
               <div style="display: flex; gap: 1rem; align-items: center; width: 100%;">
                 <button id="reset-progress-btn" class="btn btn-secondary" style="flex: 1; border-color: var(--danger); color: var(--danger);" data-i18n="btn_hard_reset">
-                  <span data-i18n="btn_hard_reset">⚠️ Hard Reset</span>
+                  ⚠️ Hard Reset
                 </button>
                 <button id="logout-btn" class="btn btn-secondary" style="flex: 1; border-color: var(--accent); color: var(--accent);" data-i18n="btn_logout">
-                  <span data-i18n="btn_logout">🚪 Logout</span>
+                  🚪 Logout
                 </button>
               </div>
             </div>
@@ -313,21 +313,21 @@
         <!-- Intro Screen -->
         <div id="lesson-pretest-intro-screen" style="text-align: center;">
           <div class="congrats-icon" style="animation: none; font-size: 5rem;">🔍</div>
-          <h2 id="lesson-pretest-intro-title" style="font-family: var(--font-serif); margin-bottom: 1rem;" data-i18n="lesson_pretest_intro_title"><span data-i18n="lesson_pretest_intro_title">Lesson Pre-Test</span></h2>
+          <h2 id="lesson-pretest-intro-title" style="font-family: var(--font-serif); margin-bottom: 1rem;" data-i18n="lesson_pretest_intro_title">Lesson Pre-Test</h2>
           <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem;"><span data-i18n="lesson_pretest_intro_desc">Before starting today's lesson, take this brief 3-question pre-test. This helps assess your current knowledge of this lesson's vocabulary and grammar.</span></p>
-          <button id="begin-lesson-test-btn" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem; box-shadow: 0 0 25px var(--primary-glow); width: 100%; max-width: 400px; margin-bottom: 1rem;" data-i18n="btn_lesson_pretest_start"><span data-i18n="btn_lesson_pretest_start">Start Pre-Test</span></button>
-          <button id="skip-lesson-test-entirely-btn" class="btn btn-secondary" style="padding: 0.8rem 2.5rem; font-size: 1rem; width: 100%; max-width: 400px; border-color: var(--glass-border);" data-i18n="btn_lesson_pretest_skip"><span data-i18n="btn_lesson_pretest_skip">Skip & Start Lesson</span></button>
+          <button id="begin-lesson-test-btn" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem; box-shadow: 0 0 25px var(--primary-glow); width: 100%; max-width: 400px; margin-bottom: 1rem;" data-i18n="btn_lesson_pretest_start">Start Pre-Test</button>
+          <button id="skip-lesson-test-entirely-btn" class="btn btn-secondary" style="padding: 0.8rem 2.5rem; font-size: 1rem; width: 100%; max-width: 400px; border-color: var(--glass-border);" data-i18n="btn_lesson_pretest_skip">Skip & Start Lesson</button>
         </div>
 
         <!-- Quiz Screen -->
         <div id="lesson-pretest-quiz-screen" style="display: none; text-align: left;">
-          <h2 id="lesson-pretest-quiz-title" style="font-family: var(--font-serif); margin-bottom: 1.5rem; color: var(--primary); text-align: center;">Lesson Pre-Test</h2>
+          <h2 id="lesson-pretest-quiz-title" style="font-family: var(--font-serif); margin-bottom: 1.5rem; color: var(--primary); text-align: center;" data-i18n="lesson_pretest_intro_title">Lesson Pre-Test</h2>
           <div class="pretest-progress-bar">
             <div id="lesson-pretest-progress-fill" class="pretest-progress-fill" style="width: 0%;"></div>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
             <span id="lesson-pretest-question-number">Question 1 of 3</span>
-            <span class="tag tag-hsk1">Lesson Assessment</span>
+            <span class="tag tag-hsk1" data-i18n="lbl_lesson_assessment">Lesson Assessment</span>
           </div>
           
           <div class="quiz-question-card">
@@ -350,7 +350,7 @@
         <!-- Results Screen -->
         <div id="lesson-pretest-result-screen" style="display: none; text-align: center;">
           <div class="congrats-icon" style="font-size: 5rem; text-shadow: 0 0 20px var(--accent-glow);">📊</div>
-          <h2 style="font-family: var(--font-serif); margin-bottom: 1rem;" data-i18n="lesson_pretest_result_title"><span data-i18n="lesson_pretest_result_title">Lesson Pre-Test Results</span></h2>
+          <h2 style="font-family: var(--font-serif); margin-bottom: 1rem;" data-i18n="lesson_pretest_result_title">Lesson Pre-Test Results</h2>
           <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem;"><span data-i18n="lesson_pretest_result_desc">Here is your assessment result:</span></p>
           
           <div class="glass-panel" style="padding: 2rem; max-width: 500px; margin: 0 auto 2rem; display: flex; flex-direction: column; gap: 1.5rem;">
@@ -365,9 +365,9 @@
           </div>
           
           <div style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center; width: 100%;">
-            <button id="lesson-pretest-start-study-btn" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem; width: 80%; max-width: 350px;" data-i18n="btn_start_1h_study"><span data-i18n="btn_start_1h_study">🚀 Start 1-Hour Lesson Study</span></button>
-            <button id="lesson-pretest-skip-lesson-btn" class="btn btn-secondary" style="padding: 0.75rem 2rem; font-size: 1rem; width: 80%; max-width: 350px; display: none;" data-i18n="btn_skip_mark_completed"><span data-i18n="btn_skip_mark_completed">⏭️ Skip & Mark Completed</span></button>
-            <button id="lesson-pretest-exit-btn" class="btn btn-secondary" style="padding: 0.75rem 2rem; font-size: 1rem; width: 80%; max-width: 350px;" data-i18n="btn_back_to_dashboard"><span data-i18n="btn_back_to_dashboard">Back to Dashboard</span></button>
+            <button id="lesson-pretest-start-study-btn" class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem; width: 80%; max-width: 350px;" data-i18n="btn_start_1h_study">🚀 Start 1-Hour Lesson Study</button>
+            <button id="lesson-pretest-skip-lesson-btn" class="btn btn-secondary" style="padding: 0.75rem 2rem; font-size: 1rem; width: 80%; max-width: 350px; display: none;" data-i18n="btn_skip_mark_completed">⏭️ Skip & Mark Completed</button>
+            <button id="lesson-pretest-exit-btn" class="btn btn-secondary" style="padding: 0.75rem 2rem; font-size: 1rem; width: 80%; max-width: 350px;" data-i18n="btn_back_to_dashboard">Back to Dashboard</button>
           </div>
         </div>
 
@@ -410,7 +410,7 @@
         
         <!-- STAGE 1: VOCABULARY PANE -->
         <div id="vocab-pane" class="lesson-pane-content" style="display: block;">
-          <h3 style="font-family: var(--font-serif); margin-bottom: 1.5rem; color: var(--primary);" data-i18n="stage1_title"><span data-i18n="stage1_title">Stage 1: Vocabulary Building (15 Minutes)</span></h3>
+          <h3 style="font-family: var(--font-serif); margin-bottom: 1.5rem; color: var(--primary);" data-i18n="stage1_title">Stage 1: Vocabulary Building (15 Minutes)</h3>
           <p style="color: var(--text-secondary); margin-bottom: 2rem;"><span data-i18n="stage1_desc">Review key HSK 3.0 vocabulary. Tap the card to flip and reveal the definition. Trace the character on the right.</span></p>
           
           <div class="vocab-stage">
@@ -421,12 +421,12 @@
                 <div id="vocab-flashcard" class="flashcard">
                   <div class="flashcard-face flashcard-front">
                     <div id="vocab-char" class="card-hanzi">你</div>
-                    <div class="card-hint">Tap Card to Flip</div>
+                    <div class="card-hint" data-i18n="tap_to_flip">Tap Card to Flip</div>
                   </div>
                   <div class="flashcard-face flashcard-back">
                     <div id="vocab-meaning" class="card-meaning">you</div>
                     <div id="vocab-pinyin" class="card-pinyin">nǐ</div>
-                    <div class="card-hint">Tap to Flip back</div>
+                    <div class="card-hint" data-i18n="tap_to_flip_back">Tap to Flip back</div>
                   </div>
                 </div>
               </div>
@@ -434,7 +434,7 @@
               <!-- Details & Examples -->
               <div class="vocab-details">
                 <div class="vocab-detail-item">
-                  <div class="vocab-detail-label">Pronunciation</div>
+                  <div class="vocab-detail-label" data-i18n="lbl_pronunciation">Pronunciation</div>
                   <div style="display: flex; align-items: center; gap: 1rem;">
                     <button id="vocab-speak-btn" class="audio-btn" title="Listen Pronunciation">🔊</button>
                     <span id="vocab-detail-pinyin" style="font-size: 1.3rem; font-weight: 600; color: var(--primary);">nǐ</span>
@@ -442,7 +442,7 @@
                 </div>
                 
                 <div class="vocab-detail-item">
-                  <div class="vocab-detail-label">Example Sentence</div>
+                  <div class="vocab-detail-label" data-i18n="lbl_example_sentence">Example Sentence</div>
                   <div class="example-box">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                       <div id="vocab-ex-cn" class="example-cn">你好！</div>
@@ -458,9 +458,9 @@
             <!-- Right Column: Writing & Tracing Practice Panel -->
             <div class="writing-practice-panel glass-panel">
               <div class="writing-modes-header">
-                <button id="mode-animate-btn" class="btn-mode active" data-mode="animate">📹 Animate</button>
-                <button id="mode-trace-btn" class="btn-mode" data-mode="trace">✍️ Trace Guide</button>
-                <button id="mode-freewrite-btn" class="btn-mode" data-mode="freewrite">🎨 Free Write</button>
+                <button id="mode-animate-btn" class="btn-mode active" data-mode="animate" data-i18n="btn_animate">📹 Animate</button>
+                <button id="mode-trace-btn" class="btn-mode" data-mode="trace" data-i18n="btn_trace">✍️ Trace Guide</button>
+                <button id="mode-freewrite-btn" class="btn-mode" data-mode="freewrite" data-i18n="btn_freewrite">🎨 Free Write</button>
               </div>
 
               <!-- Tianzige Drawing Area -->
@@ -474,14 +474,14 @@
               <!-- Controls -->
               <div class="writing-controls">
                 <button id="btn-writing-play" class="btn btn-secondary btn-sm" data-i18n="btn_play">▶ Play</button>
-                <button id="btn-writing-clear" class="btn btn-secondary btn-sm" style="display: none;">🧹 Clear</button>
-                <button id="btn-writing-reset" class="btn btn-secondary btn-sm">🔄 Reset</button>
+                <button id="btn-writing-clear" class="btn btn-secondary btn-sm" style="display: none;" data-i18n="btn_clear">🧹 Clear</button>
+                <button id="btn-writing-reset" class="btn btn-secondary btn-sm" data-i18n="btn_reset">🔄 Reset</button>
               </div>
 
               <!-- Character Deconstruction Block -->
               <div class="deconstruct-card">
-                <h4>🧩 Character Deconstruction</h4>
-                <p id="vocab-deconstruct-text" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; line-height: 1.4;">
+                <h4 data-i18n="lbl_deconstruct_title">🧩 Character Deconstruction</h4>
+                <p id="vocab-deconstruct-text" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; line-height: 1.4;" data-i18n="lbl_deconstruct_default">
                   (Select a word to see its deconstruction)
                 </p>
               </div>
@@ -498,7 +498,7 @@
 
         <!-- STAGE 2: GRAMMAR PANE -->
         <div id="grammar-pane" class="lesson-pane-content" style="display: none;">
-          <h3 style="font-family: var(--font-serif); margin-bottom: 1.5rem; color: var(--primary);" data-i18n="stage2_title"><span data-i18n="stage2_title">Stage 2: Grammar Rules & Sentence Builders (15 Minutes)</span></h3>
+          <h3 style="font-family: var(--font-serif); margin-bottom: 1.5rem; color: var(--primary);" data-i18n="stage2_title">Stage 2: Grammar Rules & Sentence Builders (15 Minutes)</h3>
           <p style="color: var(--text-secondary); margin-bottom: 2rem;"><span data-i18n="stage2_desc">Understand the structure and rules of the language. Review explanations, then test yourself using the sentence builders below.</span></p>
           
           <div id="grammar-topics-container">
@@ -508,14 +508,14 @@
 
         <!-- STAGE 3: DIALOGUE PANE -->
         <div id="dialogue-pane" class="lesson-pane-content" style="display: none;">
-          <h3 style="font-family: var(--font-serif); margin-bottom: 1rem; color: var(--primary);" data-i18n="stage3_title"><span data-i18n="stage3_title">Stage 3: Conversational Dialogue (15 Minutes)</span></h3>
+          <h3 style="font-family: var(--font-serif); margin-bottom: 1rem; color: var(--primary);" data-i18n="stage3_title">Stage 3: Conversational Dialogue (15 Minutes)</h3>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
             <p style="color: var(--text-secondary); margin: 0;"><span data-i18n="stage3_desc">Listen to the complete dialogue, practice reading, and study the context of your new expressions.</span></p>
             <div style="display: flex; gap: 0.75rem;">
-              <button id="dialogue-play-all-btn" class="btn btn-secondary">
+              <button id="dialogue-play-all-btn" class="btn btn-secondary" data-i18n="btn_read_dialogue">
                 🔊 Read Dialogue
               </button>
-              <button id="pinyin-visibility-toggle" class="btn btn-secondary">
+              <button id="pinyin-visibility-toggle" class="btn btn-secondary" data-i18n="btn_toggle_pinyin_label">
                 👁️ Toggle Pinyin
               </button>
             </div>
@@ -530,10 +530,10 @@
 
         <!-- STAGE 4: QUIZ PANE -->
         <div id="quiz-pane" class="lesson-pane-content" style="display: none;">
-          <h3 style="font-family: var(--font-serif); margin-bottom: 1.5rem; color: var(--primary);">
+          <h3 style="font-family: var(--font-serif); margin-bottom: 1.5rem; color: var(--primary);" data-i18n="stage4_title">
             Stage 4: Review Quiz & Assessment (15 Minutes)
           </h3>
-          <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+          <p style="color: var(--text-secondary); margin-bottom: 2rem;" data-i18n="stage4_desc">
             Test your knowledge! Complete this quiz to wrap up today's lesson. You need 75% or higher to pass.
           </p>
           
@@ -563,11 +563,11 @@
 
         <!-- SHARED PANE NAVIGATION FOOTER -->
         <div class="study-section-footer">
-          <button id="pane-back-btn" class="btn btn-secondary">◀ Back Section</button>
-          <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+          <button id="pane-back-btn" class="btn btn-secondary" data-i18n="btn_back_section">◀ Back Section</button>
+          <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;" data-i18n="study_tracking_msg">
             Study time is tracking in the background
           </div>
-          <button id="pane-next-btn" class="btn btn-primary" style="background: var(--success); color: var(--bg-darker); box-shadow: 0 4px 14px rgba(0, 245, 212, 0.3);">
+          <button id="pane-next-btn" class="btn btn-primary" style="background: var(--success); color: var(--bg-darker); box-shadow: 0 4px 14px rgba(0, 245, 212, 0.3);" data-i18n="btn_continue_study">
             Continue Study ▶
           </button>
         </div>
@@ -579,8 +579,8 @@
     <section id="congrats-view" class="view-section">
       <div class="glass-panel congrats-card" style="max-width: 600px; margin: 2rem auto;">
         <div class="congrats-icon" style="font-size: 5rem; text-shadow: 0 0 20px var(--accent-glow);">🎉</div>
-        <h1 style="font-size: 2.2rem; font-family: var(--font-serif); margin-bottom: 1rem;">Lesson Completed!</h1>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Excellent focus. You completed the full 1-hour curriculum block for today.</p>
+        <h1 style="font-size: 2.2rem; font-family: var(--font-serif); margin-bottom: 1rem;" data-i18n="congrats_lesson_title">Lesson Completed!</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;" data-i18n="congrats_lesson_desc">Excellent focus. You completed the full 1-hour curriculum block for today.</p>
         
         <div class="glass-panel" style="padding: 1.5rem; max-width: 450px; margin: 0 auto 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div style="text-align: center; border-right: 1px solid var(--glass-border);">
@@ -589,7 +589,7 @@
           </div>
           <div style="text-align: center;">
             <div id="congrats-quiz-score" style="font-size: 1.5rem; font-weight: 700; color: var(--success);">4 / 4</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Quiz Score</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;" data-i18n="lbl_quiz_score">Quiz Score</div>
           </div>
         </div>
         
@@ -613,8 +613,8 @@
 
       <!-- The Matrix -->
       <div class="glass-panel pinyin-matrix-container" style="overflow-x: auto; padding: 1rem;">
-        <h3 style="margin-bottom: 1rem;">Interactive Chart</h3>
-        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Click any syllable to hear its 4 tones.</p>
+        <h3 style="margin-bottom: 1rem;" data-i18n="pinyin_interactive_title">Interactive Chart</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;" data-i18n="pinyin_click_hint">Click any syllable to hear its 4 tones.</p>
         <div id="pinyin-matrix" style="min-width: 800px;">
           <!-- Matrix will be injected here -->
         </div>
@@ -631,13 +631,13 @@
   <div id="pinyin-tone-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content glass-panel" style="max-width: 400px; text-align: center;">
       <h2 id="pinyin-modal-title" style="margin-bottom: 0.5rem; font-family: var(--font-serif); font-size: 2rem;">ma</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Select a tone to hear the pronunciation</p>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;" data-i18n="pinyin_select_tone">Select a tone to hear the pronunciation</p>
       
       <div id="pinyin-modal-tones" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
         <!-- Tones injected here -->
       </div>
       
-      <button class="btn btn-secondary" onclick="document.getElementById('pinyin-tone-modal').style.display='none'" style="width: 100%;">Close</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('pinyin-tone-modal').style.display='none'" style="width: 100%;" data-i18n="btn_close">Close</button>
     </div>
   </div>
 

@@ -156,7 +156,70 @@ const i18nDictionary = {
     "stage2_tab": "Stage 2: Grammar (15m)",
     "stage3_tab": "Stage 3: Dialogue (15m)",
     "stage4_tab": "Stage 4: Review Quiz (15m)",
-    "feedback": "Feedback:"
+    "feedback": "Feedback:",
+
+    // Dynamic templates (used by t() helper)
+    "question_progress": "Question {{current}} of {{total}}",
+    "word_progress": "Word {{current}} of {{total}}",
+    "stage4_title": "Stage 4: Review Quiz & Assessment (15 Minutes)",
+    "stage4_desc": "Test your knowledge! Complete this quiz to wrap up today's lesson. You need 75% or higher to pass.",
+    "btn_continue_study": "Continue Study ▶",
+    "study_tracking_msg": "Study time is tracking in the background",
+    "lbl_pronunciation": "Pronunciation",
+    "lbl_example_sentence": "Example Sentence",
+    "lbl_deconstruct_title": "🧩 Character Deconstruction",
+    "lbl_deconstruct_default": "(Select a word to see its deconstruction)",
+    "btn_read_dialogue": "🔊 Read Dialogue",
+    "btn_toggle_pinyin_label": "👁️ Toggle Pinyin",
+    "lbl_lesson_assessment": "Lesson Assessment",
+    "btn_check_answer": "Check Answer",
+    "msg_try_again": "Try again.",
+    "lesson_stages_info": "4 Stages • 60 Minutes",
+    "lbl_done": "✔ Done",
+    "btn_start_lesson_short": "Start Lesson",
+    "todays_lesson_with_level": "TODAY'S LESSON • {{level}}",
+    "btn_start_today": "🚀 Start Today's 1-Hour Lesson",
+    "level_complete_title": "🎉 Level Complete!",
+    "level_complete_desc": "Congratulations! You have completed all lessons for {{level}}. You are ready to move on to the next level or review your lessons below.",
+    "btn_explore_next": "Explore Next Level",
+    "all_levels_complete": "Outstanding! You've mastered all available HSK 1-3 levels!",
+    "lbl_complete_tag": "COMPLETE",
+    "listen_select": "Listen and select the correct option:",
+    "hsk_benchmark_level": "HSK level benchmark: Level {{level}}",
+    "pretest_q_meaning": "What is the meaning of the character \"{{char}}\"?",
+    "pretest_q_pinyin": "What is the correct pinyin for \"{{char}}\" ({{meaning}})?",
+    "pretest_q_match": "Which character matches the meaning \"{{meaning}}\"?",
+    "pretest_q_listen": "Listen and select the correct meaning:",
+    "pretest_exp_meaning": "\"{{char}}\" ({{pinyin}}) means \"{{meaning}}\".",
+    "pretest_exp_pinyin": "The pronunciation for \"{{char}}\" is \"{{pinyin}}\".",
+    "pretest_exp_match": "\"{{char}}\" is the character for \"{{meaning}}\".",
+    "pretest_exp_listen": "You heard \"{{pinyin}}\" ({{char}}), which means \"{{meaning}}\".",
+    "pretest_exp_listen_alt": "This character is {{char}} ({{pinyin}}) which means {{meaning}}.",
+    "no_quiz_available": "No quiz available for this lesson.",
+    "pretest_result_perfect": "Outstanding mastery! 🌟",
+    "pretest_result_perfect_desc": "You answered all pre-test questions correctly! You already know the vocabulary and grammar covered here. You can skip this lesson to save time, or study anyway to lock in your score.",
+    "pretest_result_ready": "Ready to learn! 📚",
+    "pretest_result_ready_desc": "You scored {{score}}/{{total}}. This is the perfect level for you to study! Start the 1-hour study block to master these words and grammar rules.",
+    "congrats_lesson_title": "Lesson Completed!",
+    "congrats_lesson_desc": "Excellent focus. You completed the full 1-hour curriculum block for today.",
+    "lbl_quiz_score": "Quiz Score",
+    "error_load_lessons": "Failed to load lessons. Please check your connection and try again.",
+    "error_network": "Network error. Please try again.",
+    "error_load_lesson": "Error loading lesson from database.",
+    "tap_to_flip": "Tap Card to Flip",
+    "tap_to_flip_back": "Tap to Flip back",
+    "pinyin_interactive_title": "Interactive Chart",
+    "pinyin_click_hint": "Click any syllable to hear its 4 tones.",
+    "hsk1_level_name": "HSK 1 (Beginner)",
+    "hsk2_level_name": "HSK 2 (Elementary)",
+    "hsk3_level_name": "HSK 3 (Intermediate)",
+    "btn_animate": "📹 Animate",
+    "btn_trace": "✍️ Trace Guide",
+    "btn_freewrite": "🎨 Free Write",
+    "btn_clear": "🧹 Clear",
+    "btn_reset": "🔄 Reset",
+    "pinyin_select_tone": "Select a tone to hear the pronunciation",
+    "btn_close": "Close"
   },
   
   th: {
@@ -314,8 +377,90 @@ const i18nDictionary = {
     "stage2_tab": "ด่าน 2: ไวยากรณ์ (15 นาที)",
     "stage3_tab": "ด่าน 3: บทสนทนา (15 นาที)",
     "stage4_tab": "ด่าน 4: แบบทดสอบ (15 นาที)",
-    "feedback": "ข้อเสนอแนะ:"
+    "feedback": "ข้อเสนอแนะ:",
+
+    // Dynamic templates (used by t() helper)
+    "question_progress": "คำถามที่ {{current}} จาก {{total}}",
+    "word_progress": "คำที่ {{current}} จาก {{total}}",
+    "stage4_title": "ด่านที่ 4: แบบทดสอบทบทวนและประเมินผล (15 นาที)",
+    "stage4_desc": "ทดสอบความรู้ของคุณ! ทำแบบทดสอบนี้ให้เสร็จเพื่อจบบทเรียนวันนี้ คุณต้องได้คะแนน 75% ขึ้นไปจึงจะผ่าน",
+    "btn_continue_study": "เรียนต่อ ▶",
+    "study_tracking_msg": "กำลังบันทึกเวลาเรียนในพื้นหลัง",
+    "lbl_pronunciation": "การออกเสียง",
+    "lbl_example_sentence": "ประโยคตัวอย่าง",
+    "lbl_deconstruct_title": "🧩 การแยกส่วนประกอบตัวอักษร",
+    "lbl_deconstruct_default": "(เลือกคำเพื่อดูการแยกส่วนประกอบ)",
+    "btn_read_dialogue": "🔊 อ่านบทสนทนา",
+    "btn_toggle_pinyin_label": "👁️ ซ่อน/แสดงพินอิน",
+    "lbl_lesson_assessment": "การประเมินบทเรียน",
+    "btn_check_answer": "ตรวจคำตอบ",
+    "msg_try_again": "ลองอีกครั้ง",
+    "lesson_stages_info": "4 ด่าน • 60 นาที",
+    "lbl_done": "✔ เสร็จแล้ว",
+    "btn_start_lesson_short": "เริ่มบทเรียน",
+    "todays_lesson_with_level": "บทเรียนวันนี้ • {{level}}",
+    "btn_start_today": "🚀 เริ่มบทเรียน 1 ชั่วโมง",
+    "level_complete_title": "🎉 จบระดับแล้ว!",
+    "level_complete_desc": "ยินดีด้วย! คุณเรียนจบบทเรียนทั้งหมดสำหรับ {{level}} แล้ว คุณพร้อมที่จะเรียนระดับถัดไปหรือทบทวนบทเรียนด้านล่าง",
+    "btn_explore_next": "สำรวจระดับถัดไป",
+    "all_levels_complete": "ยอดเยี่ยมมาก! คุณเรียนรู้ HSK 1-3 ครบทุกระดับแล้ว!",
+    "lbl_complete_tag": "เสร็จสิ้น",
+    "listen_select": "ฟังและเลือกคำตอบที่ถูกต้อง:",
+    "hsk_benchmark_level": "มาตรฐานระดับ HSK: ระดับ {{level}}",
+    "pretest_q_meaning": "ตัวอักษร \"{{char}}\" มีความหมายว่าอะไร?",
+    "pretest_q_pinyin": "พินอินที่ถูกต้องของ \"{{char}}\" ({{meaning}}) คืออะไร?",
+    "pretest_q_match": "ตัวอักษรใดมีความหมายตรงกับ \"{{meaning}}\"?",
+    "pretest_q_listen": "ฟังและเลือกความหมายที่ถูกต้อง:",
+    "pretest_exp_meaning": "\"{{char}}\" ({{pinyin}}) หมายถึง \"{{meaning}}\"",
+    "pretest_exp_pinyin": "การออกเสียงของ \"{{char}}\" คือ \"{{pinyin}}\"",
+    "pretest_exp_match": "\"{{char}}\" คือตัวอักษรที่หมายถึง \"{{meaning}}\"",
+    "pretest_exp_listen": "คุณได้ยิน \"{{pinyin}}\" ({{char}}) ซึ่งหมายถึง \"{{meaning}}\"",
+    "pretest_exp_listen_alt": "อักษรนี้คือ {{char}} ({{pinyin}}) ซึ่งหมายถึง {{meaning}}",
+    "no_quiz_available": "ไม่มีแบบทดสอบสำหรับบทเรียนนี้",
+    "pretest_result_perfect": "เก่งมากเลย! 🌟",
+    "pretest_result_perfect_desc": "คุณตอบคำถามก่อนเรียนถูกทุกข้อ! คุณรู้คำศัพท์และไวยากรณ์ในบทนี้แล้ว สามารถข้ามบทเรียนเพื่อประหยัดเวลา หรือจะเรียนต่อเพื่อทบทวนก็ได้",
+    "pretest_result_ready": "พร้อมเรียนแล้ว! 📚",
+    "pretest_result_ready_desc": "คุณได้คะแนน {{score}}/{{total}} ระดับนี้เหมาะกับคุณมาก! เริ่มเรียนบทเรียน 1 ชั่วโมงเพื่อเรียนรู้คำศัพท์และไวยากรณ์เหล่านี้",
+    "congrats_lesson_title": "เรียนจบแล้ว!",
+    "congrats_lesson_desc": "ยอดเยี่ยมมาก คุณเรียนจบบทเรียน 1 ชั่วโมงของวันนี้ครบแล้ว",
+    "lbl_quiz_score": "คะแนนแบบทดสอบ",
+    "error_load_lessons": "ไม่สามารถโหลดบทเรียนได้ กรุณาตรวจสอบการเชื่อมต่อแล้วลองใหม่",
+    "error_network": "เครือข่ายขัดข้อง กรุณาลองใหม่อีกครั้ง",
+    "error_load_lesson": "เกิดข้อผิดพลาดในการโหลดบทเรียนจากฐานข้อมูล",
+    "tap_to_flip": "แตะการ์ดเพื่อพลิก",
+    "tap_to_flip_back": "แตะเพื่อพลิกกลับ",
+    "pinyin_interactive_title": "ตารางแบบโต้ตอบ",
+    "pinyin_click_hint": "คลิกที่พยางค์ใดก็ได้เพื่อฟัง 4 เสียงวรรณยุกต์",
+    "hsk1_level_name": "HSK 1 (ระดับเริ่มต้น)",
+    "hsk2_level_name": "HSK 2 (ระดับต้น)",
+    "hsk3_level_name": "HSK 3 (ระดับกลาง)",
+    "btn_animate": "📹 แสดงอนิเมชัน",
+    "btn_trace": "✍️ วาดตาม",
+    "btn_freewrite": "🎨 เขียนอิสระ",
+    "btn_clear": "🧹 ล้าง",
+    "btn_reset": "🔄 เริ่มใหม่",
+    "pinyin_select_tone": "เลือกเสียงวรรณยุกต์เพื่อฟังการออกเสียง",
+    "btn_close": "ปิด"
   }
 };
 
 window.i18nDictionary = i18nDictionary;
+
+/**
+ * Centralized translation helper with template interpolation.
+ * Usage: t('question_progress', { current: 1, total: 12 })
+ *   → "Question 1 of 12" (en) / "คำถามที่ 1 จาก 12" (th)
+ * Falls back to English if key is missing in current language,
+ * then falls back to the raw key string.
+ */
+window.t = function(key, params) {
+  const lang = (window.state && window.state.currentLanguage) || 'en';
+  const dict = window.i18nDictionary[lang] || window.i18nDictionary['en'];
+  let str = dict[key] || window.i18nDictionary['en'][key] || key;
+  if (params) {
+    Object.keys(params).forEach(function(k) {
+      str = str.replace(new RegExp('\\{\\{' + k + '\\}\\}', 'g'), params[k]);
+    });
+  }
+  return str;
+};

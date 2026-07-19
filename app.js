@@ -40,6 +40,20 @@ const state = {
   currentLessonId: null
 };
 
+// Expose state globally so i18n.js t() helper can read currentLanguage
+window.state = state;
+
+// Global helper for fetching data-driven translated strings from the database
+window.ld = function(item, baseField) {
+  if (state.currentLanguage === 'th') {
+    const thField = baseField === 'exampleEn' ? 'example_th' : baseField + '_th';
+    if (item[thField] !== undefined && item[thField] !== null) {
+      return item[thField];
+    }
+  }
+  return item[baseField] !== undefined ? item[baseField] : '';
+};
+
 const timelineStages = ["vocab-pane", "grammar-pane", "dialogue-pane", "quiz-pane"];
 
 // Speech Synthesis setup
@@ -171,8 +185,8 @@ function fetchCurriculumAndRender(level) {
       console.error("Failed to fetch curriculum:", err);
       const container = document.getElementById('dashboard-lessons-container');
       if (container) {
-         container.innerHTML = '<div class="error text-center mt-3" style="color: var(--danger);">Failed to load lessons. Please check your connection and try again.</div>';
-      }
+         container.innerHTML = `<div class="error text-center mt-3" style="color: var(--danger);">${t('error_load_lessons')}</div>`;
+       }
     });
 }
 
@@ -343,11 +357,11 @@ function setupEventListeners() {
           localStorage.setItem("hanpath_token", data.token);
           loadProgress();
         } else {
-          errorDiv.textContent = data.error || "An error occurred";
+        errorDiv.textContent = data.error || t('error_network');
           errorDiv.style.display = "block";
         }
       } catch (err) {
-        errorDiv.textContent = "Network error. Please try again.";
+        errorDiv.textContent = t('error_network');
         errorDiv.style.display = "block";
       }
     });
@@ -640,9 +654,9 @@ function setupEventListeners() {
 }
 
 function getLevelName(level) {
-  if (level === 'hsk1') return 'HSK 1 (Beginner)';
-  if (level === 'hsk2') return 'HSK 2 (Elementary)';
-  if (level === 'hsk3') return 'HSK 3 (Intermediate)';
+  if (level === 'hsk1') return t('hsk1_level_name');
+  if (level === 'hsk2') return t('hsk2_level_name');
+  if (level === 'hsk3') return t('hsk3_level_name');
   return level ? level.toUpperCase() : '';
 }
 
@@ -673,40 +687,40 @@ function renderDashboard() {
   if (todayPanel) {
     if (activeLesson) {
       todayPanel.style.display = 'block';
-      document.getElementById('today-lesson-title').textContent = (state.currentLanguage === 'th' && activeLesson.title_th) ? activeLesson.title_th : activeLesson.title;
+      document.getElementById('today-lesson-title').textContent = ld(activeLesson, 'title');
       
       let descId = "todays_lesson_desc";
       if (state.userLevel === 'hsk2') descId = "todays_lesson_desc_hsk2";
       if (state.userLevel === 'hsk3') descId = "todays_lesson_desc_hsk3";
-      document.getElementById('today-lesson-desc').textContent = window.i18nDictionary[state.currentLanguage][descId] || "Learn essential vocabulary...";
+      document.getElementById('today-lesson-desc').textContent = t(descId);
       
       const todayTag = document.getElementById('today-lesson-tag');
-      todayTag.textContent = `${state.currentLanguage === 'th' ? 'บทเรียนวันนี้' : "TODAY'S LESSON"} • ${state.userLevel.toUpperCase()}`;
+      todayTag.textContent = t('todays_lesson_with_level', { level: state.userLevel.toUpperCase() });
       todayTag.className = `tag tag-${state.userLevel}`;
       
       const startBtn = document.getElementById('today-lesson-start-btn');
-      startBtn.textContent = state.currentLanguage === 'th' ? '🚀 เริ่มบทเรียน 1 ชั่วโมง' : "🚀 Start Today's 1-Hour Lesson";
+      startBtn.textContent = t('btn_start_today');
       startBtn.onclick = () => routeToLesson(activeLesson.id);
     } else {
       if (lessons.length > 0) {
         todayPanel.style.display = 'block';
-        document.getElementById('today-lesson-title').textContent = state.currentLanguage === "th" ? "🎉 จบระดับแล้ว!" : "🎉 Level Complete!";
-        document.getElementById('today-lesson-desc').textContent = state.currentLanguage === "th" ? `ยินดีด้วย! คุณเรียนจบบทเรียนทั้งหมดสำหรับ ${state.userLevel.toUpperCase()} แล้ว คุณพร้อมที่จะเรียนระดับถัดไปหรือทบทวนบทเรียนด้านล่าง` : `Congratulations! You have completed all lessons for ${state.userLevel.toUpperCase()}. You are ready to move on to the next level or review your lessons below.`;
+        document.getElementById('today-lesson-title').textContent = t('level_complete_title');
+        document.getElementById('today-lesson-desc').textContent = t('level_complete_desc', { level: state.userLevel.toUpperCase() });
         
         const todayTag = document.getElementById('today-lesson-tag');
-        todayTag.textContent = "COMPLETE";
+        todayTag.textContent = t('lbl_complete_tag');
         todayTag.className = "tag tag-hsk1";
         todayTag.style.background = "var(--success)";
         
         const startBtn = document.getElementById('today-lesson-start-btn');
-        startBtn.textContent = state.currentLanguage === "th" ? "สำรวจระดับถัดไป" : "Explore Next Level";
+        startBtn.textContent = t('btn_explore_next');
         startBtn.onclick = () => {
           if (state.userLevel === 'hsk1') {
             state.userLevel = 'hsk2';
           } else if (state.userLevel === 'hsk2') {
             state.userLevel = 'hsk3';
           } else {
-            document.getElementById('today-lesson-desc').textContent = state.currentLanguage === "th" ? "ยอดเยี่ยมมาก! คุณเรียนรู้ HSK 1-3 ครบทุกระดับแล้ว!" : "Outstanding! You've mastered all available HSK 1-3 levels!";
+            document.getElementById('today-lesson-desc').textContent = t('all_levels_complete');
             document.getElementById('today-lesson-desc').style.color = "var(--success)";
             startBtn.style.display = "none";
             return;
@@ -726,15 +740,15 @@ function renderDashboard() {
     div.className = `lesson-row glass-panel ${isCompleted ? 'completed' : ''}`;
     div.innerHTML = `
       <div class="lesson-info">
-        <h4 class="mb-1">${(state.currentLanguage === 'th' && l.title_th) ? l.title_th : l.title}</h4>
+        <h4 class="mb-1">${ld(l, 'title')}</h4>
         <div class="text-sm text-muted">
-          ${state.currentLanguage === 'th' ? '4 ด่าน • 60 นาที' : '4 Stages • 60 Minutes'}
+          ${t('lesson_stages_info')}
         </div>
       </div>
       <div>
         ${isCompleted ? 
-          `<span class="text-success fw-bold">✔ ${state.currentLanguage === 'th' ? 'เสร็จแล้ว' : 'Done'}</span>` : 
-          `<button class="btn btn-primary btn-sm start-lesson-btn" data-id="${l.id}">${state.currentLanguage === 'th' ? 'เริ่มบทเรียน' : 'Start Lesson'}</button>`
+          `<span class="text-success fw-bold">${t('lbl_done')}</span>` : 
+          `<button class="btn btn-primary btn-sm start-lesson-btn" data-id="${l.id}">${t('btn_start_lesson_short')}</button>`
         }
       </div>
     `;
@@ -759,7 +773,7 @@ function startLesson(id) {
       state.currentLesson = data;
       
       document.getElementById('lesson-level-badge').textContent = getLevelName(state.userLevel);
-      document.getElementById('lesson-title-display').textContent = (state.currentLanguage === 'th' && state.currentLesson.title_th) ? state.currentLesson.title_th : state.currentLesson.title;
+      document.getElementById('lesson-title-display').textContent = ld(state.currentLesson, 'title');
       
       state.timerSeconds = 3600;
       state.timerPaused = false;
@@ -786,7 +800,7 @@ function startLesson(id) {
     })
     .catch(err => {
       console.error("Failed to load full lesson data:", err);
-      alert("Error loading lesson from database.");
+      alert(t('error_load_lesson'));
     });
 }
 
@@ -815,19 +829,19 @@ function renderVocabPane() {
     if (!v) return;
     
     document.getElementById('vocab-char').textContent = v.character;
-    document.getElementById('vocab-meaning').textContent = (state.currentLanguage === 'th' && v.meaning_th) ? v.meaning_th : v.meaning;
+    document.getElementById('vocab-meaning').textContent = ld(v, 'meaning');
     document.getElementById('vocab-pinyin').textContent = v.pinyin;
     
     document.getElementById('vocab-detail-pinyin').textContent = v.pinyin;
     document.getElementById('vocab-ex-cn').textContent = v.exampleCn;
     document.getElementById('vocab-ex-py').textContent = v.examplePy;
-    document.getElementById('vocab-ex-en').textContent = (state.currentLanguage === 'th') ? (v.example_th || '') : v.exampleEn;
+    document.getElementById('vocab-ex-en').textContent = ld(v, 'exampleEn');
     
     let deconstructDefault = "Basic radical combination.";
-    document.getElementById('vocab-deconstruct-text').textContent = (state.currentLanguage === 'th' && v.deconstruct_th) ? v.deconstruct_th : (v.deconstruct || deconstructDefault);
+    document.getElementById('vocab-deconstruct-text').textContent = ld(v, 'deconstruct') || deconstructDefault;
     
     document.getElementById('vocab-flashcard').classList.remove('flipped');
-    document.getElementById('vocab-index-indicator').textContent = (state.currentLanguage === 'th' ? `คำที่ ${state.vocabIndex + 1} จาก ${state.currentLesson.vocab.length}` : `Word ${state.vocabIndex + 1} of ${state.currentLesson.vocab.length}`);
+    document.getElementById('vocab-index-indicator').textContent = t('word_progress', { current: state.vocabIndex + 1, total: state.currentLesson.vocab.length });
     
     // HanziWriter init
     if (typeof HanziWriter !== "undefined") {
@@ -885,7 +899,7 @@ function renderGrammarPane() {
       div.style.marginBottom = '1.5rem';
       
       let html = `<h4 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem;">${g.title}</h4>`;
-      let explanation = (state.currentLanguage === 'th' && g.explanation_th) ? g.explanation_th : g.explanation;
+      let explanation = ld(g, 'explanation');
       html += `<p style="margin-bottom: 1rem;">${explanation}</p>`;
       
       g.examples.forEach(ex => {
@@ -907,7 +921,7 @@ function renderGrammarPane() {
                <div class="grammar-word-bank" id="${pId}-word-bank" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
                  ${g.practice.words.map((w, wIdx) => `<button class="btn btn-secondary btn-sm prac-word-btn" data-word="${w}">${w}</button>`).join('')}
                </div>
-               <button class="btn btn-primary btn-sm check-prac-btn" data-pid="${pId}" data-answer='${JSON.stringify(g.practice.answer)}'>${state.currentLanguage === "th" ? "ตรวจคำตอบ" : "Check Answer"}</button>
+               <button class="btn btn-primary btn-sm check-prac-btn" data-pid="${pId}" data-answer='${JSON.stringify(g.practice.answer)}'>${t('btn_check_answer')}</button>
                <span class="prac-feedback" id="${pId}-feedback" style="margin-left: 1rem; font-weight: bold;"></span>
              </div>
            `;
@@ -952,13 +966,13 @@ function renderGrammarPane() {
         
         const feedback = document.getElementById(`${pId}-feedback`);
         if (JSON.stringify(userWords) === JSON.stringify(correctAnswer)) {
-          feedback.textContent = window.i18nDictionary[state.currentLanguage]["msg_correct"] + " 🎉";
+          feedback.textContent = t('msg_correct') + " 🎉";
           feedback.style.color = "var(--success)";
           answerBox.style.borderColor = "var(--success)";
           state.score += 20;
           updateDashboardStats();
         } else {
-          feedback.textContent = state.currentLanguage === "th" ? "ลองอีกครั้ง" : "Try again.";
+          feedback.textContent = t('msg_try_again');
           feedback.style.color = "var(--error)";
           answerBox.style.borderColor = "var(--error)";
         }
@@ -1018,7 +1032,100 @@ function renderDialoguePane() {
     }
   }
 
+function generatePostLessonQuiz(vocab) {
+  const generatedQuiz = [];
+  const qCount = Math.min(10, vocab.length);
+
+  for (let i = 0; i < qCount; i++) {
+    const target = vocab[i];
+    const qType = Math.floor(Math.random() * 4); // 0 = meaning, 1 = pinyin, 2 = character, 3 = listening
+    let questionText = "";
+    let questionTextTh = "";
+    let answerVal = "";
+    let explanationText = "";
+    let explanationTextTh = "";
+    let options = [];
+    let qTypeStr = "text";
+    let testWordStr = "";
+
+    if (qType === 0) {
+      questionText = "What is the meaning of " + target.character + "?";
+      questionTextTh = "ความหมายของ " + target.character + " คืออะไร?";
+      answerVal = target.meaning;
+      explanationText = target.character + " (" + target.pinyin + ") means " + target.meaning + ".";
+      explanationTextTh = target.character + " (" + target.pinyin + ") แปลว่า " + target.meaning + ".";
+      options.push(target.meaning);
+      vocab.forEach(v => {
+        if (v.meaning !== target.meaning && options.length < 4) {
+          options.push(v.meaning);
+        }
+      });
+      while (options.length < 4) options.push("Meaning " + options.length);
+    } else if (qType === 1) {
+      questionText = "What is the pinyin for " + target.character + " (" + target.meaning + ")?";
+      questionTextTh = "พินอินของ " + target.character + " (" + target.meaning + ") คืออะไร?";
+      answerVal = target.pinyin;
+      explanationText = "The pronunciation is " + target.pinyin + ".";
+      explanationTextTh = "การออกเสียงคือ " + target.pinyin + ".";
+      options.push(target.pinyin);
+      vocab.forEach(v => {
+        if (v.pinyin !== target.pinyin && options.length < 4) {
+          options.push(v.pinyin);
+        }
+      });
+      while (options.length < 4) options.push("Pinyin " + options.length);
+    } else if (qType === 2) {
+      questionText = "Which character means '" + target.meaning + "'?";
+      questionTextTh = "ตัวอักษรใดแปลว่า '" + target.meaning + "'?";
+      answerVal = target.character;
+      explanationText = target.character + " is the character for " + target.meaning + ".";
+      explanationTextTh = target.character + " คือตัวอักษรของ " + target.meaning + ".";
+      options.push(target.character);
+      vocab.forEach(v => {
+        if (v.character !== target.character && options.length < 4) {
+          options.push(v.character);
+        }
+      });
+      while (options.length < 4) options.push("字" + options.length);
+    } else {
+      qTypeStr = "listening";
+      testWordStr = target.character;
+      questionText = "Listen and select the correct meaning:";
+      questionTextTh = "ฟังแล้วเลือกความหมายที่ถูกต้อง:";
+      answerVal = target.meaning;
+      explanationText = "You heard " + target.pinyin + " (" + target.character + "), meaning " + target.meaning + ".";
+      explanationTextTh = "คุณได้ยิน " + target.pinyin + " (" + target.character + ") แปลว่า " + target.meaning + ".";
+      options.push(target.meaning);
+      vocab.forEach(v => {
+        if (v.meaning !== target.meaning && options.length < 4) {
+          options.push(v.meaning);
+        }
+      });
+      while (options.length < 4) options.push("Meaning " + options.length);
+    }
+
+    options.sort(() => Math.random() - 0.5);
+
+    generatedQuiz.push({
+      type: qTypeStr,
+      testWord: testWordStr,
+      question: questionText,
+      question_th: questionTextTh,
+      answer: answerVal,
+      explanation: explanationText,
+      explanation_th: explanationTextTh,
+      options: options
+    });
+  }
+
+  return generatedQuiz;
+}
+
 function renderQuizPane() {
+  if (!state.currentLesson.quiz || state.currentLesson.quiz.length === 0) {
+    state.currentLesson.quiz = generatePostLessonQuiz(state.currentLesson.vocab);
+  }
+  
   state.quizIndex = 0;
   state.quizScore = 0;
   state.quizAnswers = [];
@@ -1026,24 +1133,24 @@ function renderQuizPane() {
 }
 
 function renderQuizQuestion() {
-  const isThai = state.currentLanguage === 'th';
-  document.getElementById('quiz-progress').textContent = isThai ? 
-    `คำถามที่ ${state.quizIndex + 1} จาก ${state.currentLesson.quiz.length}` : 
-    `Question ${state.quizIndex + 1} of ${state.currentLesson.quiz.length}`;
+  const questionLbl = document.getElementById('lesson-quiz-question-lbl');
   
-  const q = state.currentLesson.quiz[state.quizIndex];
-  const qText = document.getElementById('quiz-question-text');
-  
-  if (q.type === 'audio') {
-    qText.innerHTML = `<span style="font-size: 2rem;">🔊</span> <br/> ${isThai ? 'ฟังและเลือกคำตอบที่ถูกต้อง:' : 'Listen and select the correct option:'}`;
-  } else {
-    qText.textContent = (isThai && q.question_th) ? q.question_th : q.question;
+  // Restore the normal nextBtn onclick behavior if we have a quiz
+  document.getElementById('lesson-quiz-next-btn').onclick = nextQuizQuestion;
+
+  if (questionLbl) {
+    questionLbl.innerHTML = `<span>${t('question_progress', { current: state.quizIndex + 1, total: state.currentLesson.quiz.length })}</span>`;
   }
   
-  if (q.type === 'listening') {
-    document.getElementById('lesson-quiz-text').innerHTML = `
+  const q = state.currentLesson.quiz[state.quizIndex];
+  const qText = document.getElementById('lesson-quiz-text');
+  
+  if (q.type === 'audio') {
+    qText.innerHTML = `<span style="font-size: 2rem;">🔊</span> <br/> ${t('listen_select')}`;
+  } else if (q.type === 'listening') {
+    qText.innerHTML = `
       <div style="text-align: center; margin-bottom: 1rem;">
-        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem;">Listen and select the correct option:</p>
+        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem;">${t('listen_select')}</p>
         <button id="quiz-audio-trigger-btn" class="audio-btn" style="width:60px; height:60px; font-size:1.5rem;">🔊</button>
       </div>
     `;
@@ -1055,7 +1162,7 @@ function renderQuizQuestion() {
       }
     }, 10);
   } else {
-    document.getElementById('lesson-quiz-text').textContent = q.question;
+    qText.textContent = ld(q, 'question');
   }
   
   const opts = document.getElementById('lesson-quiz-options');
@@ -1091,11 +1198,11 @@ function handleQuizAnswer(selectedOpt, btnEl) {
   if (isCorrect) {
     btnEl.classList.add("correct");
     state.quizScore++;
-    document.getElementById('lesson-quiz-correctness').textContent = "Correct!";
+    document.getElementById('lesson-quiz-correctness').textContent = t('msg_correct');
     document.getElementById('lesson-quiz-correctness').style.color = "var(--success)";
   } else {
     btnEl.classList.add("incorrect");
-    document.getElementById('lesson-quiz-correctness').textContent = "Incorrect";
+    document.getElementById('lesson-quiz-correctness').textContent = t('msg_incorrect');
     document.getElementById('lesson-quiz-correctness').style.color = "var(--error)";
   }
   
@@ -1105,9 +1212,9 @@ function handleQuizAnswer(selectedOpt, btnEl) {
   const nextBtn = document.getElementById('lesson-quiz-next-btn');
   nextBtn.style.display = 'inline-block';
   if (state.quizIndex === state.currentLesson.quiz.length - 1) {
-    nextBtn.textContent = window.i18nDictionary[state.currentLanguage]["btn_finish_lesson"];
+    nextBtn.textContent = t('btn_finish_lesson');
   } else {
-    nextBtn.textContent = window.i18nDictionary[state.currentLanguage]["btn_next_question"];
+    nextBtn.textContent = t('btn_next_question');
   }
 }
 
@@ -1138,7 +1245,8 @@ function finishLesson() {
   
   saveProgress();
   
-  document.getElementById('congrats-quiz-score').textContent = `${state.quizScore} / ${state.currentLesson.quiz.length}`;
+  const totalQuiz = (state.currentLesson.quiz && state.currentLesson.quiz.length) ? state.currentLesson.quiz.length : 0;
+  document.getElementById('congrats-quiz-score').textContent = `${state.quizScore} / ${totalQuiz}`;
   document.getElementById('congrats-time').textContent = `${Math.floor(timeSpent/60)}m ${timeSpent%60}s`;
   
   switchView('congrats-view');
@@ -1161,30 +1269,17 @@ function initPretest() {
 }
 
 function loadPretestQuestion() {
-  const isThai = state.currentLanguage === 'th';
-  document.getElementById('pretest-quiz-progress').textContent = isThai ? 
-    `คำถามที่ ${state.pretestIndex + 1} จาก ${window.CHINESE_LESSONS.preTestQuestions.length}` : 
-    `Question ${state.pretestIndex + 1} of ${window.CHINESE_LESSONS.preTestQuestions.length}`;
-  
-  const qText = document.getElementById('pretest-question-text');
   const questionsList = window.CHINESE_LESSONS.preTestQuestions;
   const totalCount = questionsList.length;
   const question = questionsList[state.pretestIndex];
   
+  document.getElementById("pretest-question-number").textContent = t('question_progress', { current: state.pretestIndex + 1, total: totalCount });
   
-  const currentLang = state.currentLanguage || "en";
-  const questionNumberText = currentLang === "th" 
-    ? `คำถามที่ ${state.pretestIndex + 1} จาก ${totalCount}` 
-    : `Question ${state.pretestIndex + 1} of ${totalCount}`;
-  document.getElementById("pretest-question-number").textContent = questionNumberText;
-  
-  const hskLevelText = currentLang === "th" 
-    ? `มาตรฐานระดับ HSK: ระดับ ${question.level}` 
-    : `HSK level benchmark: Level ${question.level}`;
-  document.getElementById("pretest-question-level").textContent = hskLevelText;
+  document.getElementById("pretest-question-level").textContent = t('hsk_benchmark_level', { level: question.level });
   document.getElementById("pretest-progress-fill").style.width = `${((state.pretestIndex) / totalCount) * 100}%`;
   
-  qText.textContent = question.question; // Ideally this comes from a localized source as well options
+  const qText = document.getElementById('pretest-question-text');
+  qText.textContent = ld(question, 'question');
   
   document.getElementById("pretest-explanation-box").style.display = "none";
   document.getElementById("pretest-next-btn").style.display = "none";
@@ -1192,30 +1287,33 @@ function loadPretestQuestion() {
   const optionsBox = document.getElementById("pretest-options-container");
   optionsBox.innerHTML = "";
   
-  question.options.forEach(opt => {
+  const currentOptions = ld(question, 'options');
+  currentOptions.forEach((opt, idx) => {
     const btn = document.createElement("button");
     btn.className = "quiz-option";
     btn.textContent = opt;
     btn.style.width = "100%";
     btn.style.textAlign = "left";
     btn.style.marginBottom = "0.5rem";
-    btn.addEventListener("click", () => selectPretestAnswer(btn, opt));
+    btn.addEventListener("click", () => selectPretestAnswer(btn, opt, idx));
     optionsBox.appendChild(btn);
   });
 }
 
-function selectPretestAnswer(button, selectedVal) {
+function selectPretestAnswer(button, selectedVal, selectedIdx) {
   const question = window.CHINESE_LESSONS.preTestQuestions[state.pretestIndex];
   const optionsList = document.getElementById("pretest-options-container").querySelectorAll(".quiz-option");
   
-  optionsList.forEach(optBtn => {
-    optBtn.disabled = true;
-    if (optBtn.textContent === question.answer) {
-      optBtn.style.borderColor = "var(--success)";
+  const correctAnswer = ld(question, 'answer');
+
+  optionsList.forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === correctAnswer) {
+      btn.style.borderColor = "var(--success)";
     }
   });
   
-  const isCorrect = selectedVal === question.answer;
+  const isCorrect = (selectedVal === correctAnswer);
   if (isCorrect) {
     state.pretestScore++;
     button.classList.add("correct");
@@ -1227,11 +1325,12 @@ function selectPretestAnswer(button, selectedVal) {
   
   const expBox = document.getElementById("pretest-explanation-box");
   const expText = document.getElementById("pretest-explanation-text");
-  expText.textContent = question.explanation;
+  
+  expText.textContent = ld(question, 'explanation');
   expBox.style.display = "block";
   expBox.style.borderColor = isCorrect ? "var(--success)" : "var(--error)";
   expBox.querySelector("strong").style.color = isCorrect ? "var(--success)" : "var(--error)";
-  expBox.querySelector("strong").textContent = isCorrect ? (window.i18nDictionary[state.currentLanguage]["msg_correct"]) : (window.i18nDictionary[state.currentLanguage]["msg_incorrect"]);
+  expBox.querySelector("strong").textContent = isCorrect ? t('msg_correct') : t('msg_incorrect');
   
   document.getElementById("pretest-next-btn").style.display = "inline-block";
 }
@@ -1396,13 +1495,13 @@ function routeToLesson(id) {
       document.getElementById("lesson-pretest-quiz-screen").style.display = "none";
       document.getElementById("lesson-pretest-result-screen").style.display = "none";
 
-      document.getElementById("lesson-pretest-intro-title").textContent = window.i18nDictionary[state.currentLanguage]["lesson_pretest_intro_title"] + ": " + state.pretestLesson.title;
+      document.getElementById("lesson-pretest-intro-title").textContent = t('lesson_pretest_intro_title') + ": " + state.pretestLesson.title;
 
       switchView("lesson-pretest-view");
     })
     .catch(err => {
       console.error("Failed to load full lesson data for pretest:", err);
-      alert("Error loading lesson from database.");
+      alert(t('error_load_lesson'));
     });
 }
 
@@ -1426,9 +1525,9 @@ function startLessonPretestQuiz() {
     let testWordStr = "";
 
     if (qType === 0) {
-      questionText = `What is the meaning of the character "${target.character}"?`;
+      questionText = t('pretest_q_meaning', { char: target.character });
       answerVal = target.meaning;
-      explanationText = `"${target.character}" (${target.pinyin}) means "${target.meaning}".`;
+      explanationText = t('pretest_exp_meaning', { char: target.character, pinyin: target.pinyin, meaning: target.meaning });
       options.push(target.meaning);
       vocab.forEach(v => {
         if (v.meaning !== target.meaning && options.length < 4) {
@@ -1439,9 +1538,9 @@ function startLessonPretestQuiz() {
         options.push("To listen " + options.length);
       }
     } else if (qType === 1) {
-      questionText = `What is the correct pinyin for "${target.character}" (${target.meaning})?`;
+      questionText = t('pretest_q_pinyin', { char: target.character, meaning: target.meaning });
       answerVal = target.pinyin;
-      explanationText = `The pronunciation for "${target.character}" is "${target.pinyin}".`;
+      explanationText = t('pretest_exp_pinyin', { char: target.character, pinyin: target.pinyin });
       options.push(target.pinyin);
       vocab.forEach(v => {
         if (v.pinyin !== target.pinyin && options.length < 4) {
@@ -1452,9 +1551,9 @@ function startLessonPretestQuiz() {
         options.push("pīn" + options.length);
       }
     } else if (qType === 2) {
-      questionText = `Which character matches the meaning "${target.meaning}"?`;
+      questionText = t('pretest_q_match', { meaning: target.meaning });
       answerVal = target.character;
-      explanationText = `"${target.character}" is the character for "${target.meaning}".`;
+      explanationText = t('pretest_exp_match', { char: target.character, meaning: target.meaning });
       options.push(target.character);
       vocab.forEach(v => {
         if (v.character !== target.character && options.length < 4) {
@@ -1467,9 +1566,9 @@ function startLessonPretestQuiz() {
     } else {
       qTypeStr = "listening";
       testWordStr = target.character;
-      questionText = `Listen and select the correct meaning:`;
+      questionText = t('pretest_q_listen');
       answerVal = target.meaning;
-      explanationText = `You heard "${target.pinyin}" (${target.character}), which means "${target.meaning}".`;
+      explanationText = t('pretest_exp_listen', { char: target.character, pinyin: target.pinyin, meaning: target.meaning });
       options.push(target.meaning);
       vocab.forEach(v => {
         if (v.meaning !== target.meaning && options.length < 4) {
@@ -1502,11 +1601,7 @@ function loadLessonPretestQuestion() {
   const totalCount = state.lessonPretestQuestions.length;
 
   
-  const currentLang2 = state.currentLanguage || "en";
-  const questionNumberText2 = currentLang2 === "th" 
-    ? `คำถามที่ ${state.lessonPretestIndex + 1} จาก ${totalCount}` 
-    : `Question ${state.lessonPretestIndex + 1} of ${totalCount}`;
-  document.getElementById("lesson-pretest-question-number").textContent = questionNumberText2;
+  document.getElementById("lesson-pretest-question-number").textContent = t('question_progress', { current: state.lessonPretestIndex + 1, total: totalCount });
   document.getElementById("lesson-pretest-progress-fill").style.width = `${(state.lessonPretestIndex / totalCount) * 100}%`;
 
   const qText = document.getElementById("lesson-pretest-question-text");
@@ -1526,7 +1621,7 @@ function loadLessonPretestQuestion() {
       }
     }, 10);
   } else {
-    qText.textContent = q.question;
+    qText.textContent = ld(q, 'question');
   }
 
   const container = document.getElementById("lesson-pretest-options-container");
@@ -1574,14 +1669,14 @@ function selectLessonPretestAnswer(button, selectedVal) {
   expBox.style.display = "block";
   expBox.style.borderColor = isCorrect ? "var(--success)" : "var(--error)";
   expBox.querySelector("strong").style.color = isCorrect ? "var(--success)" : "var(--error)";
-  expBox.querySelector("strong").textContent = isCorrect ? (window.i18nDictionary[state.currentLanguage]["msg_correct"]) : (window.i18nDictionary[state.currentLanguage]["msg_incorrect"]);
+  expBox.querySelector("strong").textContent = isCorrect ? t('msg_correct') : t('msg_incorrect');
 
   const nextBtn = document.getElementById("lesson-pretest-next-btn");
   nextBtn.style.display = "inline-block";
   if (state.lessonPretestIndex === state.lessonPretestQuestions.length - 1) {
-    nextBtn.textContent = window.i18nDictionary[state.currentLanguage]["btn_next_question"];
+    nextBtn.textContent = t('btn_next_question');
   } else {
-    nextBtn.textContent = window.i18nDictionary[state.currentLanguage]["btn_next_question"];
+    nextBtn.textContent = t('btn_next_question');
   }
 }
 
@@ -1608,14 +1703,14 @@ function finishLessonPretest() {
   const skipBtn = document.getElementById("lesson-pretest-skip-lesson-btn");
 
   if (score === total) {
-    recTitle.textContent = "Outstanding mastery! 🌟";
+    recTitle.textContent = t('pretest_result_perfect');
     recTitle.style.color = "var(--success)";
-    recDesc.textContent = "You answered all pre-test questions correctly! You already know the vocabulary and grammar covered here. You can skip this lesson to save time, or study anyway to lock in your score.";
+    recDesc.textContent = t('pretest_result_perfect_desc');
     skipBtn.style.display = "inline-block";
   } else {
-    recTitle.textContent = "Ready to learn! 📚";
+    recTitle.textContent = t('pretest_result_ready');
     recTitle.style.color = "var(--primary)";
-    recDesc.textContent = `You scored ${score}/${total}. This is the perfect level for you to study! Start the 1-hour study block to master these words and grammar rules.`;
+    recDesc.textContent = t('pretest_result_ready_desc', { score: score, total: total });
     skipBtn.style.display = "none";
   }
 }
@@ -1652,7 +1747,7 @@ function renderPinyinRules(rules) {
   rules.forEach(rule => {
     const card = document.createElement('div');
     card.className = 'rule-card';
-    const explanation = (state.currentLanguage === 'th' && rule.explanation_th) ? rule.explanation_th : rule.explanation;
+    const explanation = ld(rule, 'explanation');
     card.innerHTML = `
       <h4>${rule.title}</h4>
       <p>${explanation.replace(/\n/g, '<br>')}</p>
