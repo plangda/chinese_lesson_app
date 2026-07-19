@@ -747,7 +747,7 @@ function renderDashboard() {
       </div>
       <div>
         ${isCompleted ? 
-          `<span class="text-success fw-bold">${t('lbl_done')}</span>` : 
+          `<button class="btn btn-primary btn-sm start-lesson-btn" data-id="${l.id}">${t('lbl_done')} (Re-learn)</button>` : 
           `<button class="btn btn-primary btn-sm start-lesson-btn" data-id="${l.id}">${t('btn_start_lesson_short')}</button>`
         }
       </div>
@@ -1034,7 +1034,7 @@ function renderDialoguePane() {
 
 function generatePostLessonQuiz(vocab) {
   const generatedQuiz = [];
-  const qCount = Math.min(10, vocab.length);
+  const qCount = Math.min(20, vocab.length);
 
   for (let i = 0; i < qCount; i++) {
     const target = vocab[i];
@@ -1042,9 +1042,11 @@ function generatePostLessonQuiz(vocab) {
     let questionText = "";
     let questionTextTh = "";
     let answerVal = "";
+    let answerValTh = "";
     let explanationText = "";
     let explanationTextTh = "";
     let options = [];
+    let optionsTh = [];
     let qTypeStr = "text";
     let testWordStr = "";
 
@@ -1052,59 +1054,82 @@ function generatePostLessonQuiz(vocab) {
       questionText = "What is the meaning of " + target.character + "?";
       questionTextTh = "ความหมายของ " + target.character + " คืออะไร?";
       answerVal = target.meaning;
+      answerValTh = target.meaning_th || target.meaning;
       explanationText = target.character + " (" + target.pinyin + ") means " + target.meaning + ".";
-      explanationTextTh = target.character + " (" + target.pinyin + ") แปลว่า " + target.meaning + ".";
-      options.push(target.meaning);
+      explanationTextTh = target.character + " (" + target.pinyin + ") แปลว่า " + (target.meaning_th || target.meaning) + ".";
+      
+      const optPairs = [{ en: target.meaning, th: target.meaning_th || target.meaning }];
       vocab.forEach(v => {
-        if (v.meaning !== target.meaning && options.length < 4) {
-          options.push(v.meaning);
+        if (v.meaning !== target.meaning && optPairs.length < 4) {
+          optPairs.push({ en: v.meaning, th: v.meaning_th || v.meaning });
         }
       });
-      while (options.length < 4) options.push("Meaning " + options.length);
+      while (optPairs.length < 4) optPairs.push({ en: "Meaning " + optPairs.length, th: "ความหมาย " + optPairs.length });
+      
+      optPairs.sort(() => Math.random() - 0.5);
+      options = optPairs.map(o => o.en);
+      optionsTh = optPairs.map(o => o.th);
+
     } else if (qType === 1) {
       questionText = "What is the pinyin for " + target.character + " (" + target.meaning + ")?";
-      questionTextTh = "พินอินของ " + target.character + " (" + target.meaning + ") คืออะไร?";
+      questionTextTh = "พินอินของ " + target.character + " (" + (target.meaning_th || target.meaning) + ") คืออะไร?";
       answerVal = target.pinyin;
+      answerValTh = target.pinyin; // pinyin is the same
       explanationText = "The pronunciation is " + target.pinyin + ".";
       explanationTextTh = "การออกเสียงคือ " + target.pinyin + ".";
-      options.push(target.pinyin);
+      
+      const pinyinOpts = [target.pinyin];
       vocab.forEach(v => {
-        if (v.pinyin !== target.pinyin && options.length < 4) {
-          options.push(v.pinyin);
+        if (v.pinyin !== target.pinyin && pinyinOpts.length < 4) {
+          pinyinOpts.push(v.pinyin);
         }
       });
-      while (options.length < 4) options.push("Pinyin " + options.length);
+      while (pinyinOpts.length < 4) pinyinOpts.push("Pinyin " + pinyinOpts.length);
+      pinyinOpts.sort(() => Math.random() - 0.5);
+      options = pinyinOpts;
+      optionsTh = pinyinOpts;
+
     } else if (qType === 2) {
       questionText = "Which character means '" + target.meaning + "'?";
-      questionTextTh = "ตัวอักษรใดแปลว่า '" + target.meaning + "'?";
+      questionTextTh = "ตัวอักษรใดแปลว่า '" + (target.meaning_th || target.meaning) + "'?";
       answerVal = target.character;
+      answerValTh = target.character;
       explanationText = target.character + " is the character for " + target.meaning + ".";
-      explanationTextTh = target.character + " คือตัวอักษรของ " + target.meaning + ".";
-      options.push(target.character);
+      explanationTextTh = target.character + " คือตัวอักษรของ " + (target.meaning_th || target.meaning) + ".";
+      
+      const charOpts = [target.character];
       vocab.forEach(v => {
-        if (v.character !== target.character && options.length < 4) {
-          options.push(v.character);
+        if (v.character !== target.character && charOpts.length < 4) {
+          charOpts.push(v.character);
         }
       });
-      while (options.length < 4) options.push("字" + options.length);
+      while (charOpts.length < 4) charOpts.push("字" + charOpts.length);
+      charOpts.sort(() => Math.random() - 0.5);
+      options = charOpts;
+      optionsTh = charOpts;
+
     } else {
       qTypeStr = "listening";
       testWordStr = target.character;
       questionText = "Listen and select the correct meaning:";
       questionTextTh = "ฟังแล้วเลือกความหมายที่ถูกต้อง:";
       answerVal = target.meaning;
+      answerValTh = target.meaning_th || target.meaning;
       explanationText = "You heard " + target.pinyin + " (" + target.character + "), meaning " + target.meaning + ".";
-      explanationTextTh = "คุณได้ยิน " + target.pinyin + " (" + target.character + ") แปลว่า " + target.meaning + ".";
-      options.push(target.meaning);
+      explanationTextTh = "คุณได้ยิน " + target.pinyin + " (" + target.character + ") แปลว่า " + (target.meaning_th || target.meaning) + ".";
+      
+      const optPairs = [{ en: target.meaning, th: target.meaning_th || target.meaning }];
       vocab.forEach(v => {
-        if (v.meaning !== target.meaning && options.length < 4) {
-          options.push(v.meaning);
+        if (v.meaning !== target.meaning && optPairs.length < 4) {
+          optPairs.push({ en: v.meaning, th: v.meaning_th || v.meaning });
         }
       });
-      while (options.length < 4) options.push("Meaning " + options.length);
+      while (optPairs.length < 4) optPairs.push({ en: "Meaning " + optPairs.length, th: "ความหมาย " + optPairs.length });
+      
+      optPairs.sort(() => Math.random() - 0.5);
+      options = optPairs.map(o => o.en);
+      optionsTh = optPairs.map(o => o.th);
     }
-
-    options.sort(() => Math.random() - 0.5);
 
     generatedQuiz.push({
       type: qTypeStr,
@@ -1112,9 +1137,11 @@ function generatePostLessonQuiz(vocab) {
       question: questionText,
       question_th: questionTextTh,
       answer: answerVal,
+      answer_th: answerValTh,
       explanation: explanationText,
       explanation_th: explanationTextTh,
-      options: options
+      options: options,
+      options_th: optionsTh
     });
   }
 
@@ -1174,7 +1201,8 @@ function renderQuizQuestion() {
   const pct = (state.quizIndex / state.currentLesson.quiz.length) * 100;
   document.getElementById('lesson-quiz-progress-fill').style.width = `${pct}%`;
   
-  q.options.forEach(opt => {
+  const currentOptions = ld(q, 'options');
+  currentOptions.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'btn btn-secondary';
     btn.style.width = '100%';
@@ -1187,12 +1215,13 @@ function renderQuizQuestion() {
 
 function handleQuizAnswer(selectedOpt, btnEl) {
   const q = state.currentLesson.quiz[state.quizIndex];
-  const isCorrect = selectedOpt === q.answer;
+  const correctAnswer = ld(q, 'answer');
+  const isCorrect = selectedOpt === correctAnswer;
   
   const opts = document.getElementById('lesson-quiz-options').querySelectorAll('button');
   opts.forEach(b => {
     b.disabled = true;
-    if (b.textContent === q.answer) b.style.borderColor = "var(--success)";
+    if (b.textContent === correctAnswer) b.style.borderColor = "var(--success)";
   });
   
   if (isCorrect) {
@@ -1206,7 +1235,7 @@ function handleQuizAnswer(selectedOpt, btnEl) {
     document.getElementById('lesson-quiz-correctness').style.color = "var(--error)";
   }
   
-  document.getElementById('lesson-quiz-explanation-text').textContent = q.explanation;
+  document.getElementById('lesson-quiz-explanation-text').textContent = ld(q, 'explanation');
   document.getElementById('lesson-quiz-explanation-box').style.display = 'block';
   
   const nextBtn = document.getElementById('lesson-quiz-next-btn');
