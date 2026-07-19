@@ -1034,10 +1034,18 @@ function renderDialoguePane() {
 
 function generatePostLessonQuiz(vocab) {
   const generatedQuiz = [];
-  const qCount = Math.min(20, vocab.length);
+  if (!vocab || vocab.length === 0) return generatedQuiz;
+
+  // Ensure at least 10 questions, up to a max of 20
+  let qCount = Math.max(10, vocab.length);
+  if (qCount > 20) qCount = 20;
+  
+  // Shuffle vocab so the order is randomized and repeated words aren't obvious
+  const shuffledVocab = [...vocab].sort(() => Math.random() - 0.5);
 
   for (let i = 0; i < qCount; i++) {
-    const target = vocab[i];
+    // Use modulo to wrap around if qCount > vocab.length
+    const target = shuffledVocab[i % shuffledVocab.length];
     const qType = Math.floor(Math.random() * 4); // 0 = meaning, 1 = pinyin, 2 = character, 3 = listening
     let questionText = "";
     let questionTextTh = "";
@@ -1149,9 +1157,9 @@ function generatePostLessonQuiz(vocab) {
 }
 
 function renderQuizPane() {
-  if (!state.currentLesson.quiz || state.currentLesson.quiz.length === 0) {
-    state.currentLesson.quiz = generatePostLessonQuiz(state.currentLesson.vocab);
-  }
+  // Always dynamically generate the quiz to ensure sufficient length (10+ questions) and full localization
+  // We ignore pre-generated DB quizzes because they often lack Thai translations for options and answers.
+  state.currentLesson.quiz = generatePostLessonQuiz(state.currentLesson.vocab);
   
   state.quizIndex = 0;
   state.quizScore = 0;
