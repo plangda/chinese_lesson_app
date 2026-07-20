@@ -1036,17 +1036,20 @@ function generatePostLessonQuiz(vocab) {
   const generatedQuiz = [];
   if (!vocab || vocab.length === 0) return generatedQuiz;
 
-  // Ensure at least 10 questions, up to a max of 20
-  let qCount = Math.max(10, vocab.length);
-  if (qCount > 20) qCount = 20;
+  // Maximum 15 questions, exactly 1 question per vocabulary word to prevent duplicates
+  let qCount = Math.min(15, vocab.length);
   
-  // Shuffle vocab so the order is randomized and repeated words aren't obvious
+  // Shuffle vocab so the order is randomized
   const shuffledVocab = [...vocab].sort(() => Math.random() - 0.5);
 
   for (let i = 0; i < qCount; i++) {
-    // Use modulo to wrap around if qCount > vocab.length
-    const target = shuffledVocab[i % shuffledVocab.length];
-    const qType = Math.floor(Math.random() * 4); // 0 = meaning, 1 = pinyin, 2 = character, 3 = listening
+    const target = shuffledVocab[i];
+    // HSK Exam Mock Styles:
+    // 0 = True/False (Reading Part 1 Mock) - Show character, meaning, ask True/False
+    // 1 = Multiple Choice Listening (Listening Part 3/4 Mock) - Listen, choose correct meaning
+    // 2 = Multiple Choice Reading (Reading Part 2 Mock) - Match meaning to character
+    const qType = Math.floor(Math.random() * 3); 
+    
     let questionText = "";
     let questionTextTh = "";
     let answerVal = "";
@@ -1056,87 +1059,69 @@ function generatePostLessonQuiz(vocab) {
     let options = [];
     let optionsTh = [];
     let qTypeStr = "text";
-    let testWordStr = "";
+    let testWordStr = target.character;
 
     if (qType === 0) {
-      questionText = "What is the meaning of " + target.character + "?";
-      questionTextTh = "ความหมายของ " + target.character + " คืออะไร?";
+      qTypeStr = "true_false"; // Custom type for UI if handled, else fallback to text options
+      // 50% chance to be true, 50% false
+      const isTrue = Math.random() > 0.5;
+      let displayMeaning = target.meaning;
+      let displayMeaningTh = target.meaning_th || target.meaning;
+      
+      if (!isTrue && vocab.length > 1) {
+          // pick a wrong meaning
+          let wrongVocab = vocab.filter(v => v.character !== target.character);
+          let wrongChoice = wrongVocab[Math.floor(Math.random() * wrongVocab.length)];
+          displayMeaning = wrongChoice.meaning;
+          displayMeaningTh = wrongChoice.meaning_th || wrongChoice.meaning;
+      }
+      
+      questionText = `Does ${target.character} mean "${displayMeaning}"?`;
+      questionTextTh = `คำว่า ${target.character} แปลว่า "${displayMeaningTh}" ใช่หรือไม่?`;
+      answerVal = isTrue ? "True" : "False";
+      answerValTh = isTrue ? "ใช่" : "ไม่ใช่";
+      explanationText = `${target.character} (${target.pinyin}) means "${target.meaning}".`;
+      explanationTextTh = `${target.character} (${target.pinyin}) แปลว่า "${target.meaning_th || target.meaning}".`;
+      
+      options = ["True", "False"];
+      optionsTh = ["ใช่", "ไม่ใช่"];
+      
+    } else if (qType === 1) {
+      qTypeStr = "listening";
+      questionText = "Listen to the audio and select the correct meaning:";
+      questionTextTh = "ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง:";
       answerVal = target.meaning;
       answerValTh = target.meaning_th || target.meaning;
-      explanationText = target.character + " (" + target.pinyin + ") means " + target.meaning + ".";
-      explanationTextTh = target.character + " (" + target.pinyin + ") แปลว่า " + (target.meaning_th || target.meaning) + ".";
+      explanationText = `You heard ${target.pinyin} (${target.character}), meaning "${target.meaning}".`;
+      explanationTextTh = `คุณได้ยิน ${target.pinyin} (${target.character}) แปลว่า "${target.meaning_th || target.meaning}".`;
       
       const optPairs = [{ en: target.meaning, th: target.meaning_th || target.meaning }];
-      vocab.forEach(v => {
-        if (v.meaning !== target.meaning && optPairs.length < 4) {
-          optPairs.push({ en: v.meaning, th: v.meaning_th || v.meaning });
-        }
-      });
-      while (optPairs.length < 4) optPairs.push({ en: "Meaning " + optPairs.length, th: "ความหมาย " + optPairs.length });
+      const wrongOpts = vocab.filter(v => v.character !== target.character).sort(() => Math.random() - 0.5);
+      for(let w of wrongOpts) {
+          if(optPairs.length < 4) optPairs.push({ en: w.meaning, th: w.meaning_th || w.meaning });
+      }
       
       optPairs.sort(() => Math.random() - 0.5);
       options = optPairs.map(o => o.en);
       optionsTh = optPairs.map(o => o.th);
 
-    } else if (qType === 1) {
-      questionText = "What is the pinyin for " + target.character + " (" + target.meaning + ")?";
-      questionTextTh = "พินอินของ " + target.character + " (" + (target.meaning_th || target.meaning) + ") คืออะไร?";
-      answerVal = target.pinyin;
-      answerValTh = target.pinyin; // pinyin is the same
-      explanationText = "The pronunciation is " + target.pinyin + ".";
-      explanationTextTh = "การออกเสียงคือ " + target.pinyin + ".";
-      
-      const pinyinOpts = [target.pinyin];
-      vocab.forEach(v => {
-        if (v.pinyin !== target.pinyin && pinyinOpts.length < 4) {
-          pinyinOpts.push(v.pinyin);
-        }
-      });
-      while (pinyinOpts.length < 4) pinyinOpts.push("Pinyin " + pinyinOpts.length);
-      pinyinOpts.sort(() => Math.random() - 0.5);
-      options = pinyinOpts;
-      optionsTh = pinyinOpts;
-
     } else if (qType === 2) {
-      questionText = "Which character means '" + target.meaning + "'?";
-      questionTextTh = "ตัวอักษรใดแปลว่า '" + (target.meaning_th || target.meaning) + "'?";
+      qTypeStr = "text";
+      questionText = `Which character means "${target.meaning}"?`;
+      questionTextTh = `ตัวอักษรใดแปลว่า "${target.meaning_th || target.meaning}"?`;
       answerVal = target.character;
       answerValTh = target.character;
-      explanationText = target.character + " is the character for " + target.meaning + ".";
-      explanationTextTh = target.character + " คือตัวอักษรของ " + (target.meaning_th || target.meaning) + ".";
+      explanationText = `${target.character} is the character for "${target.meaning}".`;
+      explanationTextTh = `${target.character} คือตัวอักษรของ "${target.meaning_th || target.meaning}".`;
       
       const charOpts = [target.character];
-      vocab.forEach(v => {
-        if (v.character !== target.character && charOpts.length < 4) {
-          charOpts.push(v.character);
-        }
-      });
-      while (charOpts.length < 4) charOpts.push("字" + charOpts.length);
+      const wrongOpts = vocab.filter(v => v.character !== target.character).sort(() => Math.random() - 0.5);
+      for(let w of wrongOpts) {
+          if(charOpts.length < 4) charOpts.push(w.character);
+      }
       charOpts.sort(() => Math.random() - 0.5);
       options = charOpts;
       optionsTh = charOpts;
-
-    } else {
-      qTypeStr = "listening";
-      testWordStr = target.character;
-      questionText = "Listen and select the correct meaning:";
-      questionTextTh = "ฟังแล้วเลือกความหมายที่ถูกต้อง:";
-      answerVal = target.meaning;
-      answerValTh = target.meaning_th || target.meaning;
-      explanationText = "You heard " + target.pinyin + " (" + target.character + "), meaning " + target.meaning + ".";
-      explanationTextTh = "คุณได้ยิน " + target.pinyin + " (" + target.character + ") แปลว่า " + (target.meaning_th || target.meaning) + ".";
-      
-      const optPairs = [{ en: target.meaning, th: target.meaning_th || target.meaning }];
-      vocab.forEach(v => {
-        if (v.meaning !== target.meaning && optPairs.length < 4) {
-          optPairs.push({ en: v.meaning, th: v.meaning_th || v.meaning });
-        }
-      });
-      while (optPairs.length < 4) optPairs.push({ en: "Meaning " + optPairs.length, th: "ความหมาย " + optPairs.length });
-      
-      optPairs.sort(() => Math.random() - 0.5);
-      options = optPairs.map(o => o.en);
-      optionsTh = optPairs.map(o => o.th);
     }
 
     generatedQuiz.push({
@@ -1152,10 +1137,8 @@ function generatePostLessonQuiz(vocab) {
       options_th: optionsTh
     });
   }
-
   return generatedQuiz;
 }
-
 function renderQuizPane() {
   // Always dynamically generate the quiz to ensure sufficient length (10+ questions) and full localization
   // We ignore pre-generated DB quizzes because they often lack Thai translations for options and answers.

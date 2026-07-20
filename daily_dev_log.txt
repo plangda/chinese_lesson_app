@@ -1,1 +1,1 @@
-File: daily_dev_log.txt(This file should be left empty initially. The Coding Agent will append its actions here, and the PM Skill will read from it.)
+File: daily_dev_log.txt(This file should be left empty initially. The Coding Agent will append its actions here, and the PM Skill will read from it.)

@@ -18,7 +18,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | :--- | :--- | :---: | :---: | :--- |
 | **SQLite Database Schema & Setup** | Phase 1: Database & Backend | `Complete` | 100% | Configured in `database.js` with schemas for lessons, vocab, grammar, dialogues, and progress tracking. |
 | **Express API & Server Routes** | Phase 1: Database & Backend | `Complete` | 100% | Implemented in `server.js` with routes for lessons, full curricula, and user progress backup. |
-| **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `Complete` | 100% | 21 lessons generated and seeded containing all 150 HSK 1 words, grammar, dialogues, and quizzes. |
+| **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `Complete` | 100% | 39 thematic lessons generated offline and seeded containing exactly 500 unique HSK 1 words. |
 | **HSK 2 & 3 Curriculum Seeding** | Phase 1: Database & Backend | `In Progress` | 20% | 5 mock/structural lessons seeded for HSK 2 and HSK 3; requires full curriculum data generation. |
 | **HSK 4, 5, 6 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Advanced content generation and database seeding for higher proficiency levels. |
 | **Level Placement Pre-Test System** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 12-question diagnostic test that maps results to recommended start levels. |
@@ -26,7 +26,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Stage 1: Vocabulary & Tracing** | Phase 3: Core Learning Engine | `Complete` | 100% | Flashcards with click-to-flip animations and an interactive drawing canvas using `hanzi-writer.min.js`. |
 | **Stage 2: Grammar & Practice** | Phase 3: Core Learning Engine | `Complete` | 100% | Grammar explanations, example sentences, and interactive word-reordering exercises. |
 | **Stage 3: Dialogue & TTS Playback** | Phase 3: Core Learning Engine | `Complete` | 100% | Bilingual dialogue reader with speaker avatars, translation toggle, and speech synthesis engine. |
-| **Stage 4: Lesson Review Quiz** | Phase 3: Core Learning Engine | `Complete` | 100% | 5-question multi-stage quiz with instant answer verification and grammatical explanations. |
+| **Stage 4: Lesson Review Quiz** | Phase 3: Core Learning Engine | `Complete` | 100% | Dynamic 15-question quiz mimicking official HSK 3.0 formats (True/False, Listening, Reading). |
 | **Pinyin Chart (Lesson 0)** | Phase 3: Core Learning Engine | `Complete` | 100% | Interactive CSS grid with hover popups and 1,600+ human-recorded MP3s mapped dynamically from Purple Culture. Replaces computer 'v' with proper 'ü'. |
 | **Streak & Time-Spent Tracking** | Phase 4: Consistency & Retention | `Complete` | 100% | Tracks study streak and total hours; streaks reset dynamically if a day is skipped. |
 | **Daily Study Reminder System** | Phase 4: Consistency & Retention | `Complete` | 100% | Periodic interval checks on user-set reminder times and integrated UI status notifications. |

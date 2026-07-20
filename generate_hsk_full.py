@@ -17,10 +17,7 @@ CSV_PATH = 'hsk30.csv'
 model = genai.GenerativeModel('gemini-2.5-flash-lite', generation_config={"response_mime_type": "application/json"})
 
 def get_db():
-    return libsql_client.create_client_sync(
-        url=os.environ.get("TURSO_DATABASE_URL"),
-        auth_token=os.environ.get("TURSO_AUTH_TOKEN")
-    )
+    return None
 
 def read_hsk_words(level):
     words = []
@@ -35,11 +32,13 @@ def read_hsk_words(level):
                 })
     return words
 
-def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2"):
+def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_name=None):
     words_str = json.dumps(words_chunk, ensure_ascii=False)
+    theme_instruction = f"The overall theme for this lesson should be around: '{theme_name}'." if theme_name else "You must create a highly engaging, thematic 4-stage Chinese lesson for these words."
+    
     prompt = f"""
     You are an expert Chinese teacher. I will give you a list of Chinese vocabulary words.
-    You must create a highly engaging, thematic 4-stage Chinese lesson for these words.
+    {theme_instruction}
     
     Vocabulary Words: {words_str}
     
@@ -83,20 +82,27 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2"):
         }},
         "quiz": [
             {{
-                "type": "vocab",
-                "question": "Which word means ...?",
-                "options": ["A", "B", "C", "D"],
-                "answer": "A",
+                "type": "true_false",
+                "question": "Does this word match the meaning? Word: [Word], Meaning: [Meaning]",
+                "options": ["True", "False"],
+                "answer": "True",
                 "explanation": "Because..."
             }},
             {{
-                "type": "grammar",
-                "question": "Fill in the blank: ...",
-                "options": ["A", "B", "C", "D"],
-                "answer": "A",
+                "type": "fill_in_the_blank",
+                "question": "Complete the sentence: 我 ___ 喝茶。 (I like to drink tea.)",
+                "options": ["爱", "不", "很", "是"],
+                "answer": "爱",
+                "explanation": "Because..."
+            }},
+            {{
+                "type": "reading_comprehension",
+                "question": "Choose the best response to this statement: 你好吗？",
+                "options": ["我很好", "再见", "谢谢", "对不起"],
+                "answer": "我很好",
                 "explanation": "Because..."
             }}
-            // Provide 4-6 quiz questions covering vocab, pinyin, and grammar
+            // Provide 4-6 quiz questions closely mocking the official HSK 1 exam formats.
         ]
     }}
     """
@@ -109,118 +115,109 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2"):
         return None
 
 def insert_lesson_to_db(db, lesson_data, day_number, hsk_level="hsk2"):
-    cursor = db.cursor()
     lesson_id = f"{hsk_level}_day{day_number}"
+    lesson_data["id"] = lesson_id
+    lesson_data["hsk_level"] = hsk_level
+    lesson_data["day_number"] = day_number
     
-    try:
-        # 1. Insert Lesson
-        cursor.execute(
-            "INSERT OR REPLACE INTO lessons (id, hsk_level, day_number, title, duration_minutes) VALUES (?, ?, ?, ?, ?)",
-            (lesson_id, hsk_level, day_number, lesson_data.get('title', 'Unknown Theme'), 60)
-        )
-        
-        # 2. Insert Vocab
-        for i, word in enumerate(lesson_data['vocab']):
-            cursor.execute(
-                """INSERT INTO vocab (lesson_id, character, pinyin, meaning, deconstruct, example_cn, example_py, example_en, sort_order)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (lesson_id, word['character'], word['pinyin'], word['meaning'], word.get('deconstruct',''), 
-                 word.get('example_cn',''), word.get('example_py',''), word.get('example_en',''), i)
-            )
-            
-        # 3. Insert Grammar
-        for i, gram in enumerate(lesson_data.get('grammar', [])):
-            cursor.execute(
-                "INSERT INTO grammar (lesson_id, title, explanation, sort_order) VALUES (?, ?, ?, ?)",
-                (lesson_id, gram['title'], gram['explanation'], i)
-            )
-            grammar_id = cursor.lastrowid
-            
-            for j, ex in enumerate(gram.get('examples', [])):
-                cursor.execute(
-                    "INSERT INTO grammar_examples (grammar_id, cn, py, en, sort_order) VALUES (?, ?, ?, ?, ?)",
-                    (grammar_id, ex['cn'], ex['py'], ex['en'], j)
-                )
-                
-            if 'practice' in gram:
-                p = gram['practice']
-                cursor.execute(
-                    "INSERT INTO grammar_practice (grammar_id, prompt, words, answer) VALUES (?, ?, ?, ?)",
-                    (grammar_id, p['prompt'], json.dumps(p.get('words', [])), json.dumps(p.get('answer', [])))
-                )
-                
-        # 4. Insert Dialogue
-        dial = lesson_data.get('dialogue')
-        if dial:
-            cursor.execute("INSERT INTO dialogues (lesson_id, title) VALUES (?, ?)", (lesson_id, dial['title']))
-            dial_id = cursor.lastrowid
-            for i, line in enumerate(dial.get('lines', [])):
-                cursor.execute(
-                    "INSERT INTO dialogue_lines (dialogue_id, speaker, cn, py, en, sort_order) VALUES (?, ?, ?, ?, ?, ?)",
-                    (dial_id, line.get('speaker', 'A'), line['cn'], line['py'], line['en'], i)
-                )
-                
-        # 5. Insert Quiz
-        for i, q in enumerate(lesson_data.get('quiz', [])):
-            cursor.execute(
-                """INSERT INTO quizzes (lesson_id, type, testWord, question, options, answer, explanation, sort_order)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                (lesson_id, q.get('type', 'vocab'), q.get('testWord', ''), q.get('question', ''), 
-                 json.dumps(q.get('options', [])), q.get('answer', ''), q.get('explanation', ''), i)
-            )
-            
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        raise e
+    with open("generated_lessons.jsonl", "a", encoding="utf-8") as f:
+        f.write(json.dumps(lesson_data, ensure_ascii=False) + "\n")
 
 def run_generation(level=2, chunk_size=10, limit=None):
     words = read_hsk_words(level)
     print(f"Total HSK {level} words loaded: {len(words)}")
     
-    db = get_db()
     hsk_id = f"hsk{level}"
     
-    # Check how many days already exist for this level
-    cursor = db.cursor()
-    cursor.execute("SELECT MAX(day_number) FROM lessons WHERE hsk_level = ?", (hsk_id,))
-    max_day = cursor.fetchone()[0] or 0
-    start_idx = max_day * chunk_size
-    
-    print(f"Resuming from Day {max_day + 1} (Word index {start_idx})")
+    # We write to generated_lessons.jsonl now, start from day 0
+    max_day = 0
     
     day_number = max_day + 1
     generated_count = 0
     
-    for i in range(start_idx, len(words), chunk_size):
-        if limit and generated_count >= limit:
-            break
+    if level == 1:
+        try:
+            with open('hsk1_themes.json', 'r', encoding='utf-8') as f:
+                themes = json.load(f)
+        except Exception:
+            themes = []
             
-        chunk = words[i:i+chunk_size]
-        print(f"Generating Day {day_number} ({len(chunk)} words)...")
-        
-        max_retries = 5
-        success = False
-        for attempt in range(max_retries):
-            try:
-                lesson_data = generate_lesson_content(chunk, day_number, hsk_id)
-                if lesson_data:
-                    insert_lesson_to_db(db, lesson_data, day_number, hsk_id)
-                    print(f"  OK Day {day_number} saved successfully.")
-                    success = True
-                    break
-            except Exception as e:
-                print(f"  Attempt {attempt+1} failed: {e}")
-                print("  Sleeping for 65 seconds to respect rate limits...")
-                time.sleep(65)
+        remaining_words = list(words)
+        chunks = []
+        theme_names = []
+        for t in themes:
+            theme_chunk = []
+            for w_char in t.get('words', []):
+                for i, w_dict in enumerate(remaining_words):
+                    if w_dict['character'] == w_char:
+                        theme_chunk.append(remaining_words.pop(i))
+                        break
+            if theme_chunk:
+                chunks.append(theme_chunk)
+                theme_names.append(t.get('theme', ''))
                 
-        if not success:
-            print(f"  FAIL Failed to generate Day {day_number} after {max_retries} attempts.")
-            raise RuntimeError("Stopping pipeline due to repeated API failures (likely daily quota limit reached).")
+        for i in range(0, len(remaining_words), 15):
+            chunks.append(remaining_words[i:i+15])
+            theme_names.append("Additional Vocabulary")
             
-        day_number += 1
-        generated_count += 1
-        time.sleep(2) # rate limit pause
+        chunks_to_process = chunks[max_day:]
+        themes_to_process = theme_names[max_day:]
+        print(f"Resuming from Day {max_day + 1} (Chunk {max_day})")
+        
+        for chunk, t_name in zip(chunks_to_process, themes_to_process):
+            if limit and generated_count >= limit:
+                break
+                
+            print(f"Generating Day {day_number} ({len(chunk)} words)... Theme: {t_name}")
+            max_retries = 5
+            success = False
+            for attempt in range(max_retries):
+                try:
+                    lesson_data = generate_lesson_content(chunk, day_number, hsk_id, t_name)
+                    if lesson_data:
+                        insert_lesson_to_db(None, lesson_data, day_number, hsk_id)
+                        print(f"  OK Day {day_number} saved successfully.")
+                        success = True
+                        break
+                except Exception as e:
+                    print(f"  Attempt {attempt+1} failed: {e}")
+                    time.sleep(65)
+                    
+            if not success:
+                raise RuntimeError("Stopping pipeline due to API failures.")
+                
+            day_number += 1
+            generated_count += 1
+            time.sleep(2)
+    else:
+        start_idx = max_day * chunk_size
+        print(f"Resuming from Day {max_day + 1} (Word index {start_idx})")
+        for i in range(start_idx, len(words), chunk_size):
+            if limit and generated_count >= limit:
+                break
+                
+            chunk = words[i:i+chunk_size]
+            print(f"Generating Day {day_number} ({len(chunk)} words)...")
+            max_retries = 5
+            success = False
+            for attempt in range(max_retries):
+                try:
+                    lesson_data = generate_lesson_content(chunk, day_number, hsk_id)
+                    if lesson_data:
+                        insert_lesson_to_db(None, lesson_data, day_number, hsk_id)
+                        print(f"  OK Day {day_number} saved successfully.")
+                        success = True
+                        break
+                except Exception as e:
+                    print(f"  Attempt {attempt+1} failed: {e}")
+                    time.sleep(65)
+                    
+            if not success:
+                raise RuntimeError("Stopping pipeline due to repeated API failures.")
+                
+            day_number += 1
+            generated_count += 1
+            time.sleep(2)
 
 if __name__ == "__main__":
     print("=== Phase 1-3: Full HSK Generation Pipeline ===")

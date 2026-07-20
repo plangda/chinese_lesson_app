@@ -231,26 +231,6 @@ window.HSK1_CURRICULUM = [
         "answer": "goodbye",
         "explanation": "You heard 'zàijiàn' (再见), which means 'goodbye'."
       }
-    ],
-    "pretest": [
-      {
-        "question": "What is the English meaning of '你好' (nǐ hǎo)?",
-        "options": ["Goodbye", "Thank you", "Hello", "Sorry"],
-        "answer": "Hello",
-        "explanation": "你好 means hello."
-      },
-      {
-        "question": "If someone says '谢谢' (xièxie), you should reply with:",
-        "options": ["再见", "不客气", "没关系", "请"],
-        "answer": "不客气",
-        "explanation": "不客气 (bú kèqi) means 'you're welcome'."
-      },
-      {
-        "question": "Which word means 'Goodbye'?",
-        "options": ["再见", "你好", "喂", "对不起"],
-        "answer": "再见",
-        "explanation": "再见 (zàijiàn) means 'goodbye'."
-      }
     ]
   },
   {
@@ -443,26 +423,6 @@ window.HSK1_CURRICULUM = [
         ],
         "answer": "friend",
         "explanation": "You heard 'péngyou' (朋友), which means 'friend'."
-      }
-    ],
-    "pretest": [
-      {
-        "question": "What does '我' (wǒ) mean?",
-        "options": ["You", "He / She", "We", "I / Me"],
-        "answer": "I / Me",
-        "explanation": "我 (wǒ) means I or me."
-      },
-      {
-        "question": "Translate: '我是学生' (wǒ shì xuésheng)",
-        "options": ["I am a teacher", "I am a student", "He is a student", "You are a teacher"],
-        "answer": "I am a student",
-        "explanation": "我(I) + 是(am) + 学生(student)."
-      },
-      {
-        "question": "Which of these means 'teacher'?",
-        "options": ["学生", "同学", "朋友", "老师"],
-        "answer": "老师",
-        "explanation": "老师 (lǎoshī) means teacher."
       }
     ]
   },

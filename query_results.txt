@@ -1,0 +1,20 @@
+=== Quizzes in hsk1_day2 ===
+(99, "What does '我们 (wǒmen)' mean?", 'text')
+(100, "Which pronoun means 'she' in Chinese?", 'text')
+(101, "What is the Chinese word for 'friend'?", 'text')
+(102, "What does '同学 (tóngxué)' mean?", 'text')
+(103, 'Listen and select the correct meaning:', 'listening')
+
+=== Quizzes in hsk2_day2 ===
+(183, "What does '下雨 (xiàyǔ)' mean?", 'text')
+(184, "How do you say 'bus' in Chinese?", 'text')
+(185, "Which particle is used for choices in questions ('or')?", 'text')
+(186, "What does '晴天 (qíngtiān)' mean?", 'text')
+
+=== Quizzes in hsk3_day2 ===
+(203, "What is '感冒 (gǎnmào)' in English?", 'text')
+(204, "How do you translate 'medicine'?", 'text')
+(205, 'Complete: 你不舒服，___去医院. (You feel unwell, you should go to the hospital)', 'text')
+(206, "What does '舒服 (shūfu)' mean?", 'text')
+
+=== All Duplicate questions ===
