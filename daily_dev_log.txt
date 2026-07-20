@@ -1,1 +1,8 @@
 File: daily_dev_log.txt(This file should be left empty initially. The Coding Agent will append its actions here, and the PM Skill will read from it.)
+2026-07-20:
+- Updated generate_hsk_offline.py to correctly parse Simplified and CEDICT columns from hsk30.csv, preventing the "meaning" literal bug.
+- Truncated long dictionary meanings in generate_hsk_offline.py so the quiz buttons are not cluttered.
+- Updated i18n.js to include "day_prefix" and all 39 HSK1 themes for both English and Thai.
+- Patched app.js to prepend the localized day_prefix to lesson titles.
+- Applied line-height: 1.5 to quiz buttons in app.js for Thai layout safety.
+- Cleared the database and ran insertion script to remove old duplicate words and seed clean HSK 1 data.
