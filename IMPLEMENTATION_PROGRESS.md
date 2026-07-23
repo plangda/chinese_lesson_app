@@ -45,6 +45,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Backend N+1 Query & Architecture Refactor** | Maintenance & Bug Fixes | `Complete` | 100% | Resolved massive N+1 query loops in `/api/curriculum`, replaced sync IO with `fs.promises`, and added Turso resilience retries. |
 | **Quiz & Localization Refactor** | Maintenance & Bug Fixes | `Complete` | 100% | Centralized `ld()` localization, forced dynamic 10+ question localized quizzes, fixed question skip bug, added 'Re-learn' button. |
 | **Curriculum, Quiz & Thai Layout Fixes** | Maintenance & Bug Fixes | `Complete` | 100% | Patched CSV parsing to prevent "meaning" placeholder bug, added dynamic Day prefixes, translated 39 themes, and fixed Thai vertical tone clipping in quiz options. |
+| **HSK 1 Official 300-Word & Semantic Theme Overhaul** | Maintenance & Bug Fixes | `Complete` | 100% | Replaced 500-word generator with official 300-word dataset, mapped 38 semantic themes (Greetings, Family, Food), added UI defensive quiz guards, and updated DB import mapping for Thai fields. |
 ---
 
 ## Phase-wise Breakdown

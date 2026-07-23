@@ -1,0 +1,27 @@
+[
+  [
+    "How do you say 'Hello' in Chinese?",
+    "[\"再见\",\"你好\",\"谢谢\",\"对不起\"]",
+    "你好"
+  ],
+  [
+    "What does '再见 (zàijiàn)' mean?",
+    "[\"Hello\",\"Thank you\",\"Goodbye\",\"Sorry\"]",
+    "Goodbye"
+  ],
+  [
+    "Someone says '谢谢'. What is the correct response?",
+    "[\"对不起\",\"不客气\",\"没有\",\"再见\"]",
+    "不客气"
+  ],
+  [
+    "Which phrase means 'it's okay / no problem'?",
+    "[\"你好\",\"谢谢\",\"没关系\",\"请\"]",
+    "没关系"
+  ],
+  [
+    "Listen and select the correct meaning:",
+    "[\"to read (aloud)\",\"to know / to recognize (a person)\",\"goodbye\",\"please / to invite\"]",
+    "goodbye"
+  ]
+]

@@ -23,10 +23,27 @@ async function main() {
         const lesson_id = lesson_data.id;
         
         try {
+            console.log(`Clearing existing records for ${lesson_id} to ensure idempotency...`);
+            // Clean up existing lesson data first (safe cascade)
+            await db.run("DELETE FROM dialogue_lines WHERE dialogue_id IN (SELECT id FROM dialogues WHERE lesson_id = ?)", [lesson_id]);
+            await db.run("DELETE FROM dialogues WHERE lesson_id = ?", [lesson_id]);
+            await db.run("DELETE FROM grammar_practice WHERE grammar_id IN (SELECT id FROM grammar WHERE lesson_id = ?)", [lesson_id]);
+            await db.run("DELETE FROM grammar_examples WHERE grammar_id IN (SELECT id FROM grammar WHERE lesson_id = ?)", [lesson_id]);
+            await db.run("DELETE FROM grammar WHERE lesson_id = ?", [lesson_id]);
+            await db.run("DELETE FROM vocab WHERE lesson_id = ?", [lesson_id]);
+            await db.run("DELETE FROM lessons WHERE id = ?", [lesson_id]);
+
             // 1. Insert Lesson
             await db.run(
-                "INSERT OR REPLACE INTO lessons (id, hsk_level, day_number, title, duration_minutes) VALUES (?, ?, ?, ?, ?)",
-                [lesson_id, lesson_data.hsk_level, lesson_data.day_number, lesson_data.title || 'Unknown Theme', 60]
+                "INSERT INTO lessons (id, hsk_level, day_number, title_en, title_th, duration_minutes) VALUES (?, ?, ?, ?, ?, ?)",
+                [
+                    lesson_id, 
+                    lesson_data.hsk_level, 
+                    lesson_data.day_number, 
+                    lesson_data.title || 'Unknown Theme', 
+                    lesson_data.title_th || null, 
+                    60
+                ]
             );
             
             // 2. Insert Vocab
@@ -34,10 +51,25 @@ async function main() {
                 let sortOrder = 0;
                 for (const word of lesson_data.vocab) {
                     await db.run(
-                        `INSERT INTO vocab (lesson_id, character, pinyin, meaning, deconstruct, example_cn, example_py, example_en, sort_order)
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                        [lesson_id, word.character, word.pinyin, word.meaning, word.deconstruct || '', 
-                         word.example_cn || '', word.example_py || '', word.example_en || '', sortOrder++]
+                        `INSERT INTO vocab (
+                            lesson_id, character, pinyin, meaning_en, meaning_th, 
+                            deconstruct_en, deconstruct_th, example_cn, example_py, 
+                            example_en, example_th, sort_order
+                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                        [
+                            lesson_id, 
+                            word.character, 
+                            word.pinyin, 
+                            word.meaning, 
+                            word.translation_th || '', 
+                            word.deconstruct || '', 
+                            word.deconstruct_th || '',
+                            word.example_sentence || '', 
+                            word.example_py || '', 
+                            word.example_translation_en || '', 
+                            word.example_translation_th || '', 
+                            sortOrder++
+                        ]
                     );
                 }
             }
@@ -47,8 +79,15 @@ async function main() {
                 let gSort = 0;
                 for (const gram of lesson_data.grammar) {
                     await db.run(
-                        "INSERT INTO grammar (lesson_id, title, explanation, sort_order) VALUES (?, ?, ?, ?)",
-                        [lesson_id, gram.title, gram.explanation, gSort++]
+                        "INSERT INTO grammar (lesson_id, title_en, title_th, explanation_en, explanation_th, sort_order) VALUES (?, ?, ?, ?, ?, ?)",
+                        [
+                            lesson_id, 
+                            gram.title, 
+                            gram.title_th || null, 
+                            gram.explanation, 
+                            gram.explanation_th || null, 
+                            gSort++
+                        ]
                     );
                     const grammar_id_rs = await db.all("SELECT last_insert_rowid() AS id");
                     const grammar_id = grammar_id_rs[0].id;
@@ -57,8 +96,15 @@ async function main() {
                         let eSort = 0;
                         for (const ex of gram.examples) {
                             await db.run(
-                                "INSERT INTO grammar_examples (grammar_id, cn, py, en, sort_order) VALUES (?, ?, ?, ?, ?)",
-                                [grammar_id, ex.cn, ex.py, ex.en, eSort++]
+                                "INSERT INTO grammar_examples (grammar_id, cn, py, en, th, sort_order) VALUES (?, ?, ?, ?, ?, ?)",
+                                [
+                                    grammar_id, 
+                                    ex.cn, 
+                                    ex.py, 
+                                    ex.en, 
+                                    ex.th || null, 
+                                    eSort++
+                                ]
                             );
                         }
                     }
@@ -66,8 +112,14 @@ async function main() {
                     if (gram.practice) {
                         const p = gram.practice;
                         await db.run(
-                            "INSERT INTO grammar_practice (grammar_id, prompt, words, answer) VALUES (?, ?, ?, ?)",
-                            [grammar_id, p.prompt, JSON.stringify(p.words || []), JSON.stringify(p.answer || [])]
+                            "INSERT INTO grammar_practice (grammar_id, prompt_en, prompt_th, words, answer) VALUES (?, ?, ?, ?, ?)",
+                            [
+                                grammar_id, 
+                                p.prompt, 
+                                p.prompt_th || null, 
+                                JSON.stringify(p.words || []), 
+                                JSON.stringify(p.answer || [])
+                            ]
                         );
                     }
                 }
@@ -76,7 +128,7 @@ async function main() {
             // 4. Insert Dialogue
             if (lesson_data.dialogue) {
                 const dial = lesson_data.dialogue;
-                await db.run("INSERT INTO dialogues (lesson_id, title) VALUES (?, ?)", [lesson_id, dial.title]);
+                await db.run("INSERT INTO dialogues (lesson_id, title_en, title_th) VALUES (?, ?, ?)", [lesson_id, dial.title, dial.title_th || null]);
                 const dial_id_rs = await db.all("SELECT last_insert_rowid() AS id");
                 const dial_id = dial_id_rs[0].id;
                 
@@ -84,33 +136,29 @@ async function main() {
                     let dSort = 0;
                     for (const line of dial.lines) {
                         await db.run(
-                            "INSERT INTO dialogue_lines (dialogue_id, speaker, cn, py, en, sort_order) VALUES (?, ?, ?, ?, ?, ?)",
-                            [dial_id, line.speaker || 'A', line.cn, line.py, line.en, dSort++]
+                            "INSERT INTO dialogue_lines (dialogue_id, speaker, cn, py, en, th, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                            [
+                                dial_id, 
+                                line.speaker || 'A', 
+                                line.cn, 
+                                line.py, 
+                                line.en, 
+                                line.th || null, 
+                                dSort++
+                            ]
                         );
                     }
                 }
             }
             
-            // 5. Insert Quiz
-            if (lesson_data.quiz) {
-                let qSort = 0;
-                for (const q of lesson_data.quiz) {
-                    await db.run(
-                        `INSERT INTO quizzes (lesson_id, type, testWord, question, options, answer, explanation, sort_order)
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                        [lesson_id, q.type || 'vocab', q.testWord || '', q.question || '', 
-                         JSON.stringify(q.options || []), q.answer || '', q.explanation || '', qSort++]
-                    );
-                }
-            }
             count++;
-            console.log(`Inserted ${lesson_id}`);
+            console.log(`Inserted ${lesson_id} successfully.`);
         } catch (e) {
             console.error(`Error inserting ${lesson_id}:`, e);
         }
     }
     
-    console.log(`Successfully imported ${count} lessons.`);
+    console.log(`Successfully imported ${count} lessons into standardized tables.`);
 }
 
 main().catch(console.error);

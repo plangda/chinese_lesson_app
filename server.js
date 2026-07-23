@@ -38,7 +38,7 @@ app.get('/api/pinyin_matrix', (req, res) => {
 app.get('/api/lessons', async (req, res) => {
   try {
     const level = req.query.level || 'hsk1';
-    const lessons = await db.all('SELECT * FROM lessons WHERE hsk_level = ? AND day_number > 0 ORDER BY day_number ASC', [level]);
+    const lessons = await db.all('SELECT id, hsk_level, day_number, title_en as title, title_th, duration_minutes FROM lessons WHERE hsk_level = ? AND day_number > 0 ORDER BY day_number ASC', [level]);
     res.json(lessons);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -49,24 +49,25 @@ app.get('/api/lessons', async (req, res) => {
 app.get('/api/lessons/:id', async (req, res) => {
   try {
     const lessonId = req.params.id;
-    const lesson = await db.get('SELECT * FROM lessons WHERE id = ?', [lessonId]);
+    const lesson = await db.get('SELECT id, hsk_level, day_number, title_en as title, title_th, duration_minutes FROM lessons WHERE id = ?', [lessonId]);
     
     if (!lesson) {
       return res.status(404).json({ error: 'Lesson not found' });
     }
     
-    // Fetch relations
-    const vocab = await db.all('SELECT *, example_cn as exampleCn, example_py as examplePy, example_en as exampleEn FROM vocab WHERE lesson_id = ? ORDER BY sort_order ASC', [lessonId]);
+    // Fetch relations with alias mapping to preserve frontend model expectations
+    const vocab = await db.all('SELECT id, lesson_id, character, pinyin, meaning_en as meaning, meaning_th, deconstruct_en as deconstruct, deconstruct_th, example_cn as exampleCn, example_py as examplePy, example_en as exampleEn, example_th FROM vocab WHERE lesson_id = ? ORDER BY sort_order ASC', [lessonId]);
     
     // Process grammar and nested examples/practice
-    const rawGrammar = await db.all('SELECT * FROM grammar WHERE lesson_id = ? ORDER BY sort_order ASC', [lessonId]);
+    const rawGrammar = await db.all('SELECT id, lesson_id, title_en as title, title_th, explanation_en as explanation, explanation_th, sort_order FROM grammar WHERE lesson_id = ? ORDER BY sort_order ASC', [lessonId]);
     const grammar = [];
     for (const g of rawGrammar) {
       const examples = await db.all('SELECT cn, py, en, th FROM grammar_examples WHERE grammar_id = ? ORDER BY sort_order ASC', [g.id]);
-      const practice = await db.get('SELECT prompt, words, answer FROM grammar_practice WHERE grammar_id = ?', [g.id]);
+      const practice = await db.get('SELECT prompt_en as prompt, prompt_th, words, answer FROM grammar_practice WHERE grammar_id = ?', [g.id]);
       
       const gItem = {
         title: g.title,
+        title_th: g.title_th,
         explanation: g.explanation,
         explanation_th: g.explanation_th,
         examples: examples
@@ -75,6 +76,7 @@ app.get('/api/lessons/:id', async (req, res) => {
       if (practice) {
         gItem.practice = {
           prompt: practice.prompt,
+          prompt_th: practice.prompt_th,
           words: JSON.parse(practice.words),
           answer: JSON.parse(practice.answer)
         };
@@ -83,24 +85,18 @@ app.get('/api/lessons/:id', async (req, res) => {
     }
     
     // Dialogue
-    const dialogueRaw = await db.get('SELECT id, title FROM dialogues WHERE lesson_id = ?', [lessonId]);
+    const dialogueRaw = await db.get('SELECT id, title_en as title, title_th FROM dialogues WHERE lesson_id = ?', [lessonId]);
     let dialogue = null;
     if (dialogueRaw) {
       const lines = await db.all('SELECT speaker, cn, py, en, th FROM dialogue_lines WHERE dialogue_id = ? ORDER BY sort_order ASC', [dialogueRaw.id]);
       dialogue = {
         title: dialogueRaw.title,
+        title_th: dialogueRaw.title_th,
         lines: lines
       };
     }
     
-    // Quiz
-    const quizzesRaw = await db.all('SELECT type, testWord, question, question_th, options, answer, explanation, explanation_th FROM quizzes WHERE lesson_id = ? ORDER BY sort_order ASC', [lessonId]);
-    const quiz = quizzesRaw.map(q => ({
-      ...q,
-      options: JSON.parse(q.options)
-    }));
-    
-    // Construct final JSON exactly like the old window.HSK1_CURRICULUM format
+    // Construct final JSON exactly like the old window.HSK1_CURRICULUM format (legacy quizzes omitted)
     const fullLesson = {
       id: lesson.id,
       title: lesson.title,
@@ -108,7 +104,7 @@ app.get('/api/lessons/:id', async (req, res) => {
       vocab: vocab,
       grammar: grammar,
       dialogue: dialogue,
-      quiz: quiz
+      quiz: []
     };
     
     res.json(fullLesson);
@@ -122,7 +118,7 @@ app.get('/api/curriculum/:level', async (req, res) => {
   try {
     const level = req.params.level;
     console.log("Fetching curriculum for level:", level);
-    const lessons = await db.all('SELECT * FROM lessons WHERE hsk_level = ? AND day_number > 0 ORDER BY day_number ASC', [level]);
+    const lessons = await db.all('SELECT id, hsk_level, day_number, title_en as title, title_th, duration_minutes FROM lessons WHERE hsk_level = ? AND day_number > 0 ORDER BY day_number ASC', [level]);
     console.log("Found lessons:", lessons.length);
     if (lessons.length === 0) return res.json([]);
 
@@ -131,11 +127,11 @@ app.get('/api/curriculum/:level', async (req, res) => {
 
     // Bulk fetch vocab
     console.log("Fetching vocab for lessons...");
-    const allVocab = await db.all(`SELECT lesson_id, character, pinyin, meaning, meaning_th, deconstruct, deconstruct_th, example_cn as exampleCn, example_py as examplePy, example_en as exampleEn, example_th FROM vocab WHERE lesson_id IN (${placeholders}) ORDER BY sort_order ASC`, lessonIds);
+    const allVocab = await db.all(`SELECT lesson_id, character, pinyin, meaning_en as meaning, meaning_th, deconstruct_en as deconstruct, deconstruct_th, example_cn as exampleCn, example_py as examplePy, example_en as exampleEn, example_th FROM vocab WHERE lesson_id IN (${placeholders}) ORDER BY sort_order ASC`, lessonIds);
     console.log("Vocab fetched:", allVocab.length);
     
     // Bulk fetch grammar
-    const allGrammar = await db.all(`SELECT id, lesson_id, title, explanation, explanation_th FROM grammar WHERE lesson_id IN (${placeholders}) ORDER BY sort_order ASC`, lessonIds);
+    const allGrammar = await db.all(`SELECT id, lesson_id, title_en as title, title_th, explanation_en as explanation, explanation_th FROM grammar WHERE lesson_id IN (${placeholders}) ORDER BY sort_order ASC`, lessonIds);
     const grammarIds = allGrammar.map(g => g.id);
     let allGrammarExamples = [];
     let allGrammarPractice = [];
@@ -143,12 +139,12 @@ app.get('/api/curriculum/:level', async (req, res) => {
     if (grammarIds.length > 0) {
         const gPlaceholders = grammarIds.map(() => '?').join(',');
         allGrammarExamples = await db.all(`SELECT grammar_id, cn, py, en, th FROM grammar_examples WHERE grammar_id IN (${gPlaceholders}) ORDER BY sort_order ASC`, grammarIds);
-        allGrammarPractice = await db.all(`SELECT grammar_id, prompt, words, answer FROM grammar_practice WHERE grammar_id IN (${gPlaceholders})`, grammarIds);
+        allGrammarPractice = await db.all(`SELECT grammar_id, prompt_en as prompt, prompt_th, words, answer FROM grammar_practice WHERE grammar_id IN (${gPlaceholders})`, grammarIds);
     }
 
     // Bulk fetch dialogues
     console.log("Fetching dialogues...");
-    const allDialogues = await db.all(`SELECT id, lesson_id, title FROM dialogues WHERE lesson_id IN (${placeholders})`, lessonIds);
+    const allDialogues = await db.all(`SELECT id, lesson_id, title_en as title, title_th FROM dialogues WHERE lesson_id IN (${placeholders})`, lessonIds);
     const dialogueIds = allDialogues.map(d => d.id);
     let allDialogueLines = [];
     
@@ -157,10 +153,6 @@ app.get('/api/curriculum/:level', async (req, res) => {
         console.log("Fetching dialogue lines...");
         allDialogueLines = await db.all(`SELECT dialogue_id, speaker, cn, py, en, th FROM dialogue_lines WHERE dialogue_id IN (${dPlaceholders}) ORDER BY sort_order ASC`, dialogueIds);
     }
-
-    // Bulk fetch quizzes
-    console.log("Fetching quizzes...");
-    const allQuizzes = await db.all(`SELECT lesson_id, type, testWord, question, question_th, options, answer, explanation, explanation_th FROM quizzes WHERE lesson_id IN (${placeholders}) ORDER BY sort_order ASC`, lessonIds);
 
     console.log("Assembling curriculum...");
     const curriculum = lessons.map(lesson => {
@@ -172,9 +164,9 @@ app.get('/api/curriculum/:level', async (req, res) => {
       const lessonGrammar = lessonGrammarRaw.map(g => {
         const examples = allGrammarExamples.filter(ex => ex.grammar_id === g.id).map(({grammar_id, ...rest}) => rest);
         const practiceRow = allGrammarPractice.find(p => p.grammar_id === g.id);
-        const gItem = { title: g.title, explanation: g.explanation, examples: examples };
+        const gItem = { title: g.title, title_th: g.title_th, explanation: g.explanation, explanation_th: g.explanation_th, examples: examples };
         if (practiceRow) {
-          gItem.practice = { prompt: practiceRow.prompt, words: JSON.parse(practiceRow.words), answer: JSON.parse(practiceRow.answer) };
+          gItem.practice = { prompt: practiceRow.prompt, prompt_th: practiceRow.prompt_th, words: JSON.parse(practiceRow.words), answer: JSON.parse(practiceRow.answer) };
         }
         return gItem;
       });
@@ -183,13 +175,8 @@ app.get('/api/curriculum/:level', async (req, res) => {
       let dialogue = null;
       if (lessonDialogueRaw) {
         const lines = allDialogueLines.filter(l => l.dialogue_id === lessonDialogueRaw.id).map(({dialogue_id, ...rest}) => rest);
-        dialogue = { title: lessonDialogueRaw.title, lines: lines };
+        dialogue = { title: lessonDialogueRaw.title, title_th: lessonDialogueRaw.title_th, lines: lines };
       }
-
-      const lessonQuiz = allQuizzes.filter(q => q.lesson_id === lid).map(({lesson_id, ...rest}) => ({
-        ...rest,
-        options: JSON.parse(rest.options)
-      }));
 
       return {
         id: lesson.id,
@@ -198,7 +185,7 @@ app.get('/api/curriculum/:level', async (req, res) => {
         vocab: lessonVocab,
         grammar: lessonGrammar,
         dialogue: dialogue,
-        quiz: lessonQuiz
+        quiz: []
       };
     });
 

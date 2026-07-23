@@ -164,19 +164,23 @@ function fetchCurriculumAndRender(level) {
     })
     .then(data => {
       if (!window.CHINESE_LESSONS) {
-        window.CHINESE_LESSONS = {
-          lessons: {},
-          preTestQuestions: [
-            { id: "q1", level: 1, question: "Identify the correct meaning of '医生 (yīshēng)':", options: ["Doctor", "Teacher", "Student", "Hospital"], answer: "Doctor", explanation: "'医生' (yīshēng) means doctor. Hospital is 医院 (yīyuàn)." },
-            { id: "q2", level: 1, question: "Which sentence is grammatically correct?", options: ["我明天去北京", "我去北京明天", "北京去我明天", "去北京我明天"], answer: "我明天去北京", explanation: "In Chinese, time words (like 明天) come before or immediately after the subject (我)." },
-            { id: "q3", level: 1, question: "How do you read this time: '8:00'?", options: ["八点 (bā diǎn)", "八天 (bā tiān)", "八号 (bā hào)", "八月 (bā yuè)"], answer: "八点 (bā diǎn)", explanation: "'点' (diǎn) is used for o'clock. '天' is day, '号' is date, '月' is month." },
-            { id: "q4", level: 2, question: "Fill in the blank: 你觉得这件衣服____？", options: ["怎么", "怎么样", "怎么了", "为什么"], answer: "怎么样", explanation: "'怎么样' (zěnmeyàng) means 'how is it?' and is used to ask for opinions." },
-            { id: "q5", level: 2, question: "What does '生病 (shēngbìng)' mean?", options: ["To be sick", "To be angry", "To be happy", "To sleep"], answer: "To be sick", explanation: "'生病' means to fall ill or get sick." },
-            { id: "q6", level: 2, question: "Fill in the blank: 我每天早上六点____起床。(I wake up as early as 6 AM every day.)", options: ["就", "才", "也", "都"], answer: "就", explanation: "'就' (jiù) implies that the action happens early or easily." },
-            { id: "q7", level: 3, question: "Fill in the blank: ____外面在下雨，但是我还是要去跑步。", options: ["虽然", "因为", "如果", "所以"], answer: "虽然", explanation: "虽然...但是... (suīrán... dànshì...) is a fixed structure meaning 'Although... but...'." },
-            { id: "q8", level: 3, question: "Choose the correct grammar usage for the '被' (bèi) passive structure:", options: ["我的咖啡被他喝了", "他被喝了我的咖啡", "咖啡把他喝了", "我的咖啡把他喝了"], answer: "我的咖啡被他喝了", explanation: "The structure is: [Receiver] + 被 + [Doer] + [Verb]. My coffee (receiver) was drunk by him (doer)." }
-          ]
-        };
+        window.CHINESE_LESSONS = {};
+      }
+      if (!window.CHINESE_LESSONS.lessons) {
+        window.CHINESE_LESSONS.lessons = {};
+      }
+      if (!window.CHINESE_LESSONS.preTestQuestions) {
+        window.CHINESE_LESSONS.preTestQuestions = [
+          { id: "q1", level: 1, type: "vocab", question: "Which of the following means 'Hello'?", question_th: "คำใดมีความหมายว่า 'สวัสดี'?", options: ["谢谢", "你好", "再见", "对不起"], options_th: ["谢谢 (ขอบคุณ)", "你好 (สวัสดี)", "再见 (ลาก่อน)", "对不起 (ขอโทษ)"], answer: "你好", answer_th: "你好 (สวัสดี)", explanation: "你好 (nǐ hǎo) means Hello.", explanation_th: "你好 (nǐ hǎo) แปลว่า สวัสดี" },
+          { id: "q2", level: 1, type: "pinyin", question: "What is the pinyin for '吃' (to eat)?", question_th: "พินอินของ '吃' (กิน) คืออะไร?", options: ["chī", "hē", "shū", "dà"], options_th: ["chī", "hē", "shū", "dà"], answer: "chī", answer_th: "chī", explanation: "吃 is pronounced 'chī' and means to eat.", explanation_th: "吃 ออกเสียงว่า 'chī' แปลว่า กิน" },
+          { id: "q3", level: 1, type: "grammar", question: "Which sentence is grammatically correct for 'I drink tea'?", question_th: "ประโยคใดถูกต้องตามหลักไวยากรณ์สำหรับคำว่า 'ฉันดื่มชา'?", options: ["我喝茶。", "茶喝我。", "我茶喝。", "茶我喝。"], options_th: ["我喝茶。", "茶喝我。", "我茶喝。", "茶我喝。"], answer: "我喝茶。", answer_th: "我喝茶。", explanation: "Standard word order in Chinese is Subject-Verb-Object (SVO): 我 (I) + 喝 (drink) + 茶 (tea).", explanation_th: "โครงสร้างประโยคมาตรฐานในภาษาจีนคือ ประธาน-กริยา-กรรม (SVO): 我 (ฉัน) + 喝 (ดื่ม) + 茶 (ชา)" },
+          { id: "q4", level: 2, type: "vocab", question: "Translate this word: '便宜'", question_th: "แปลคำนี้: '便宜'", options: ["Expensive", "Cheap", "Beautiful", "Delicious"], options_th: ["แพง", "ถูก", "สวยงาม", "อร่อย"], answer: "Cheap", answer_th: "ถูก", explanation: "便宜 (piányi) means cheap.", explanation_th: "便宜 (piányi) แปลว่า ราคาถูก" },
+          { id: "q5", level: 2, type: "pinyin", question: "What is the pinyin for '帮助' (to help)?", question_th: "พินอินของ '帮助' (ช่วยเหลือ) คืออะไร?", options: ["bāngzhù", "bàozhǐ", "chànggē", "chuān"], options_th: ["bāngzhù", "bàozhǐ", "chànggē", "chuān"], answer: "bāngzhù", answer_th: "bāngzhù", explanation: "帮助 is pronounced 'bāngzhù' and means to help.", explanation_th: "帮助 ออกเสียงว่า 'bāngzhù' แปลว่า ช่วยเหลือ" },
+          { id: "q6", level: 2, type: "grammar", question: "Select the correct sentence for 'He likes to read newspapers':", question_th: "เลือกประโยคที่ถูกต้องสำหรับคำว่า 'เขาชอบอ่านหนังสือพิมพ์':", options: ["他喜欢看报纸。", "看报纸他喜欢。", "他看报纸喜欢。", "喜欢他看报纸。"], options_th: ["他喜欢看报纸。", "看报纸他喜欢。", "他看报纸喜欢。", "喜欢他看报纸。"], answer: "他喜欢看报纸。", answer_th: "他喜欢看报纸。", explanation: "Subject + 喜欢 (like) + Verb-Object: 他 (He) + 喜欢 (likes) + 看报纸 (to read newspapers).", explanation_th: "ประธาน + 喜欢 (ชอบ) + กริยา-กรรม: 他 (เขา) + 喜欢 (ชอบ) + 看报纸 (อ่านหนังสือพิมพ์)" },
+          { id: "q7", level: 3, type: "vocab", question: "Which describes 'getting sick'?", question_th: "คำใดอธิบายถึงการ 'ป่วย'?", options: ["生病", "生气", "生命", "生意"], options_th: ["生病 (ป่วย)", "生气 (โกรธ)", "生命 (ชีวิต)", "生意 (ธุรกิจ)"], answer: "生病", answer_th: "生病 (ป่วย)", explanation: "生病 (shēngbìng) means to fall ill.", explanation_th: "生病 (shēngbìng) แปลว่า ป่วย หรือ ไม่สบาย" },
+          { id: "q8", level: 3, type: "pinyin", question: "What is the pinyin for '安静' (quiet)?", question_th: "พินอินของ '安静' (เงียบ) คืออะไร?", options: ["ānjìng", "āyí", "ǎi", "ā"], options_th: ["ānjìng", "āyí", "ǎi", "ā"], answer: "ānjìng", answer_th: "ānjìng", explanation: "安静 is pronounced 'ānjìng' and means quiet.", explanation_th: "安静 ออกเสียงว่า 'ānjìng' แปลว่า เงียบ" },
+          { id: "q9", level: 3, type: "grammar", question: "Complete the sentence to say 'He drank the tea': 他把茶___。", question_th: "เติมประโยคให้สมบูรณ์สำหรับ 'เขาดื่มชาแล้ว': 他把茶___。", options: ["喝了", "喝", "茶了", "把喝了"], options_th: ["喝了", "喝", "茶了", "把喝了"], answer: "喝了", answer_th: "喝了", explanation: "In a 把 (bǎ) sentence, the structure is Subject + 把 + Object + Verb + Result: 他 (He) + 把 + 茶 (tea) + 喝了 (drank).", explanation_th: "ในประโยค 把 (bǎ) โครงสร้างคือ ประธาน + 把 + กรรม + กริยา + ผลลัพธ์: 他 (เขา) + 把 + 茶 (ชา) + 喝了 (ดื่มแล้ว)" }
+        ];
       }
       window.CHINESE_LESSONS.lessons[level] = data;
       renderDashboard();
@@ -191,6 +195,7 @@ function fetchCurriculumAndRender(level) {
 }
 
 function applyProgressState(data) {
+  state.currentLanguage = data.currentLanguage || 'en';
   state.userLevel = data.userLevel || null;
   state.completedLessons = data.completedLessons || [];
   state.streakCount = data.streakCount || 0;
@@ -220,6 +225,7 @@ function applyProgressState(data) {
 
 function saveProgress() {
   const dataToSave = {
+    currentLanguage: state.currentLanguage,
     userLevel: state.userLevel,
     completedLessons: state.completedLessons,
     streakCount: state.streakCount,
@@ -280,7 +286,16 @@ function translateUI(forceRequery = false) {
   // Specific dynamic updates
   const el = (id) => document.getElementById(id);
   if (el('dialogue-title-lbl') && state.currentLesson && state.currentLesson.dialogue) {
-     el('dialogue-title-lbl').textContent = state.currentLesson.dialogue.title;
+     el('dialogue-title-lbl').textContent = ld(state.currentLesson.dialogue, 'title');
+  }
+  if (el('lesson-title-display') && state.currentLesson) {
+     el('lesson-title-display').textContent = ld(state.currentLesson, 'title');
+  }
+  if (el('lesson-level-badge') && state.userLevel) {
+     el('lesson-level-badge').textContent = getLevelName(state.userLevel);
+  }
+  if (el('user-level-badge') && state.userLevel) {
+     el('user-level-badge').textContent = getLevelName(state.userLevel);
   }
 }
 
@@ -311,10 +326,24 @@ function setupEventListeners() {
         if (state.currentView === 'dashboard-view') {
           renderDashboard();
         } else if (state.currentView === 'pretest-view') {
-          initPretest();
+          // Safely re-render current question without resetting progress
+          loadPretestQuestion();
+        } else if (state.currentView === 'lesson-pretest-view') {
+          // Re-render only if actively taking the test (not on result screen)
+          if (document.getElementById("lesson-pretest-quiz-screen").style.display !== "none") {
+            loadLessonPretestQuestion();
+          }
+        } else if (state.currentView === 'lesson-view') {
+          // Safely re-render active pane without resetting states
+          if (state.currentPane === "vocab-pane") renderVocabPane();
+          if (state.currentPane === "grammar-pane") renderGrammarPane();
+          if (state.currentPane === "dialogue-pane") renderDialoguePane();
+          if (state.currentPane === "quiz-pane") renderQuizQuestion();
         } else if (state.currentView === 'welcome-view') {
           // static, translateUI is enough
         }
+        
+        saveProgress(); // Persist language preference
       });
     }
 
@@ -1044,6 +1073,10 @@ function generatePostLessonQuiz(vocab) {
 
   for (let i = 0; i < qCount; i++) {
     const target = shuffledVocab[i];
+    // Defensive check (Lesson Learned): skip malformed vocab to prevent nonsense questions
+    if (!target || !target.meaning || target.meaning === target.character) {
+        continue;
+    }
     // HSK Exam Mock Styles:
     // 0 = True/False (Reading Part 1 Mock) - Show character, meaning, ask True/False
     // 1 = Multiple Choice Listening (Listening Part 3/4 Mock) - Listen, choose correct meaning
@@ -1533,83 +1566,107 @@ function startLessonPretestQuiz() {
   const vocab = state.pretestLesson.vocab;
   const qCount = Math.min(3, vocab.length);
 
-  // Generate 3 unique questions based on vocab
   for (let i = 0; i < qCount; i++) {
     const target = vocab[i];
     const qType = Math.floor(Math.random() * 4); // 0 = meaning, 1 = pinyin, 2 = character, 3 = listening
     let questionText = "";
+    let questionTextTh = "";
     let answerVal = "";
+    let answerValTh = "";
     let explanationText = "";
-    let options = [];
+    let explanationTextTh = "";
+    let optPairs = [];
     let qTypeStr = "text";
     let testWordStr = "";
 
     if (qType === 0) {
-      questionText = t('pretest_q_meaning', { char: target.character });
+      questionText = `What is the meaning of ${target.character}?`;
+      questionTextTh = `คำว่า ${target.character} แปลว่าอะไร?`;
       answerVal = target.meaning;
-      explanationText = t('pretest_exp_meaning', { char: target.character, pinyin: target.pinyin, meaning: target.meaning });
-      options.push(target.meaning);
+      answerValTh = target.meaning_th || target.meaning;
+      explanationText = `${target.character} (${target.pinyin}) means ${target.meaning}.`;
+      explanationTextTh = `${target.character} (${target.pinyin}) แปลว่า ${target.meaning_th || target.meaning}.`;
+      
+      optPairs.push({ en: target.meaning, th: target.meaning_th || target.meaning });
       vocab.forEach(v => {
-        if (v.meaning !== target.meaning && options.length < 4) {
-          options.push(v.meaning);
+        if (v.meaning !== target.meaning && optPairs.length < 4) {
+          optPairs.push({ en: v.meaning, th: v.meaning_th || v.meaning });
         }
       });
-      while (options.length < 4) {
-        options.push("To listen " + options.length);
+      while (optPairs.length < 4) {
+        optPairs.push({ en: "To listen " + optPairs.length, th: "ฟัง " + optPairs.length });
       }
     } else if (qType === 1) {
-      questionText = t('pretest_q_pinyin', { char: target.character, meaning: target.meaning });
+      questionText = `What is the pinyin for ${target.character} (${target.meaning})?`;
+      questionTextTh = `พินอินของ ${target.character} (${target.meaning_th || target.meaning}) คืออะไร?`;
       answerVal = target.pinyin;
-      explanationText = t('pretest_exp_pinyin', { char: target.character, pinyin: target.pinyin });
-      options.push(target.pinyin);
+      answerValTh = target.pinyin;
+      explanationText = `${target.character} is pronounced ${target.pinyin}.`;
+      explanationTextTh = `${target.character} ออกเสียงว่า ${target.pinyin}.`;
+      
+      optPairs.push({ en: target.pinyin, th: target.pinyin });
       vocab.forEach(v => {
-        if (v.pinyin !== target.pinyin && options.length < 4) {
-          options.push(v.pinyin);
+        if (v.pinyin !== target.pinyin && optPairs.length < 4) {
+          optPairs.push({ en: v.pinyin, th: v.pinyin });
         }
       });
-      while (options.length < 4) {
-        options.push("pīn" + options.length);
+      while (optPairs.length < 4) {
+        optPairs.push({ en: "pīn" + optPairs.length, th: "pīn" + optPairs.length });
       }
     } else if (qType === 2) {
-      questionText = t('pretest_q_match', { meaning: target.meaning });
+      questionText = `Which character means ${target.meaning}?`;
+      questionTextTh = `ตัวอักษรใดแปลว่า ${target.meaning_th || target.meaning}?`;
       answerVal = target.character;
-      explanationText = t('pretest_exp_match', { char: target.character, meaning: target.meaning });
-      options.push(target.character);
+      answerValTh = target.character;
+      explanationText = `${target.character} means ${target.meaning}.`;
+      explanationTextTh = `${target.character} แปลว่า ${target.meaning_th || target.meaning}.`;
+      
+      optPairs.push({ en: target.character, th: target.character });
       vocab.forEach(v => {
-        if (v.character !== target.character && options.length < 4) {
-          options.push(v.character);
+        if (v.character !== target.character && optPairs.length < 4) {
+          optPairs.push({ en: v.character, th: v.character });
         }
       });
-      while (options.length < 4) {
-        options.push("字" + options.length);
+      while (optPairs.length < 4) {
+        optPairs.push({ en: "字" + optPairs.length, th: "字" + optPairs.length });
       }
     } else {
       qTypeStr = "listening";
       testWordStr = target.character;
-      questionText = t('pretest_q_listen');
+      questionText = `Listen and select the correct meaning:`;
+      questionTextTh = `ฟังเสียงแล้วเลือกความหมายที่ถูกต้อง:`;
       answerVal = target.meaning;
-      explanationText = t('pretest_exp_listen', { char: target.character, pinyin: target.pinyin, meaning: target.meaning });
-      options.push(target.meaning);
+      answerValTh = target.meaning_th || target.meaning;
+      explanationText = `You heard ${target.pinyin} (${target.character}), meaning ${target.meaning}.`;
+      explanationTextTh = `คุณได้ยิน ${target.pinyin} (${target.character}) แปลว่า ${target.meaning_th || target.meaning}.`;
+      
+      optPairs.push({ en: target.meaning, th: target.meaning_th || target.meaning });
       vocab.forEach(v => {
-        if (v.meaning !== target.meaning && options.length < 4) {
-          options.push(v.meaning);
+        if (v.meaning !== target.meaning && optPairs.length < 4) {
+          optPairs.push({ en: v.meaning, th: v.meaning_th || v.meaning });
         }
       });
-      while (options.length < 4) {
-        options.push("Meaning " + options.length);
+      while (optPairs.length < 4) {
+        optPairs.push({ en: "Meaning " + optPairs.length, th: "ความหมาย " + optPairs.length });
       }
     }
 
     // Shuffle options
-    options.sort(() => Math.random() - 0.5);
+    optPairs.sort(() => Math.random() - 0.5);
+    const correctIndex = optPairs.findIndex(opt => opt.en === answerVal);
 
     state.lessonPretestQuestions.push({
       type: qTypeStr,
       testWord: testWordStr,
       question: questionText,
+      question_th: questionTextTh,
       answer: answerVal,
+      answer_th: answerValTh,
       explanation: explanationText,
-      options: options
+      explanation_th: explanationTextTh,
+      options: optPairs.map(o => o.en),
+      options_th: optPairs.map(o => o.th),
+      correctIndex: correctIndex
     });
   }
 
@@ -1629,7 +1686,7 @@ function loadLessonPretestQuestion() {
   if (q.type === 'listening') {
     qText.innerHTML = `
       <div style="text-align: center; margin-bottom: 1rem;">
-        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem;">${q.question}</p>
+        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1rem;">${ld(q, 'question')}</p>
         <button id="lesson-pretest-audio-btn" class="audio-btn" style="width:60px; height:60px; font-size:1.5rem;">🔊</button>
       </div>
     `;
@@ -1650,30 +1707,31 @@ function loadLessonPretestQuestion() {
   document.getElementById("lesson-pretest-explanation-box").style.display = "none";
   document.getElementById("lesson-pretest-next-btn").style.display = "none";
 
-  q.options.forEach(opt => {
+  const currentOptions = ld(q, 'options');
+  currentOptions.forEach((opt, idx) => {
     const btn = document.createElement("button");
     btn.className = "quiz-option";
     btn.textContent = opt;
     btn.style.width = "100%";
     btn.style.textAlign = "left";
     btn.style.marginBottom = "0.5rem";
-    btn.onclick = () => selectLessonPretestAnswer(btn, opt);
+    btn.onclick = () => selectLessonPretestAnswer(btn, opt, idx);
     container.appendChild(btn);
   });
 }
 
-function selectLessonPretestAnswer(button, selectedVal) {
+function selectLessonPretestAnswer(button, selectedVal, selectedIdx) {
   const q = state.lessonPretestQuestions[state.lessonPretestIndex];
   const options = document.getElementById("lesson-pretest-options-container").querySelectorAll(".quiz-option");
 
-  options.forEach(btn => {
+  options.forEach((btn, idx) => {
     btn.disabled = true;
-    if (btn.textContent === q.answer) {
+    if (idx === q.correctIndex) {
       btn.style.borderColor = "var(--success)";
     }
   });
 
-  const isCorrect = selectedVal === q.answer;
+  const isCorrect = selectedIdx === q.correctIndex;
   if (isCorrect) {
     state.lessonPretestScore++;
     button.style.background = "rgba(0, 245, 212, 0.1)";
@@ -1685,7 +1743,7 @@ function selectLessonPretestAnswer(button, selectedVal) {
 
   const expBox = document.getElementById("lesson-pretest-explanation-box");
   const expText = document.getElementById("lesson-pretest-explanation-text");
-  expText.textContent = q.explanation;
+  expText.textContent = ld(q, 'explanation');
   expBox.style.display = "block";
   expBox.style.borderColor = isCorrect ? "var(--success)" : "var(--error)";
   expBox.querySelector("strong").style.color = isCorrect ? "var(--success)" : "var(--error)";

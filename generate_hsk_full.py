@@ -21,7 +21,8 @@ def get_db():
 
 def read_hsk_words(level):
     words = []
-    with open(CSV_PATH, 'r', encoding='utf-8') as f:
+    file_path = 'hsk1_official_300.csv' if level == 1 else CSV_PATH
+    with open(file_path, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row.get('Level', row.get('level')) == str(level):
@@ -50,10 +51,11 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
                 "character": "...",
                 "pinyin": "...",
                 "meaning": "...",
+                "translation_th": "Thai translation of the meaning",
                 "deconstruct": "Explain the radicals/components briefly",
-                "example_cn": "A simple example sentence using this word",
-                "example_py": "pinyin for example",
-                "example_en": "English for example"
+                "example_sentence": "A simple example sentence using this word",
+                "example_translation_en": "English for example",
+                "example_translation_th": "Thai for example"
             }}
             // MUST return an entry for EVERY word in the provided list
         ],
@@ -76,8 +78,8 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
         "dialogue": {{
             "title": "A dialogue using the vocab",
             "lines": [
-                {{"speaker": "A", "cn": "...", "py": "...", "en": "..."}},
-                {{"speaker": "B", "cn": "...", "py": "...", "en": "..."}}
+                {{"speaker": "A", "cn": "...", "py": "...", "en": "...", "th": "..."}},
+                {{"speaker": "B", "cn": "...", "py": "...", "en": "...", "th": "..."}}
             ]
         }},
         "quiz": [
@@ -109,9 +111,18 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
     
     response = model.generate_content(prompt)
     try:
-        return json.loads(response.text)
+        data = json.loads(response.text)
+        # Validation checks
+        if "vocab" not in data or "grammar" not in data or "dialogue" not in data:
+            raise ValueError("Missing core section (vocab, grammar, dialogue)")
+        if len(data.get("grammar", [])) == 0:
+            raise ValueError("Missing grammar points")
+        for v in data.get("vocab", []):
+            if "translation_th" not in v or "example_sentence" not in v:
+                raise ValueError("Vocab missing translation_th or example_sentence")
+        return data
     except Exception as e:
-        print(f"Error parsing JSON for Day {day_number}: {e}")
+        print(f"Error parsing/validating JSON for Day {day_number}: {e}")
         return None
 
 def insert_lesson_to_db(db, lesson_data, day_number, hsk_level="hsk2"):
@@ -137,7 +148,7 @@ def run_generation(level=2, chunk_size=10, limit=None):
     
     if level == 1:
         try:
-            with open('hsk1_themes.json', 'r', encoding='utf-8') as f:
+            with open('hsk1_themes_final.json', 'r', encoding='utf-8') as f:
                 themes = json.load(f)
         except Exception:
             themes = []

@@ -1,0 +1,87 @@
+{
+  "id": "hsk1_day1",
+  "hsk_level": "hsk1",
+  "day_number": 1,
+  "title": "Greetings & Essential Phrases",
+  "duration_minutes": 60,
+  "vocab": [
+    {
+      "character": "请",
+      "pinyin": "qǐng",
+      "meaning": "请"
+    },
+    {
+      "character": "请问",
+      "pinyin": "qǐngwèn",
+      "meaning": "请问"
+    },
+    {
+      "character": "请进",
+      "pinyin": "qǐng jìn",
+      "meaning": "请进"
+    },
+    {
+      "character": "请坐",
+      "pinyin": "qǐng zuò",
+      "meaning": "请坐"
+    },
+    {
+      "character": "谢谢",
+      "pinyin": "xièxie",
+      "meaning": "谢谢"
+    },
+    {
+      "character": "不客气",
+      "pinyin": "bù kèqì",
+      "meaning": "不客气"
+    },
+    {
+      "character": "对不起",
+      "pinyin": "duìbuqǐ",
+      "meaning": "对不起"
+    },
+    {
+      "character": "没关系",
+      "pinyin": "méi guānxi",
+      "meaning": "没关系"
+    },
+    {
+      "character": "再见",
+      "pinyin": "zàijiàn",
+      "meaning": "再见"
+    },
+    {
+      "character": "好",
+      "pinyin": "hǎo",
+      "meaning": "好"
+    },
+    {
+      "character": "对",
+      "pinyin": "duì",
+      "meaning": "对"
+    },
+    {
+      "character": "是不是",
+      "pinyin": "shì bu shì",
+      "meaning": "是不是"
+    },
+    {
+      "character": "行",
+      "pinyin": "xíng",
+      "meaning": "行"
+    }
+  ],
+  "grammar": [],
+  "dialogue": {
+    "title": "Greetings & Essential Phrases Dialogue",
+    "lines": [
+      {
+        "speaker": "A",
+        "cn": "我们今天学习 Greetings & Essential Phrases。",
+        "py": "Wǒmen jīntiān xuéxí Greetings & Essential Phrases.",
+        "en": "Today we study Greetings & Essential Phrases."
+      }
+    ]
+  },
+  "quiz": []
+}
