@@ -6,8 +6,8 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 
 - **Total Tasks**: 24 (excluding Maintenance & Bug Fixes)
 - **Completed Tasks**: 15
-- **In-Progress Tasks**: 2
-- **Not Started Tasks**: 7
+- **In-Progress Tasks**: 1
+- **Not Started Tasks**: 8
 - **Overall Project Completion**: **~63%** (Core Web App: **~95%**)
 
 ---
@@ -18,8 +18,8 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | :--- | :--- | :---: | :---: | :--- |
 | **SQLite Database Schema & Setup** | Phase 1: Database & Backend | `Complete` | 100% | Configured in `database.js` with schemas for lessons, vocab, grammar, dialogues, and progress tracking. |
 | **Express API & Server Routes** | Phase 1: Database & Backend | `Complete` | 100% | Implemented in `server.js` with routes for lessons, full curricula, and user progress backup. |
-| **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `In Progress` | 5% | Day 1 seeded; remaining 37 days of HSK 1 curriculum generation and seeding are in progress. |
-| **HSK 2 & 3 Curriculum Seeding** | Phase 1: Database & Backend | `In Progress` | 20% | 5 mock/structural lessons seeded for HSK 2 and HSK 3; requires full curriculum data generation. |
+| **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `In Progress` | 2% | Day 1 seeded; remaining 37 days of HSK 1 curriculum generation and seeding are in progress. |
+| **HSK 2 & 3 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | No lessons seeded; waiting for content generation. |
 | **HSK 4, 5, 6 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Advanced content generation and database seeding for higher proficiency levels. |
 | **Level Placement Pre-Test System** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 12-question diagnostic test that maps results to recommended start levels. |
 | **Lesson Pre-test (Gating)** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 3-question diagnostic pre-test for each lesson with an option to skip if scored 100%. |
@@ -76,8 +76,8 @@ gantt
 ### Phase Progress Breakdown
 
 1. **Phase 1: Database & Backend** (SQLite, REST API, Seeding)
-   - **Progress**: 80%
-   - *Next Action*: Expand curriculum files to fully populate HSK 2, 3, 4, 5, and 6.
+   - **Progress**: 40%
+   - *Next Action*: Generate HSK 1 (remaining days), HSK 2, and HSK 3 curriculum data and seed the tables.
 2. **Phase 2: Diagnostic & Assessment** (Placement & Gating)
    - **Progress**: 100%
    - *Next Action*: Complete.
