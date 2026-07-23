@@ -38,6 +38,22 @@ HanPath operates as a Single Page Application (SPA) with a lightweight Node.js b
 - **Driver:** `@libsql/client` wrapper with custom exponential backoff retry logic for resilience against network instability.
 - **API Design:** RESTful endpoints. Deeply nested curriculum data is fetched via highly optimized batch SQL queries (resolving previous N+1 query inefficiencies) and assembled in-memory (O(N) complexity) before being served to the client.
 
+**Database Schema Design:**
+- **Standardized Column Layout:** All user-facing translatable strings are explicitly separated into English (`_en`) and Thai (`_th`) columns in the database (e.g., `meaning_en`, `meaning_th` in the `vocab` table; `explanation_en`, `explanation_th` in the `grammar` table). This provides standard translation schemas across the entire database.
+- **SQL Translation Aliases:** The server routes fetch these language-specific fields and alias them (e.g. `meaning_en as meaning`) to maintain seamless backward compatibility with the frontend's legacy code.
+
+**Seeding & Idempotency Logic:**
+- **Check-and-Skip Efficiency:** To prevent redundant writes and save Turso database operations, the seeder `insert_generated_lessons.js` checks the database before importing. It runs a single count query: `SELECT COUNT(*) as count FROM vocab WHERE lesson_id = ?`.
+  - **Skip:** If the count is greater than `0`, it skips the lesson, avoiding unnecessary updates.
+  - **Self-Healing:** If the lesson ID exists in `lessons` but the count is `0`, it automatically clears the remnant rows and re-seeds the lesson (handling past script crashes automatically).
+- **Gatekeeper CLI Prompt:** If a force overwrite is required (passing the `--force` or `-f` flag), the script checks if the shell is interactive (`process.stdin.isTTY`). If interactive, it halts and demands a manual `yes/no` response before overwriting. If non-interactive (such as in an AI session or automated runner), it safely aborts to prevent accidental loss of data.
+- **Interactive HTTP Transactions:** Standard SQL `BEGIN TRANSACTION` commands fail over stateless edge HTTP endpoints. To make seeding completely bulletproof, we exposed the native LibSQL `.transaction("write")` API in `database.js`. All operations for a single lesson are executed inside this transactional scope; if any insert fails, the transaction is rolled back, leaving zero corrupted or partial rows.
+
+**Process for Future Database Adjustments:**
+- **Structural Database Changes:** We will **never** perform destructive `DROP TABLE` operations on a live production database. Future schema modifications will be handled via additive SQL Migration Scripts using the `ALTER TABLE` statement (e.g., `ALTER TABLE vocab ADD COLUMN ...`).
+- **Content Typo Fixes & Adjustments:** Small spelling corrections or translation fixes will be done using targeted `UPDATE` scripts (or in a future phase, a web-based Admin Panel) rather than re-running the entire seeder.
+- **Seeding for New Curriculum:** The seeding script is treated as a **One-Way Seed**. It will only be run to import *new* curriculum levels (like HSK 2 and HSK 3) while existing levels remain permanently untouched.
+
 **Data Schema (Core Entities):**
 - `user_progress`: Tracks HSK level, scores, streaks, time spent, and completed lessons.
 - `lessons`: Curricular structure mapping days to HSK levels.

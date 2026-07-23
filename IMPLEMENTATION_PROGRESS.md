@@ -4,11 +4,11 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 
 ## Overall Implementation Summary
 
-- **Total Tasks**: 19 (excluding Maintenance & Bug Fixes)
-- **Completed Tasks**: 14
-- **In-Progress Tasks**: 2
-- **Not Started Tasks**: 3
-- **Overall Project Completion**: **~80%** (Core Web App: **~95%**)
+- **Total Tasks**: 24 (excluding Maintenance & Bug Fixes)
+- **Completed Tasks**: 16
+- **In-Progress Tasks**: 1
+- **Not Started Tasks**: 7
+- **Overall Project Completion**: **~67%** (Core Web App: **~95%**)
 
 ---
 
@@ -46,6 +46,9 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Quiz & Localization Refactor** | Maintenance & Bug Fixes | `Complete` | 100% | Centralized `ld()` localization, forced dynamic 10+ question localized quizzes, fixed question skip bug, added 'Re-learn' button. |
 | **Curriculum, Quiz & Thai Layout Fixes** | Maintenance & Bug Fixes | `Complete` | 100% | Patched CSV parsing to prevent "meaning" placeholder bug, added dynamic Day prefixes, translated 39 themes, and fixed Thai vertical tone clipping in quiz options. |
 | **HSK 1 Official 300-Word & Semantic Theme Overhaul** | Maintenance & Bug Fixes | `Complete` | 100% | Replaced 500-word generator with official 300-word dataset, mapped 38 semantic themes (Greetings, Family, Food), added UI defensive quiz guards, and updated DB import mapping for Thai fields. |
+| **Standardized Database Schema Refactor** | Maintenance & Bug Fixes | `Complete` | 100% | Migrated Turso tables to explicit suffix translation columns (`_en`/`_th`), dropped legacy quizzes table, and updated server endpoints. |
+| **Frontend Localization & Crash Patch** | Maintenance & Bug Fixes | `Complete` | 100% | Fixed `window.CHINESE_LESSONS` signup crash and updated `translateUI` to update static page elements (headers, badges) on language toggle. |
+| **Transactional Seeding Skip Optimization** | Maintenance & Bug Fixes | `Complete` | 100% | Implemented check-and-skip seeder validation, transaction rollback, and interactive CLI prompts to prevent redundant Turso writes. |
 ---
 
 ## Phase-wise Breakdown
