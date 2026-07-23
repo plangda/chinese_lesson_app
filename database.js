@@ -36,6 +36,28 @@ async function getDb() {
     },
     exec: async (sql) => {
       return await executeWithRetry(() => client.executeMultiple(sql));
+    },
+    transaction: async () => {
+      const tx = await client.transaction("write");
+      return {
+        all: async (sql, args) => {
+          const rs = await tx.execute({ sql, args: args || [] });
+          return rs.rows;
+        },
+        get: async (sql, args) => {
+          const rs = await tx.execute({ sql, args: args || [] });
+          return rs.rows[0] || null;
+        },
+        run: async (sql, args) => {
+          return await tx.execute({ sql, args: args || [] });
+        },
+        commit: async () => {
+          await tx.commit();
+        },
+        rollback: async () => {
+          await tx.rollback();
+        }
+      };
     }
   };
 }

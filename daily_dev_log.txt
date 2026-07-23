@@ -6,3 +6,11 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Patched app.js to prepend the localized day_prefix to lesson titles.
 - Applied line-height: 1.5 to quiz buttons in app.js for Thai layout safety.
 - Cleared the database and ran insertion script to remove old duplicate words and seed clean HSK 1 data.
+
+2026-07-23:
+- Created and executed migrate_to_standardized_db.js to standardize all translation columns with explicit _en and _th suffixes.
+- Dropped legacy quizzes table and refactored insert_generated_lessons.js to clear previous entries before runs for full seeding idempotency.
+- Refactored server.js SQL queries to use new columns and mapped them via aliases to preserve backward compatibility.
+- Fixed window.CHINESE_LESSONS initialization crash in app.js and updated translateUI() to dynamically update lesson headers, badges, and dialogue titles on language toggle.
+- Pushed changes to git to trigger live production deployment on Vercel.
+- Upgraded database.js and insert_generated_lessons.js to support transactional seeder skips and interactive CLI confirmation prompts.
