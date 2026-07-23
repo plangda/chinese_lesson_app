@@ -66,7 +66,7 @@ HanPath operates as a Single Page Application (SPA) with a lightweight Node.js b
 **Overall Completion Status: ~80%** (Core Application is ~95% Complete)
 
 **Milestones Achieved:**
-- ✅ **Phase 1: Database & Backend:** Schema setup, Turso cloud migration, API routes established, and full HSK 1 curriculum seeded. Standardized on the official 300-word HSK 1 vocabulary mapped across 38 semantic themes (Greetings, Family, Food, Time) with full Thai localization and strict schema validation. Backend architecture successfully refactored for massive query performance improvements.
+- ⏳ **Phase 1: Database & Backend:** Schema setup, Turso cloud migration, API routes established (Complete). Full HSK 1 curriculum seeding is in progress (Day 1 seeded).
 - ✅ **Phase 2: Diagnostic System:** Global placement tests and per-lesson gating pre-tests are fully functional.
 - ✅ **Phase 3: Core Learning Engine:** Vocab tracing, Grammar interactions, Dialogue UI, Pinyin Matrix chart, and Quizzes are fully operational.
 - ✅ **Phase 4: Consistency & Retention:** Streak tracking, progress syncing (smart merge between local/server), and daily reminders implemented.
