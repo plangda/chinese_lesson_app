@@ -40,6 +40,7 @@ HanPath operates as a Single Page Application (SPA) with a lightweight Node.js b
 
 **Database Schema Design:**
 - **Standardized Column Layout:** All user-facing translatable strings are explicitly separated into English (`_en`) and Thai (`_th`) columns in the database (e.g., `meaning_en`, `meaning_th` in the `vocab` table; `explanation_en`, `explanation_th` in the `grammar` table). This provides standard translation schemas across the entire database.
+- **Mixed-Language Character Preservation:** Shared linguistic attributes—specifically the original Chinese characters (`character` and `example_cn` columns) and their standard Pinyin pronunciations (`pinyin` and `example_py` columns)—are stored in unified, language-agnostic columns. Only the contextual explanations and translated meanings are split into English (`_en`) and Thai (`_th`) columns. This schema separation ensures that the core Chinese characters and pronunciations are never processed by translation engines, preventing character corruption and maintaining clean, mixed-language layouts.
 - **SQL Translation Aliases:** The server routes fetch these language-specific fields and alias them (e.g. `meaning_en as meaning`) to maintain seamless backward compatibility with the frontend's legacy code.
 
 **Seeding & Idempotency Logic:**
