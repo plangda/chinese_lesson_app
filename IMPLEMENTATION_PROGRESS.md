@@ -18,7 +18,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | :--- | :--- | :---: | :---: | :--- |
 | **SQLite Database Schema & Setup** | Phase 1: Database & Backend | `Complete` | 100% | Configured in `database.js` with schemas for lessons, vocab, grammar, dialogues, and progress tracking. |
 | **Express API & Server Routes** | Phase 1: Database & Backend | `Complete` | 100% | Implemented in `server.js` with routes for lessons, full curricula, and user progress backup. |
-| **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `In Progress` | 2% | Day 1 seeded; remaining 37 days of HSK 1 curriculum generation and seeding are in progress. |
+| **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `In Progress` | 53.8% | Days 1–21 generated and seeded; remaining 18 days in progress (waiting for daily API quota reset). |
 | **HSK 2 & 3 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | No lessons seeded; waiting for content generation. |
 | **HSK 4, 5, 6 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Advanced content generation and database seeding for higher proficiency levels. |
 | **Level Placement Pre-Test System** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 12-question diagnostic test that maps results to recommended start levels. |
@@ -49,6 +49,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Standardized Database Schema Refactor** | Maintenance & Bug Fixes | `Complete` | 100% | Migrated Turso tables to explicit suffix translation columns (`_en`/`_th`), dropped legacy quizzes table, and updated server endpoints. |
 | **Frontend Localization & Crash Patch** | Maintenance & Bug Fixes | `Complete` | 100% | Fixed `window.CHINESE_LESSONS` signup crash and updated `translateUI` to update static page elements (headers, badges) on language toggle. |
 | **Transactional Seeding Skip Optimization** | Maintenance & Bug Fixes | `Complete` | 100% | Implemented check-and-skip seeder validation, transaction rollback, and interactive CLI prompts to prevent redundant Turso writes. |
+| **Quota-Aware HSK Curriculum Generator Optimizations** | Maintenance & Bug Fixes | `Complete` | 100% | Removed quiz logic, optimized token limits (~30% saving), added uncorrupting garbage-collection, and resume capability. |
 ---
 
 ## Phase-wise Breakdown
@@ -76,8 +77,8 @@ gantt
 ### Phase Progress Breakdown
 
 1. **Phase 1: Database & Backend** (SQLite, REST API, Seeding)
-   - **Progress**: 40%
-   - *Next Action*: Generate HSK 1 (remaining days), HSK 2, and HSK 3 curriculum data and seed the tables.
+   - **Progress**: 50%
+   - *Next Action*: Wait for the daily API quota reset, then generate the remaining 18 days of HSK 1, and proceed with HSK 2 and HSK 3 generation.
 2. **Phase 2: Diagnostic & Assessment** (Placement & Gating)
    - **Progress**: 100%
    - *Next Action*: Complete.
