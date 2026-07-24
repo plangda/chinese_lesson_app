@@ -57,14 +57,22 @@ HanPath operates as a Single Page Application (SPA) with a lightweight Node.js b
 
 **HSK Curriculum Generator Specification (Offline Pipeline):**
 - **LLM-Based Content Generator:** Content is generated programmatically using `generate_hsk_full.py` powered by the `gemini-2.5-flash-lite` model. It translates standard HSK words into high-quality vocabulary sheets, grammar pointers, and dialogue scenarios complete with English and Thai translations.
+- **Hybrid API Translation Pipeline:** 
+  - *Upfront English Meaning Lookup:* Integrates `get_youdao_meaning(word)` to fetch clean English definitions from the Youdao Suggestion API on-demand before construction of the Gemini payload, resolving placeholder bugs.
+  - *Post-Generation Thai Translation:* Integrates `add_thai_translations_to_lesson(lesson_data)` to post-process English text fields (lesson title, grammar titles, grammar explanations, example sentences, and practice prompts) using a rate-limit-free Google Translate web API. This saves **~25% in output tokens** and speeds up generation.
 - **Automatic Self-Healing Parser:** At start-up, the script parses `generated_lessons.jsonl` using a robust checker (`is_lesson_complete`) that scans for JSON schema completeness (ensuring presence of all core arrays, dialogue lines, and localized translation keys). Any incomplete or corrupt records are automatically purged, and the clean, sorted records are rewritten back to the file.
 - **Seamless Incremental Resume:** Incorporates globally unique lesson IDs to query local `.jsonl` files and live database caches. Already generated days are skipped instantly, protecting against redundant API calls.
 - **Throttling & API Budgeting:** Employs a 6-second sleep throttle to respect Gemini's 15 RPM limit and handles 429 rate limits gracefully with an automated sleep-and-retry strategy. It supports a `--limit` argument to generate a specific budget of lessons per run to prevent exceeding daily free tier budgets (20 requests per day).
 
-**Data Schema (Core Entities):**
+**Data Schema (Core Entities & Standardized Columns):**
 - `user_progress`: Tracks HSK level, scores, streaks, time spent, and completed lessons.
-- `lessons`: Curricular structure mapping days to HSK levels.
-- `vocab`, `grammar`, `grammar_examples`, `grammar_practice`, `dialogues`, `dialogue_lines`: Relational tables linking content securely to `lesson_id`.
+- `lessons`: Curricular structure mapping days to HSK levels. Columns: `id`, `hsk_level`, `day_number`, `title_en`, `title_th`.
+- `vocab`: Relational vocab linking content to `lesson_id`. Columns: `id`, `lesson_id`, `character`, `pinyin`, `meaning_en`, `meaning_th`, `deconstruct_en`, `deconstruct_th`, `example_cn`, `example_py`, `example_en`, `example_th`.
+- `grammar`: Grammar concepts linking content to `lesson_id`. Columns: `id`, `lesson_id`, `title_en`, `title_th`, `explanation_en`, `explanation_th`.
+- `grammar_examples`: Examples linked to grammar rows. Columns: `id`, `grammar_id`, `cn`, `py`, `en`, `th`.
+- `grammar_practice`: Practice questions linked to grammar rows. Columns: `id`, `grammar_id`, `prompt_en`, `prompt_th`, `words` (JSON array), `answer` (JSON array).
+- `dialogues`: Dialogue headers linked to `lesson_id`. Columns: `id`, `lesson_id`, `title_en`, `title_th`.
+- `dialogue_lines`: Individual conversation lines. Columns: `id`, `dialogue_id`, `speaker`, `cn`, `py`, `en`, `th`.
 
 ---
 
@@ -89,3 +97,13 @@ HanPath operates as a Single Page Application (SPA) with a lightweight Node.js b
   - *Pronunciation Assessment:* Integrating a speech-to-text API (e.g., Web Speech API or external service) to score user pronunciation accuracy.
   - *DevOps & Custom Domains:* Docker containerization, formal production deployment on Vercel, and configuration of a clean, branded custom domain (avoiding phishing-like URLs).
   - *Automated Testing:* Implementing a test suite (Jest/Supertest) to guard against regressions in the API and UI state.
+
+---
+
+## 4. Key Discussions & Decisions Log
+
+- **Interactive Confirmations Guardrail (Reverted TTY Check):** Decided to completely block force overwrites (`--force`) in non-interactive tasks. Reverted the seeder's automatic override patch to ensure force database deletes cannot run silently in background task runners, and locked this constraint locally in `.agents/AGENTS.md`.
+- **CEDICT Parsing & Dictionary Lookup:** Moved vocabulary English definitions out of Gemini's scope by querying the Youdao API locally. This prevents Chinese characters from ending up in the English meaning fields.
+- **Post-Generation Translation Pipeline:** Moved long grammar explanations and example translations to Google Translate (via raw HTTP web calls post-generation) rather than prompting Gemini. This reduces Gemini output token count by ~25%, shortens response latency, and guarantees complete, natural Thai translation output.
+- **Language Suffix Suffixing vs Unified Columns:** Unified character and Pinyin columns while splitting translation meanings (`meaning_en` / `meaning_th`) to avoid corruption, maintaining mixed-language compatibility in the database.
+

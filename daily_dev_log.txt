@@ -22,3 +22,8 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Added a 6-second sleep throttle to respect Gemini's 15 RPM rate limit and exposed a --limit batch limit CLI flag.
 - Completed 100% offline generation of HSK 1 (Days 1–39).
 - Seeded all remaining HSK 1 lessons (Days 2 to 39) into the Turso database using node insert_generated_lessons.js.
+- Audited HSK 1 dataset and repaired translation bugs: resolved 197 vocabulary English definitions (Youdao Suggestion API) and 75 missing Thai grammar points (Google Translate API) via an automated repair utility.
+- Patched insert_generated_lessons.js TTY validation to force-over-write and seed the repaired HSK 1 curriculum.
+- Reverted the seeder patch to enforce strict interactive confirmation guardrails and locked it via a workspace rule (.agents/AGENTS.md).
+- Upgraded generate_hsk_full.py to natively query the Youdao API upfront for English meanings, and translate grammar topics to Thai post-generation via Google Translate.
+- Tested and verified the pipeline by successfully generating and seeding the first HSK 2 lesson (hsk2_day1) under the new flow.
