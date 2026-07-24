@@ -3,6 +3,8 @@ import csv
 import json
 import time
 import argparse
+import urllib.request
+import urllib.parse
 import google.generativeai as genai
 from dotenv import load_dotenv
 
@@ -16,6 +18,38 @@ CSV_PATH = 'hsk30.csv'
 # Set up the Gemini model with JSON response type
 model = genai.GenerativeModel('gemini-2.5-flash-lite', generation_config={"response_mime_type": "application/json"})
 
+def get_youdao_meaning(word):
+    clean_word = word.split('|')[0]
+    url = f"https://dict.youdao.com/suggest?num=1&doctype=json&q={urllib.parse.quote(clean_word)}"
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            entries = data.get("data", {}).get("entries", [])
+            if entries:
+                explain = entries[0].get("explain", "")
+                if ". " in explain:
+                    explain = explain.split(". ", 1)[1]
+                return explain.strip()
+    except Exception:
+        pass
+    return None
+
+def translate_en_to_th(text):
+    if not text:
+        return ""
+    url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=th&dt=t&q={urllib.parse.quote(text)}"
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            translations = data[0]
+            result = "".join(segment[0] for segment in translations if segment[0])
+            return result
+    except Exception:
+        pass
+    return ""
+
 def read_hsk_words(level):
     words = []
     file_path = 'hsk1_official_300.csv' if level == 1 else CSV_PATH
@@ -23,10 +57,12 @@ def read_hsk_words(level):
         reader = csv.DictReader(f)
         for row in reader:
             if row.get('Level', row.get('level')) == str(level):
+                fallback = row['CEDICT'].split('|')[0] if row['CEDICT'] else row['Simplified']
+                is_chinese = any('\u4e00' <= char <= '\u9fff' for char in fallback)
                 words.append({
                     "character": row['Simplified'],
                     "pinyin": row['Pinyin'],
-                    "meaning": row['CEDICT'].split('|')[0] if row['CEDICT'] else row['Simplified']
+                    "meaning": fallback if not is_chinese else ""
                 })
     return words
 
@@ -133,6 +169,35 @@ def clean_and_load_generated_lessons():
                 f.write(json.dumps(lessons[lesson_id], ensure_ascii=False) + "\n")
     return set(lessons.keys())
 
+def add_thai_translations_to_lesson(lesson_data):
+    if not lesson_data:
+        return
+    
+    if not lesson_data.get("title_th"):
+        lesson_data["title_th"] = translate_en_to_th(lesson_data.get("title"))
+
+    # Translate grammar fields
+    for g in lesson_data.get("grammar", []):
+        if not g.get("title_th"):
+            g["title_th"] = translate_en_to_th(g.get("title"))
+        if not g.get("explanation_th"):
+            g["explanation_th"] = translate_en_to_th(g.get("explanation"))
+        
+        # Examples
+        for ex in g.get("examples", []):
+            if not ex.get("th"):
+                ex["th"] = translate_en_to_th(ex.get("en"))
+                
+        # Practice
+        if "practice" in g and g["practice"].get("prompt"):
+            if not g["practice"].get("prompt_th"):
+                g["practice"]["prompt_th"] = translate_en_to_th(g["practice"].get("prompt"))
+
+    # Translate dialogue title
+    dial = lesson_data.get("dialogue")
+    if dial and not dial.get("title_th"):
+        dial["title_th"] = translate_en_to_th(dial.get("title"))
+
 def insert_lesson_to_db(db, lesson_data, day_number, hsk_level="hsk2"):
     lesson_id = f"{hsk_level}_day{day_number}"
     lesson_data["id"] = lesson_id
@@ -192,12 +257,20 @@ def run_generation(level=2, chunk_size=10, limit=None, existing_ids=None):
                 break
                 
             print(f"Generating Day {day_number}/{total_lessons} ({len(chunk)} words)... Theme: {t_name}")
+            # Resolve English meanings upfront via Youdao Suggestion API
+            for word_dict in chunk:
+                if not word_dict.get("meaning"):
+                    meaning = get_youdao_meaning(word_dict["character"])
+                    word_dict["meaning"] = meaning if meaning else word_dict["character"]
+                    time.sleep(0.2) # Avoid aggressive API hits
+                    
             max_retries = 5
             success = False
             for attempt in range(max_retries):
                 try:
                     lesson_data = generate_lesson_content(chunk, day_number, hsk_id, t_name)
                     if lesson_data:
+                        add_thai_translations_to_lesson(lesson_data)
                         insert_lesson_to_db(None, lesson_data, day_number, hsk_id)
                         print(f"  OK Day {day_number} saved successfully.")
                         success = True
@@ -241,12 +314,20 @@ def run_generation(level=2, chunk_size=10, limit=None, existing_ids=None):
                 break
                 
             print(f"Generating Day {day_number}/{total_lessons} ({len(chunk)} words)...")
+            # Resolve English meanings upfront via Youdao Suggestion API
+            for word_dict in chunk:
+                if not word_dict.get("meaning"):
+                    meaning = get_youdao_meaning(word_dict["character"])
+                    word_dict["meaning"] = meaning if meaning else word_dict["character"]
+                    time.sleep(0.2) # Avoid aggressive API hits
+                    
             max_retries = 5
             success = False
             for attempt in range(max_retries):
                 try:
                     lesson_data = generate_lesson_content(chunk, day_number, hsk_id)
                     if lesson_data:
+                        add_thai_translations_to_lesson(lesson_data)
                         insert_lesson_to_db(None, lesson_data, day_number, hsk_id)
                         print(f"  OK Day {day_number} saved successfully.")
                         success = True
