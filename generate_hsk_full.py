@@ -2,9 +2,9 @@ import os
 import csv
 import json
 import time
+import argparse
 import google.generativeai as genai
 from dotenv import load_dotenv
-import libsql_client
 
 # Load API key
 load_dotenv(os.path.expanduser('~/.env'))
@@ -15,9 +15,6 @@ CSV_PATH = 'hsk30.csv'
 
 # Set up the Gemini model with JSON response type
 model = genai.GenerativeModel('gemini-2.5-flash-lite', generation_config={"response_mime_type": "application/json"})
-
-def get_db():
-    return None
 
 def read_hsk_words(level):
     words = []
@@ -81,31 +78,7 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
                 {{"speaker": "A", "cn": "...", "py": "...", "en": "...", "th": "..."}},
                 {{"speaker": "B", "cn": "...", "py": "...", "en": "...", "th": "..."}}
             ]
-        }},
-        "quiz": [
-            {{
-                "type": "true_false",
-                "question": "Does this word match the meaning? Word: [Word], Meaning: [Meaning]",
-                "options": ["True", "False"],
-                "answer": "True",
-                "explanation": "Because..."
-            }},
-            {{
-                "type": "fill_in_the_blank",
-                "question": "Complete the sentence: 我 ___ 喝茶。 (I like to drink tea.)",
-                "options": ["爱", "不", "很", "是"],
-                "answer": "爱",
-                "explanation": "Because..."
-            }},
-            {{
-                "type": "reading_comprehension",
-                "question": "Choose the best response to this statement: 你好吗？",
-                "options": ["我很好", "再见", "谢谢", "对不起"],
-                "answer": "我很好",
-                "explanation": "Because..."
-            }}
-            // Provide 4-6 quiz questions closely mocking the official HSK 1 exam formats.
-        ]
+        }}
     }}
     """
     
@@ -125,6 +98,41 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
         print(f"Error parsing/validating JSON for Day {day_number}: {e}")
         return None
 
+def is_lesson_complete(data):
+    required_keys = ["id", "title", "vocab", "grammar", "dialogue"]
+    if not all(k in data for k in required_keys):
+        return False
+    if not isinstance(data.get("vocab"), list) or len(data["vocab"]) == 0:
+        return False
+    if not isinstance(data.get("grammar"), list) or len(data["grammar"]) == 0:
+        return False
+    dialogue = data.get("dialogue")
+    if not isinstance(dialogue, dict) or "lines" not in dialogue:
+        return False
+    if not isinstance(dialogue.get("lines"), list) or len(dialogue["lines"]) == 0:
+        return False
+    return True
+
+def clean_and_load_generated_lessons():
+    lessons = {}
+    file_path = "generated_lessons.jsonl"
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                try:
+                    data = json.loads(line)
+                    if is_lesson_complete(data):
+                        lessons[data["id"]] = data
+                except Exception:
+                    pass
+        # Rewrite the file with only valid, sorted lessons
+        with open(file_path, "w", encoding="utf-8") as f:
+            for lesson_id in sorted(lessons.keys(), key=lambda x: int(x.split('_day')[1]) if '_day' in x else 0):
+                f.write(json.dumps(lessons[lesson_id], ensure_ascii=False) + "\n")
+    return set(lessons.keys())
+
 def insert_lesson_to_db(db, lesson_data, day_number, hsk_level="hsk2"):
     lesson_id = f"{hsk_level}_day{day_number}"
     lesson_data["id"] = lesson_id
@@ -134,16 +142,14 @@ def insert_lesson_to_db(db, lesson_data, day_number, hsk_level="hsk2"):
     with open("generated_lessons.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps(lesson_data, ensure_ascii=False) + "\n")
 
-def run_generation(level=2, chunk_size=10, limit=None):
+def run_generation(level=2, chunk_size=10, limit=None, existing_ids=None):
+    if existing_ids is None:
+        existing_ids = set()
+        
     words = read_hsk_words(level)
     print(f"Total HSK {level} words loaded: {len(words)}")
     
     hsk_id = f"hsk{level}"
-    
-    # We write to generated_lessons.jsonl now, start from day 0
-    max_day = 0
-    
-    day_number = max_day + 1
     generated_count = 0
     
     if level == 1:
@@ -171,15 +177,21 @@ def run_generation(level=2, chunk_size=10, limit=None):
             chunks.append(remaining_words[i:i+15])
             theme_names.append("Additional Vocabulary")
             
-        chunks_to_process = chunks[max_day:]
-        themes_to_process = theme_names[max_day:]
-        print(f"Resuming from Day {max_day + 1} (Chunk {max_day})")
+        total_lessons = len(chunks)
+        skipped_count = 0
         
-        for chunk, t_name in zip(chunks_to_process, themes_to_process):
-            if limit and generated_count >= limit:
+        for i, (chunk, t_name) in enumerate(zip(chunks, theme_names), start=1):
+            day_number = i
+            lesson_id = f"{hsk_id}_day{day_number}"
+            
+            if lesson_id in existing_ids:
+                skipped_count += 1
+                continue
+                
+            if limit is not None and generated_count >= limit:
                 break
                 
-            print(f"Generating Day {day_number} ({len(chunk)} words)... Theme: {t_name}")
+            print(f"Generating Day {day_number}/{total_lessons} ({len(chunk)} words)... Theme: {t_name}")
             max_retries = 5
             success = False
             for attempt in range(max_retries):
@@ -197,18 +209,38 @@ def run_generation(level=2, chunk_size=10, limit=None):
             if not success:
                 raise RuntimeError("Stopping pipeline due to API failures.")
                 
-            day_number += 1
             generated_count += 1
-            time.sleep(2)
+            time.sleep(6) # RPM Throttle
+            
+        print(f"\n=========================================")
+        print(f"HANPATH CURRICULUM SEEDING PROGRESS REPORT")
+        print(f"=========================================")
+        print(f"Level: HSK {level}")
+        print(f"- Total Target Lessons: {total_lessons}")
+        print(f"- Previously Seeded: {skipped_count}")
+        print(f"- Newly Generated this Run: {generated_count}")
+        print(f"- Remaining Lessons to Generate: {total_lessons - (skipped_count + generated_count)}")
+        print(f"- Completion Status: {((skipped_count + generated_count) / total_lessons * 100):.1f}%")
+        print(f"=========================================\n")
+        
+        return generated_count
     else:
-        start_idx = max_day * chunk_size
-        print(f"Resuming from Day {max_day + 1} (Word index {start_idx})")
-        for i in range(start_idx, len(words), chunk_size):
-            if limit and generated_count >= limit:
+        chunks = [words[i:i+chunk_size] for i in range(0, len(words), chunk_size)]
+        total_lessons = len(chunks)
+        skipped_count = 0
+        
+        for i, chunk in enumerate(chunks, start=1):
+            day_number = i
+            lesson_id = f"{hsk_id}_day{day_number}"
+            
+            if lesson_id in existing_ids:
+                skipped_count += 1
+                continue
+                
+            if limit is not None and generated_count >= limit:
                 break
                 
-            chunk = words[i:i+chunk_size]
-            print(f"Generating Day {day_number} ({len(chunk)} words)...")
+            print(f"Generating Day {day_number}/{total_lessons} ({len(chunk)} words)...")
             max_retries = 5
             success = False
             for attempt in range(max_retries):
@@ -226,24 +258,56 @@ def run_generation(level=2, chunk_size=10, limit=None):
             if not success:
                 raise RuntimeError("Stopping pipeline due to repeated API failures.")
                 
-            day_number += 1
             generated_count += 1
-            time.sleep(2)
+            time.sleep(6) # RPM Throttle
+            
+        print(f"\n=========================================")
+        print(f"HANPATH CURRICULUM SEEDING PROGRESS REPORT")
+        print(f"=========================================")
+        print(f"Level: HSK {level}")
+        print(f"- Total Target Lessons: {total_lessons}")
+        print(f"- Previously Seeded: {skipped_count}")
+        print(f"- Newly Generated this Run: {generated_count}")
+        print(f"- Remaining Lessons to Generate: {total_lessons - (skipped_count + generated_count)}")
+        print(f"- Completion Status: {((skipped_count + generated_count) / total_lessons * 100):.1f}%")
+        print(f"=========================================\n")
+        
+        return generated_count
 
 if __name__ == "__main__":
     print("=== Phase 1-3: Full HSK Generation Pipeline ===")
     print("Google Gemini Flash limit: 1500 Requests Per Day")
     
-    # HSK 1 (500 words) -> Chunk size 17 -> ~30 lessons
+    parser = argparse.ArgumentParser(description="HanPath Curriculum Generator")
+    parser.add_argument("-l", "--limit", type=int, default=None, help="Maximum number of lessons to generate in this run")
+    args = parser.parse_args()
+    
+    # 1. Clean and load existing lessons
+    existing_ids = clean_and_load_generated_lessons()
+    print(f"Loaded {len(existing_ids)} valid lessons from generated_lessons.jsonl (garbage collected invalid records).")
+    
+    global_budget = args.limit
+    
+    # HSK 1 (300 words) -> Chunk size ~15 -> ~20-30 lessons
     print("\n--- HSK 1 ---")
-    run_generation(level=1, chunk_size=17, limit=1000)
+    hsk1_gen = run_generation(level=1, chunk_size=15, limit=global_budget, existing_ids=existing_ids)
+    if global_budget is not None:
+        global_budget -= hsk1_gen
+        if global_budget <= 0:
+            print("Batch generation limit reached for this run.")
+            exit(0)
     
     # HSK 2 (772 words) -> Chunk size 20 -> ~39 lessons
     print("\n--- HSK 2 ---")
-    run_generation(level=2, chunk_size=20, limit=1000)
+    hsk2_gen = run_generation(level=2, chunk_size=20, limit=global_budget, existing_ids=existing_ids)
+    if global_budget is not None:
+        global_budget -= hsk2_gen
+        if global_budget <= 0:
+            print("Batch generation limit reached for this run.")
+            exit(0)
     
     # HSK 3 (973 words) -> Chunk size 25 -> ~39 lessons
     print("\n--- HSK 3 ---")
-    run_generation(level=3, chunk_size=25, limit=1000)
+    hsk3_gen = run_generation(level=3, chunk_size=25, limit=global_budget, existing_ids=existing_ids)
     
     print("\nFull pipeline complete!")
