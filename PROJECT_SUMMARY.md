@@ -58,7 +58,7 @@ HanPath operates as a Single Page Application (SPA) with a lightweight Node.js b
 **Data Schema (Core Entities):**
 - `user_progress`: Tracks HSK level, scores, streaks, time spent, and completed lessons.
 - `lessons`: Curricular structure mapping days to HSK levels.
-- `vocab`, `grammar`, `dialogue_lines`, `quizzes`: Relational tables linking content securely to `lesson_id`.
+- `vocab`, `grammar`, `grammar_examples`, `grammar_practice`, `dialogues`, `dialogue_lines`: Relational tables linking content securely to `lesson_id`.
 
 ---
 
