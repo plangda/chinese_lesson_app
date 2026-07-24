@@ -14,3 +14,11 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Fixed window.CHINESE_LESSONS initialization crash in app.js and updated translateUI() to dynamically update lesson headers, badges, and dialogue titles on language toggle.
 - Pushed changes to git to trigger live production deployment on Vercel.
 - Upgraded database.js and insert_generated_lessons.js to support transactional seeder skips and interactive CLI confirmation prompts.
+
+2026-07-24:
+- Refactored generate_hsk_full.py to remove quiz instructions and validation schemas, reducing Gemini output length by ~30%.
+- Added self-healing garbage collection to scan and rewrite generated_lessons.jsonl, purging corrupted/incomplete rows at startup.
+- Implemented globally unique ID tracking to enable seamless incremental resume capability.
+- Added a 6-second sleep throttle to respect Gemini's 15 RPM rate limit and exposed a --limit batch limit CLI flag.
+- Completed 100% offline generation of HSK 1 (Days 1–39).
+- Seeded all remaining HSK 1 lessons (Days 2 to 39) into the Turso database using node insert_generated_lessons.js.

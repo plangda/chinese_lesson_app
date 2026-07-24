@@ -55,6 +55,12 @@ HanPath operates as a Single Page Application (SPA) with a lightweight Node.js b
 - **Content Typo Fixes & Adjustments:** Small spelling corrections or translation fixes will be done using targeted `UPDATE` scripts (or in a future phase, a web-based Admin Panel) rather than re-running the entire seeder.
 - **Seeding for New Curriculum:** The seeding script is treated as a **One-Way Seed**. It will only be run to import *new* curriculum levels (like HSK 2 and HSK 3) while existing levels remain permanently untouched.
 
+**HSK Curriculum Generator Specification (Offline Pipeline):**
+- **LLM-Based Content Generator:** Content is generated programmatically using `generate_hsk_full.py` powered by the `gemini-2.5-flash-lite` model. It translates standard HSK words into high-quality vocabulary sheets, grammar pointers, and dialogue scenarios complete with English and Thai translations.
+- **Automatic Self-Healing Parser:** At start-up, the script parses `generated_lessons.jsonl` using a robust checker (`is_lesson_complete`) that scans for JSON schema completeness (ensuring presence of all core arrays, dialogue lines, and localized translation keys). Any incomplete or corrupt records are automatically purged, and the clean, sorted records are rewritten back to the file.
+- **Seamless Incremental Resume:** Incorporates globally unique lesson IDs to query local `.jsonl` files and live database caches. Already generated days are skipped instantly, protecting against redundant API calls.
+- **Throttling & API Budgeting:** Employs a 6-second sleep throttle to respect Gemini's 15 RPM limit and handles 429 rate limits gracefully with an automated sleep-and-retry strategy. It supports a `--limit` argument to generate a specific budget of lessons per run to prevent exceeding daily free tier budgets (20 requests per day).
+
 **Data Schema (Core Entities):**
 - `user_progress`: Tracks HSK level, scores, streaks, time spent, and completed lessons.
 - `lessons`: Curricular structure mapping days to HSK levels.
@@ -64,10 +70,10 @@ HanPath operates as a Single Page Application (SPA) with a lightweight Node.js b
 
 ## 3. Project Progress
 
-**Overall Completion Status: ~80%** (Core Application is ~95% Complete)
+**Overall Completion Status: ~83%** (Core Application is ~95% Complete)
 
 **Milestones Achieved:**
-- ⏳ **Phase 1: Database & Backend:** Schema setup, Turso cloud migration, API routes established (Complete). Full HSK 1 curriculum seeding is in progress (Day 1 seeded).
+- ✅ **Phase 1: Database & Backend:** Schema setup, Turso cloud migration, API routes, and **Full HSK 1 curriculum seeding** are completed (39 days/300 words generated and seeded). HSK 2 & 3 content generation is in progress.
 - ✅ **Phase 2: Diagnostic System:** Global placement tests and per-lesson gating pre-tests are fully functional.
 - ✅ **Phase 3: Core Learning Engine:** Vocab tracing, Grammar interactions, Dialogue UI, Pinyin Matrix chart, and Quizzes are fully operational.
 - ✅ **Phase 4: Consistency & Retention:** Streak tracking, progress syncing (smart merge between local/server), and daily reminders implemented.
