@@ -16,7 +16,7 @@ genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 CSV_PATH = 'hsk30.csv'
 
 # Set up the Gemini model with JSON response type
-model = genai.GenerativeModel('gemini-2.5-flash-lite', generation_config={"response_mime_type": "application/json"})
+model = genai.GenerativeModel('gemini-3.5-flash', generation_config={"response_mime_type": "application/json"})
 
 def get_youdao_meaning(word):
     clean_word = word.split('|')[0]
@@ -176,6 +176,15 @@ def add_thai_translations_to_lesson(lesson_data):
     if not lesson_data.get("title_th"):
         lesson_data["title_th"] = translate_en_to_th(lesson_data.get("title"))
 
+    # Translate vocabulary fields
+    for v in lesson_data.get("vocab", []):
+        if not v.get("deconstruct_th") and v.get("deconstruct"):
+            v["deconstruct_th"] = translate_en_to_th(v.get("deconstruct"))
+        if not v.get("translation_th") and v.get("meaning"):
+            v["translation_th"] = translate_en_to_th(v.get("meaning"))
+        if not v.get("example_translation_th") and v.get("example_translation_en"):
+            v["example_translation_th"] = translate_en_to_th(v.get("example_translation_en"))
+
     # Translate grammar fields
     for g in lesson_data.get("grammar", []):
         if not g.get("title_th"):
@@ -193,10 +202,14 @@ def add_thai_translations_to_lesson(lesson_data):
             if not g["practice"].get("prompt_th"):
                 g["practice"]["prompt_th"] = translate_en_to_th(g["practice"].get("prompt"))
 
-    # Translate dialogue title
+    # Translate dialogue fields
     dial = lesson_data.get("dialogue")
-    if dial and not dial.get("title_th"):
-        dial["title_th"] = translate_en_to_th(dial.get("title"))
+    if dial:
+        if not dial.get("title_th"):
+            dial["title_th"] = translate_en_to_th(dial.get("title"))
+        for line in dial.get("lines", []):
+            if not line.get("th") and line.get("en"):
+                line["th"] = translate_en_to_th(line.get("en"))
 
 def insert_lesson_to_db(db, lesson_data, day_number, hsk_level="hsk2"):
     lesson_id = f"{hsk_level}_day{day_number}"
@@ -206,6 +219,11 @@ def insert_lesson_to_db(db, lesson_data, day_number, hsk_level="hsk2"):
     
     with open("generated_lessons.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps(lesson_data, ensure_ascii=False) + "\n")
+
+def clean_char_variants(character):
+    if not character:
+        return ""
+    return character.split('|')[0].strip()
 
 def run_generation(level=2, chunk_size=10, limit=None, existing_ids=None):
     if existing_ids is None:
@@ -230,10 +248,17 @@ def run_generation(level=2, chunk_size=10, limit=None, existing_ids=None):
         for t in themes:
             theme_chunk = []
             for w_char in t.get('words', []):
+                matched = False
+                w_char_clean = clean_char_variants(w_char)
                 for i, w_dict in enumerate(remaining_words):
-                    if w_dict['character'] == w_char:
+                    if clean_char_variants(w_dict['character']) == w_char_clean:
                         theme_chunk.append(remaining_words.pop(i))
+                        matched = True
                         break
+                if not matched:
+                    # Fail loudly by logging warnings (encode to ascii backslashreplace to prevent Windows console encoding crashes)
+                    msg = f"  [Warning] Word '{w_char}' in theme '{t.get('theme')}' was not found in remaining HSK pool."
+                    print(msg.encode('ascii', 'backslashreplace').decode('ascii'))
             if theme_chunk:
                 chunks.append(theme_chunk)
                 theme_names.append(t.get('theme', ''))

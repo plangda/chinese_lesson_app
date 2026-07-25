@@ -54,6 +54,26 @@ window.ld = function(item, baseField) {
   return item[baseField] !== undefined ? item[baseField] : '';
 };
 
+function localizeLessonObject(data, lang) {
+  if (!data || typeof data !== 'object') return data;
+  if (Array.isArray(data)) return data.map(item => localizeLessonObject(item, lang));
+
+  const localized = { ...data };
+  if (lang === 'th') {
+    Object.keys(localized).forEach(key => {
+      if (key.endsWith('_th') && localized[key] !== null && localized[key] !== undefined && localized[key] !== '') {
+        const baseKey = key.slice(0, -3);
+        const targetKey = baseKey === 'example' ? 'exampleEn' : baseKey;
+        localized[targetKey] = localized[key];
+      }
+    });
+  }
+  for (const key in localized) {
+    localized[key] = localizeLessonObject(localized[key], lang);
+  }
+  return localized;
+}
+
 const timelineStages = ["vocab-pane", "grammar-pane", "dialogue-pane", "quiz-pane"];
 
 // Speech Synthesis setup
@@ -321,6 +341,9 @@ function setupEventListeners() {
     if (globalLangBtn) {
       globalLangBtn.addEventListener('click', () => {
         state.currentLanguage = state.currentLanguage === 'th' ? 'en' : 'th';
+        if (state.currentLesson && state.rawLesson) {
+          state.currentLesson = localizeLessonObject(state.rawLesson, state.currentLanguage);
+        }
         translateUI();
         // Re-render the current view to update dynamic strings
         if (state.currentView === 'dashboard-view') {
@@ -669,7 +692,7 @@ function setupEventListeners() {
     speakText(fullText);
   });
   document.getElementById('pinyin-visibility-toggle').addEventListener('click', () => {
-    const pyElements = document.querySelectorAll('.dialogue-py-text');
+    const pyElements = document.querySelectorAll('.dialogue-py');
     pyElements.forEach(el => {
       el.style.display = (el.style.display === 'none') ? 'block' : 'none';
     });
@@ -799,7 +822,8 @@ function startLesson(id) {
   fetch(`/api/lessons/${id}`)
     .then(res => res.json())
     .then(data => {
-      state.currentLesson = data;
+      state.rawLesson = data;
+      state.currentLesson = localizeLessonObject(data, state.currentLanguage);
       
       document.getElementById('lesson-level-badge').textContent = getLevelName(state.userLevel);
       document.getElementById('lesson-title-display').textContent = ld(state.currentLesson, 'title');
@@ -951,6 +975,7 @@ function renderGrammarPane() {
                  ${g.practice.words.map((w, wIdx) => `<button class="btn btn-secondary btn-sm prac-word-btn" data-word="${w}">${w}</button>`).join('')}
                </div>
                <button class="btn btn-primary btn-sm check-prac-btn" data-pid="${pId}" data-answer='${JSON.stringify(g.practice.answer)}'>${t('btn_check_answer')}</button>
+               <button class="btn btn-secondary btn-sm show-prac-btn" data-pid="${pId}" data-answer='${JSON.stringify(g.practice.answer)}' style="margin-left: 0.5rem;">${t('btn_show_answer')}</button>
                <span class="prac-feedback" id="${pId}-feedback" style="margin-left: 1rem; font-weight: bold;"></span>
              </div>
            `;
@@ -1007,6 +1032,36 @@ function renderGrammarPane() {
         }
       });
     });
+
+    document.querySelectorAll('.show-prac-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const btnEl = e.target;
+        const pId = btnEl.getAttribute('data-pid');
+        const correctAnswer = JSON.parse(btnEl.getAttribute('data-answer'));
+        
+        const answerBox = document.getElementById(`${pId}-answer-box`);
+        const bank = document.getElementById(`${pId}-word-bank`);
+        
+        answerBox.innerHTML = '';
+        correctAnswer.forEach(word => {
+          const matchedBtn = Array.from(bank.children).find(c => c.getAttribute('data-word') === word);
+          if (matchedBtn) {
+            answerBox.appendChild(matchedBtn);
+          } else {
+            const newBtn = document.createElement('button');
+            newBtn.className = 'btn btn-secondary btn-sm prac-word-btn';
+            newBtn.setAttribute('data-word', word);
+            newBtn.textContent = word;
+            answerBox.appendChild(newBtn);
+          }
+        });
+        
+        const feedback = document.getElementById(`${pId}-feedback`);
+        feedback.textContent = t('msg_correct') + " 🎉";
+        feedback.style.color = "var(--success)";
+        answerBox.style.borderColor = "var(--success)";
+      });
+    });
   }
 
 function renderDialoguePane() {
@@ -1019,11 +1074,21 @@ function renderDialoguePane() {
       
       let avatarHtml = '';
       if (line.speaker === 'A') {
-         avatarHtml = `<div class="dialogue-avatar" style="background: var(--primary);">👦</div>`;
+         avatarHtml = `
+           <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+             <div class="dialogue-avatar" style="background: var(--primary);">👦</div>
+             <button class="btn btn-secondary btn-sm dialogue-line-speak-btn" data-text="${line.cn.replace(/'/g, "&apos;")}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; opacity: 0.7;">🔈</button>
+           </div>
+         `;
       } else {
          div.style.flexDirection = 'row-reverse';
          div.style.textAlign = 'right';
-         avatarHtml = `<div class="dialogue-avatar" style="background: var(--accent);">👧</div>`;
+         avatarHtml = `
+           <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+             <div class="dialogue-avatar" style="background: var(--accent);">👧</div>
+             <button class="btn btn-secondary btn-sm dialogue-line-speak-btn" data-text="${line.cn.replace(/'/g, "&apos;")}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; opacity: 0.7;">🔈</button>
+           </div>
+         `;
       }
       
       let trans = (state.currentLanguage === 'th') ? (line.th || '') : line.en;
@@ -1043,22 +1108,13 @@ function renderDialoguePane() {
       
       container.appendChild(div);
     });
-    
-    const toggleBtn = document.getElementById('btn-dialogue-toggle');
-    if (toggleBtn) {
-      toggleBtn.onclick = () => {
-        const enLines = document.querySelectorAll('.dialogue-en');
-        enLines.forEach(l => {
-           if (l.style.display === 'none') {
-             l.style.display = 'block';
-           } else {
-             l.style.display = 'none';
-             l.style.opacity = '1';
-             l.style.transform = 'translateY(0)';
-           }
-        });
+
+    document.querySelectorAll('.dialogue-line-speak-btn').forEach(btn => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        speakText(btn.getAttribute('data-text'));
       };
-    }
+    });
   }
 
 function generatePostLessonQuiz(vocab) {
