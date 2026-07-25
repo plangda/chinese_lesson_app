@@ -60,3 +60,21 @@ As the HanPath team progresses through the development phases, this document ser
 **The Error:** Vocabulary words duplicated on the lesson cards.
 **The Cause:** Seeding scripts were run multiple times on the database without unique constraints or cleanup steps (`DELETE`), resulting in double entries.
 **Prevention:** Seeding scripts must be idempotent—either clearing the target tables before running or using `INSERT OR REPLACE` along with unique constraints in the schema.
+
+## 13. State Cleanliness and Pipeline Restarts during Refactoring
+**The Error:** After implementing the themes mapping system, HSK 1 Day 1 still contained alphabetical verbs (*爱*, *爱好*, *帮*) instead of greetings, and those verbs were permanently lost from the rest of the themed curriculum.
+**The Cause:** The generator script saw `"hsk1_day1"` was already present in the cached `generated_lessons.jsonl` and skipped generating it. This kept the old alphabetical day 1, which had consumed verbs that subsequent days were supposed to use but had to generate without.
+**Prevention:** When refactoring order-dependent or state-dependent pipelines, legacy caches and database records must be completely invalidated and wiped. Reusing stale caches blocks new pipeline paths and corrupts the resulting dataset.
+
+## 14. Normalizing String Keys for Fuzzy Mapping (Variant Safety)
+**The Error:** Core vocabulary words containing variant pipes (like *爸爸|爸*, *妈妈|妈*, *弟弟|弟*) did not match their respective themes in `hsk1_themes_final.json` (which searched for flat strings like `"爸爸"`), causing them to be dumped into the additional catch-all chunk instead of their family theme.
+**The Cause:** The loop used a strict string equality check (`==`) to match theme keys against the database vocabulary character keys, causing variants to fail matches.
+**Prevention:** When matching data across configurations, always normalize/sanitize the keys (e.g. stripping suffixes after `|` or removing extra spaces) before running the comparison.
+
+## 15. Strict Logging for Mismatched Items in Generation Loops
+**The Error:** Mismatched theme words fell through silently to the end-of-process catch-all chunks, leaving them undetected.
+**Prevention:** Data generation loops must never fail silently. If a requested configuration key or word cannot be matched in the vocabulary list, the script must output a warning or throw an exception, making mismatch bugs immediately visible in the console.
+
+## 16. Dataset-Wide Auditing
+**The Error:** The fact that family members were in the "Additional Vocabulary" day was missed because we only checked one or two files.
+**Prevention:** Verify data distribution across the entire output dataset rather than auditing individual items. Implement summary validation tests (e.g. counting total words mapped vs unmatched) before seeding database tables.
