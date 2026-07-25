@@ -16,7 +16,7 @@ genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 CSV_PATH = 'hsk30.csv'
 
 # Set up the Gemini model with JSON response type
-model = genai.GenerativeModel('gemini-3.5-flash', generation_config={"response_mime_type": "application/json"})
+model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json"})
 
 def get_youdao_meaning(word):
     clean_word = word.split('|')[0]
@@ -52,7 +52,7 @@ def translate_en_to_th(text):
 
 def read_hsk_words(level):
     words = []
-    file_path = 'hsk1_official_300.csv' if level == 1 else CSV_PATH
+    file_path = CSV_PATH
     with open(file_path, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
@@ -235,13 +235,20 @@ def run_generation(level=2, chunk_size=10, limit=None, existing_ids=None):
     hsk_id = f"hsk{level}"
     generated_count = 0
     
-    if level == 1:
-        try:
-            with open('hsk1_themes_final.json', 'r', encoding='utf-8') as f:
-                themes = json.load(f)
-        except Exception:
-            themes = []
-            
+    # Try to load themes for this level dynamically
+    themes = []
+    for suffix in ['_themes_final.json', '_themes.json']:
+        theme_path = f"hsk{level}{suffix}"
+        if os.path.exists(theme_path):
+            try:
+                with open(theme_path, 'r', encoding='utf-8') as f:
+                    themes = json.load(f)
+                print(f"Loaded themes mapping from {theme_path}")
+                break
+            except Exception as e:
+                print(f"Error loading theme file {theme_path}: {e}")
+                
+    if themes:
         remaining_words = list(words)
         chunks = []
         theme_names = []

@@ -22,7 +22,6 @@ async function main() {
             await db.run("DELETE FROM vocab WHERE lesson_id = ?", [r.id]);
             await db.run("DELETE FROM grammar WHERE lesson_id = ?", [r.id]);
             await db.run("DELETE FROM dialogues WHERE lesson_id = ?", [r.id]);
-            await db.run("DELETE FROM quizzes WHERE lesson_id = ?", [r.id]);
         }
         await db.run("DELETE FROM lessons WHERE hsk_level = 'hsk1'");
         console.log('Deleted successfully.');

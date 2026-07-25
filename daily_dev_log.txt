@@ -27,3 +27,11 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Reverted the seeder patch to enforce strict interactive confirmation guardrails and locked it via a workspace rule (.agents/AGENTS.md).
 - Upgraded generate_hsk_full.py to natively query the Youdao API upfront for English meanings, and translate grammar topics to Thai post-generation via Google Translate.
 - Tested and verified the pipeline by successfully generating and seeding the first HSK 2 lesson (hsk2_day1) under the new flow.
+
+2026-07-25:
+- Remapped all 11,092 vocabulary terms in hsk30.csv to match the official 2026 HSK 3.0 standard sizes for all 9 levels, preserving A-Z compliance and shifting draft leftovers to HSK 3.
+- Implemented dynamic semantic theme clustering using gemini-2.5-flash to map HSK 1 vocabulary into 26 daily lessons and HSK 2 into 19 daily lessons of ~11 words/day.
+- Fixed duplicated day prefix visual bug ("Day 1: Day 1: ...") by sanitizing configurations to strip "Day X" from database title strings, letting the frontend handle formatting.
+- Updated delete_hsk1.js database cleanup helper to remove obsolete references to the dropped legacy quizzes table, avoiding crashes.
+- Regenerated and successfully seeded the first 8 lessons of HSK 1 under the new compliant layout, validating the frontend UI dashboard and stroke drawing animations.
+- Updated system specs in PROJECT_SUMMARY.md and generator guidelines in .agents/skills/hsk-curriculum-generator/SKILL.md to document dynamic clustering, quiz engine architecture, and title prefix rules.

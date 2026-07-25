@@ -78,3 +78,14 @@ As the HanPath team progresses through the development phases, this document ser
 ## 16. Dataset-Wide Auditing
 **The Error:** The fact that family members were in the "Additional Vocabulary" day was missed because we only checked one or two files.
 **Prevention:** Verify data distribution across the entire output dataset rather than auditing individual items. Implement summary validation tests (e.g. counting total words mapped vs unmatched) before seeding database tables.
+
+## 17. Strict Verification of Source Compliance (Avoiding Unofficial Draft / Alphabetical Slicing Errors)
+**The Error:** HSK 1 was implemented with a 300-word limit that was created by taking the draft 500-word alphabetical list and truncating it at row 300. This resulted in an HSK 1 list that was missing the letters T, W, X, Y, and Z, completely omitting core pronouns like `我` (wǒ - I) and daily phrases like `再见` (zàijiàn - goodbye).
+**The Cause:** The development team trusted the file `hsk1_official_300.csv` as "official" without verifying its alphabetical completeness against the official guidelines published on CTI/MOE websites. In reality, the finalized HSK 3.0 (2026 version) specifies a curated list of 300 words for Level 1 and 200 words for Level 2, both spanning the entire alphabet A-Z.
+**Prevention:** Always verify that vocabulary source files are compiled from the finalized, official syllabus releases (such as the 2026 CTI/MOE updates) and perform a sanity check on alphabet-wide coverage (A-Z) before initiating any curriculum generation. Never assume a third-party repository's draft file is the final compliance standard.
+
+## 18. Redundancy between Generation Strings and UI Renderers (Title Prefixes)
+**The Error:** Lesson titles rendered on the dashboard displayed with duplicate prefixes (e.g., `"Day 1: Day 1: Essential Greetings & Politeness in Chinese"`).
+**The Cause:** The frontend dynamically prepends `"Day X: "` to any lesson title it displays based on the lesson's index number. However, the newly introduced AI clustering script generated themes that *already* had `"Day X: "` hardcoded in their title strings, resulting in duplication.
+**Prevention:** Always check if the frontend template dynamically inserts UI prefixes (like *"Day X:"* or *"Section Y:"*) before formatting strings in data configurations. Keep database strings and content definitions clean of formatting prefixes, letting the UI handle visual presentation.
+

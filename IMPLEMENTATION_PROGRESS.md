@@ -5,10 +5,10 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 ## Overall Implementation Summary
 
 - **Total Tasks**: 24 (excluding Maintenance & Bug Fixes)
-- **Completed Tasks**: 16
-- **In-Progress Tasks**: 0
+- **Completed Tasks**: 15
+- **In-Progress Tasks**: 1
 - **Not Started Tasks**: 8
-- **Overall Project Completion**: **~67%** (Core Web App: **~95%**)
+- **Overall Project Completion**: **~64%** (Core Web App: **~95%**)
 
 ---
 
@@ -18,8 +18,8 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | :--- | :--- | :---: | :---: | :--- |
 | **SQLite Database Schema & Setup** | Phase 1: Database & Backend | `Complete` | 100% | Configured in `database.js` with schemas for lessons, vocab, grammar, dialogues, and progress tracking. |
 | **Express API & Server Routes** | Phase 1: Database & Backend | `Complete` | 100% | Implemented in `server.js` with routes for lessons, full curricula, and user progress backup. |
-| **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `Complete` | 100% | All 39 days of HSK 1 curriculum generated offline and seeded into the Turso database. |
-| **HSK 2 & 3 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | No lessons seeded; waiting for content generation. |
+| **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `In Progress` | 31% | Remapped to official 300 words A-Z standard; Day 1-8 dynamic thematic lessons generated and seeded (8/26 lessons). |
+| **HSK 2 & 3 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Remapped to official sizes (200 words for HSK 2, 500 for HSK 3); theme mapping completed. |
 | **HSK 4, 5, 6 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Advanced content generation and database seeding for higher proficiency levels. |
 | **Level Placement Pre-Test System** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 12-question diagnostic test that maps results to recommended start levels. |
 | **Lesson Pre-test (Gating)** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 3-question diagnostic pre-test for each lesson with an option to skip if scored 100%. |
@@ -50,7 +50,8 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Frontend Localization & Crash Patch** | Maintenance & Bug Fixes | `Complete` | 100% | Fixed `window.CHINESE_LESSONS` signup crash and updated `translateUI` to update static page elements (headers, badges) on language toggle. |
 | **Transactional Seeding Skip Optimization** | Maintenance & Bug Fixes | `Complete` | 100% | Implemented check-and-skip seeder validation, transaction rollback, and interactive CLI prompts to prevent redundant Turso writes. |
 | **Quota-Aware HSK Curriculum Generator Optimizations** | Maintenance & Bug Fixes | `Complete` | 100% | Removed quiz logic, optimized token limits (~30% saving), added uncorrupting garbage-collection, and resume capability. |
----
+| **HSK 3.0 (2026 Standard) Remapping & Dynamic Clustering Overhaul** | Maintenance & Bug Fixes | `Complete` | 100% | Remapped all 11,092 terms to 2026 standard levels; clustered dynamically (26 themes HSK 1, 19 themes HSK 2); resolved double day prefix bugs; cleaned delete_hsk1.js; seeded Day 1-8. |
+----
 
 ## Phase-wise Breakdown
 
@@ -77,8 +78,8 @@ gantt
 ### Phase Progress Breakdown
 
 1. **Phase 1: Database & Backend** (SQLite, REST API, Seeding)
-   - **Progress**: 60%
-   - *Next Action*: Generate HSK 2 and HSK 3 curriculum data and seed the tables.
+   - **Progress**: 46%
+   - *Next Action*: Seed remaining lessons for HSK 1 (Day 9-26) and generate HSK 2 and HSK 3 curriculum data.
 2. **Phase 2: Diagnostic & Assessment** (Placement & Gating)
    - **Progress**: 100%
    - *Next Action*: Complete.
