@@ -35,3 +35,9 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Updated delete_hsk1.js database cleanup helper to remove obsolete references to the dropped legacy quizzes table, avoiding crashes.
 - Regenerated and successfully seeded the first 8 lessons of HSK 1 under the new compliant layout, validating the frontend UI dashboard and stroke drawing animations.
 - Updated system specs in PROJECT_SUMMARY.md and generator guidelines in .agents/skills/hsk-curriculum-generator/SKILL.md to document dynamic clustering, quiz engine architecture, and title prefix rules.
+
+2026-07-26:
+- Generated the remaining 18 dynamic lessons of HSK 1, completing 100% of the HSK 1 curriculum generation (Day 1 to 26).
+- Resolved a database UNIQUE constraint conflict on Day 25's `好` duplicates (due to `hǎo` and `hào` pronunciations sharing the same simplified character) by programmatically shifting `好` (hào) to Day 26's vocabulary list.
+- Successfully seeded the entire HSK 1 curriculum (Day 1 to 26) into the Turso database.
+- Generated and cached the first HSK 2 dynamic thematic lesson (hsk2_day1) under the new compliance standard before the rolling daily Gemini API free tier quota was fully utilized.
