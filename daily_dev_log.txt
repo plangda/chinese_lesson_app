@@ -41,3 +41,5 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Resolved a database UNIQUE constraint conflict on Day 25's `好` duplicates (due to `hǎo` and `hào` pronunciations sharing the same simplified character) by programmatically shifting `好` (hào) to Day 26's vocabulary list.
 - Successfully seeded the entire HSK 1 curriculum (Day 1 to 26) into the Turso database.
 - Generated and cached the first HSK 2 dynamic thematic lesson (hsk2_day1) under the new compliance standard before the rolling daily Gemini API free tier quota was fully utilized.
+- Configured sl=auto in translate_en_to_th and enforced English titles in generator prompts to prevent future bilingual title generation issues.
+- Repaired bilingual and Chinese-only titles in the HSK 1 curriculum (updating 18 lessons in place) across both the database and the JSONL cache.

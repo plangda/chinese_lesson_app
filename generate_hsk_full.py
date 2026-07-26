@@ -38,7 +38,7 @@ def get_youdao_meaning(word):
 def translate_en_to_th(text):
     if not text:
         return ""
-    url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=th&dt=t&q={urllib.parse.quote(text)}"
+    url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=th&dt=t&q={urllib.parse.quote(text)}"
     try:
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
@@ -60,9 +60,9 @@ def read_hsk_words(level):
                 fallback = row['CEDICT'].split('|')[0] if row['CEDICT'] else row['Simplified']
                 is_chinese = any('\u4e00' <= char <= '\u9fff' for char in fallback)
                 words.append({
-                    "character": row['Simplified'],
-                    "pinyin": row['Pinyin'],
-                    "meaning": fallback if not is_chinese else ""
+                     "character": row['Simplified'],
+                     "pinyin": row['Pinyin'],
+                     "meaning": fallback if not is_chinese else ""
                 })
     return words
 
@@ -78,7 +78,7 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
     
     You MUST output valid JSON only, using the EXACT structure below. Do NOT use markdown code blocks or extra text.
     {{
-        "title": "A thematic title for this lesson (e.g., 'At the Airport')",
+        "title": "A thematic title for this lesson (e.g., 'At the Airport'). MUST be in English only. Do NOT include Chinese characters or pinyin.",
         "vocab": [
             {{
                 "character": "...",
