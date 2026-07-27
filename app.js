@@ -739,7 +739,7 @@ function renderDashboard() {
   if (todayPanel) {
     if (activeLesson) {
       todayPanel.style.display = 'block';
-      document.getElementById('today-lesson-title').textContent = t('day_prefix', { day: activeLesson.day_number || activeLesson.id.replace('hsk1_day', '') }) + ld(activeLesson, 'title');
+      document.getElementById('today-lesson-title').textContent = t('day_prefix', { day: activeLesson.day_number || activeLesson.id.replace(/^hsk\d_day/, '') }) + ld(activeLesson, 'title');
       
       let descId = "todays_lesson_desc";
       if (state.userLevel === 'hsk2') descId = "todays_lesson_desc_hsk2";
@@ -792,7 +792,7 @@ function renderDashboard() {
     div.className = `lesson-row glass-panel ${isCompleted ? 'completed' : ''}`;
     div.innerHTML = `
       <div class="lesson-info">
-        <h4 class="mb-1">${t('day_prefix', { day: l.day_number || l.id.replace('hsk1_day', '') })}${ld(l, 'title')}</h4>
+        <h4 class="mb-1">${t('day_prefix', { day: l.day_number || l.id.replace(/^hsk\d_day/, '') })}${ld(l, 'title')}</h4>
         <div class="text-sm text-muted">
           ${t('lesson_stages_info')}
         </div>

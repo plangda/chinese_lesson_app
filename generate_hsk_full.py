@@ -1,6 +1,7 @@
 import os
 import csv
 import json
+import re
 import time
 import argparse
 import urllib.request
@@ -35,10 +36,10 @@ def get_youdao_meaning(word):
         pass
     return None
 
-def translate_en_to_th(text):
+def _raw_translate(text, target_lang="th"):
     if not text:
         return ""
-    url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=th&dt=t&q={urllib.parse.quote(text)}"
+    url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl={target_lang}&dt=t&q={urllib.parse.quote(text)}"
     try:
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
@@ -49,6 +50,43 @@ def translate_en_to_th(text):
     except Exception:
         pass
     return ""
+
+# Matches CJK ideographs, CJK/fullwidth punctuation, blank-marker underscores, and a
+# short trailing parenthetical (pinyin/gloss) directly attached to a citation —
+# anything matched here is preserved verbatim instead of sent through translation, so
+# an embedded Chinese example sentence — or its attached pinyin, e.g. '禾' (hé, grain)
+# — never gets mistranslated/dropped/garbled. The parenthetical length is capped so a
+# full English gloss sentence following the citation (e.g. "(It's snowing outside...)")
+# doesn't get swallowed as if it were part of the citation.
+_CJK_PROTECT_PATTERN = re.compile(
+    r"("
+    r"'[一-鿿]+'(?:\s*\([^)]{1,35}\))?"
+    r"|“[^”]+”(?:\s*\([^)]{1,35}\))?"
+    r"|[一-鿿　-〿＀-￯_]+(?:\s*\([^)]{1,35}\))?"
+    r")"
+)
+
+def translate_en_to_th(text):
+    if not text:
+        return ""
+    citations = []
+
+    def replacer(m):
+        citations.append(m.group(0))
+        return f" CITEMARK{len(citations) - 1} "
+
+    placeholder_text = _CJK_PROTECT_PATTERN.sub(replacer, text)
+    remaining = re.sub(r"CITEMARK\d+", "", placeholder_text).strip()
+    if not remaining:
+        return text  # nothing but protected content; no translation needed
+
+    translated = _raw_translate(placeholder_text)
+
+    def restore(m):
+        idx = int(m.group(1))
+        return citations[idx] if idx < len(citations) else m.group(0)
+
+    return re.sub(r"CITEMARK(\d+)", restore, translated)
 
 def read_hsk_words(level):
     words = []
@@ -65,6 +103,58 @@ def read_hsk_words(level):
                      "meaning": fallback if not is_chinese else ""
                 })
     return words
+
+def contains_thai(text):
+    return isinstance(text, str) and any('฀' <= ch <= '๿' for ch in text)
+
+def find_thai_contamination(data):
+    if contains_thai(data.get("title")):
+        return "title"
+    for v in data.get("vocab", []):
+        if contains_thai(v.get("meaning")) or contains_thai(v.get("deconstruct")):
+            return f"vocab[{v.get('character')}]"
+    for g in data.get("grammar", []):
+        if contains_thai(g.get("title")) or contains_thai(g.get("explanation")):
+            return f"grammar[{g.get('title')}]"
+    dialogue = data.get("dialogue", {})
+    if contains_thai(dialogue.get("title")):
+        return "dialogue.title"
+    return None
+
+def contains_chinese(text):
+    return isinstance(text, str) and any('一' <= ch <= '鿿' for ch in text)
+
+def find_incomplete_practice(data):
+    for g in data.get("grammar", []):
+        practice = g.get("practice")
+        if not practice:
+            continue
+        words = practice.get("words") or []
+        answer = practice.get("answer") or []
+        prompt = practice.get("prompt", "")
+        if not answer:
+            return f"grammar[{g.get('title')}].practice.answer is empty"
+        if not contains_chinese(prompt):
+            return f"grammar[{g.get('title')}].practice.prompt has no embedded example sentence"
+        if not all(a in words for a in answer):
+            return f"grammar[{g.get('title')}].practice.answer contains a token not present in words"
+    return None
+
+def is_mostly_chinese(text, threshold=0.3):
+    if not text:
+        return False
+    cjk = sum(1 for ch in text if '一' <= ch <= '鿿')
+    alpha = sum(1 for ch in text if ch.isalpha() or '一' <= ch <= '鿿')
+    return alpha > 0 and (cjk / alpha) > threshold
+
+def find_chinese_field_contamination(data):
+    for v in data.get("vocab", []):
+        if is_mostly_chinese(v.get("deconstruct")):
+            return f"vocab[{v.get('character')}].deconstruct"
+    for g in data.get("grammar", []):
+        if is_mostly_chinese(g.get("explanation")):
+            return f"grammar[{g.get('title')}].explanation"
+    return None
 
 def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_name=None):
     words_str = json.dumps(words_chunk, ensure_ascii=False)
@@ -83,9 +173,9 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
             {{
                 "character": "...",
                 "pinyin": "...",
-                "meaning": "...",
+                "meaning": "... MUST be in English only.",
                 "translation_th": "Thai translation of the meaning",
-                "deconstruct": "Explain the radicals/components briefly",
+                "deconstruct": "Explain the radicals/components briefly. MUST be written in English prose, do NOT write this in Thai or Chinese — you may cite individual Chinese characters/radicals in quotes (e.g. '禾' (hé, grain)) but the surrounding explanation must be English.",
                 "example_sentence": "A simple example sentence using this word",
                 "example_translation_en": "English for example",
                 "example_translation_th": "Thai for example"
@@ -95,15 +185,15 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
         "grammar": [
             {{
                 "title": "A grammar point utilizing some of the vocab",
-                "explanation": "Clear explanation",
+                "explanation": "Clear explanation. MUST be written in English prose, do NOT write this in Thai or Chinese — you may cite Chinese words/particles in quotes but the surrounding explanation must be English.",
                 "examples": [
                     {{"cn": "...", "py": "...", "en": "..."}},
                     {{"cn": "...", "py": "...", "en": "..."}}
                 ],
                 "practice": {{
-                    "prompt": "Fill in the blank:",
+                    "prompt": "MUST embed a complete example sentence in Chinese with the blank shown as '___', e.g. 'Fill in the blank: 今天天气___热。'. Do NOT write a generic instruction with no sentence.",
                     "words": ["word1", "word2"],
-                    "answer": ["word1"]
+                    "answer": ["word1"] // MUST be non-empty and every element MUST also appear in "words", in the order needed to fill the blank(s).
                 }}
             }}
             // Provide 1 or 2 grammar points
@@ -129,6 +219,15 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
         for v in data.get("vocab", []):
             if "translation_th" not in v or "example_sentence" not in v:
                 raise ValueError("Vocab missing translation_th or example_sentence")
+        bad_field = find_thai_contamination(data)
+        if bad_field:
+            raise ValueError(f"Thai text leaked into English field: {bad_field}")
+        bad_practice = find_incomplete_practice(data)
+        if bad_practice:
+            raise ValueError(f"Incomplete grammar practice: {bad_practice}")
+        bad_chinese_field = find_chinese_field_contamination(data)
+        if bad_chinese_field:
+            raise ValueError(f"Chinese text leaked into English field: {bad_chinese_field}")
         return data
     except Exception as e:
         print(f"Error parsing/validating JSON for Day {day_number}: {e}")

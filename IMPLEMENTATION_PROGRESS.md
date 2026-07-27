@@ -4,11 +4,11 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 
 ## Overall Implementation Summary
 
-- **Total Tasks**: 24 (excluding Maintenance & Bug Fixes)
-- **Completed Tasks**: 16
-- **In-Progress Tasks**: 0
-- **Not Started Tasks**: 8
-- **Overall Project Completion**: **~67%** (Core Web App: **~95%**)
+- **Total Tasks**: 26 (excluding Maintenance & Bug Fixes)
+- **Completed Tasks**: 18
+- **In-Progress Tasks**: 1
+- **Not Started Tasks**: 7
+- **Overall Project Completion**: **~72%** (Core Web App: **~95%**)
 
 ---
 
@@ -19,7 +19,8 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **SQLite Database Schema & Setup** | Phase 1: Database & Backend | `Complete` | 100% | Configured in `database.js` with schemas for lessons, vocab, grammar, dialogues, and progress tracking. |
 | **Express API & Server Routes** | Phase 1: Database & Backend | `Complete` | 100% | Implemented in `server.js` with routes for lessons, full curricula, and user progress backup. |
 | **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `Complete` | 100% | Remapped to official 300 words A-Z standard; all 26 dynamic thematic lessons generated and seeded. |
-| **HSK 2 & 3 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Remapped to official sizes (200 words for HSK 2, 500 for HSK 3); theme mapping completed; HSK 2 Day 1 generated. |
+| **HSK 2 Curriculum Seeding** | Phase 1: Database & Backend | `In Progress` | 81% | Days 1–17 generated and seeded into Turso. Days 18–21 pending (quota constraint: 20 req/day). Use `python generate_hsk_full.py --limit 4 --no-translate` then `node insert_generated_lessons.js`. |
+| **HSK 3 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Remapped to 500 words; theme mapping completed. Start after HSK2 complete. |
 | **HSK 4, 5, 6 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Advanced content generation and database seeding for higher proficiency levels. |
 | **Level Placement Pre-Test System** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 12-question diagnostic test that maps results to recommended start levels. |
 | **Lesson Pre-test (Gating)** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 3-question diagnostic pre-test for each lesson with an option to skip if scored 100%. |
@@ -37,7 +38,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Pronunciation Assessment** | Phase 6: Future Enhancements | `Not Started` | 0% | Planned integration of speech recognition API to analyze and score user speech input. |
 | **Multi-Character Writing Pad** | Phase 6: Future Enhancements | `Not Started` | 0% | Expand `hanzi-writer` logic to allow drawing multiple characters sequentially for vocabularies longer than one character. |
 | **Full HSK Mock Exams (2026 Format)** | Phase 6: Future Enhancements | `Not Started` | 0% | Add comprehensive end-of-level exams simulating the latest official HSK format. |
-| **Contextual LLM Translation Pipeline** | Phase 6: Future Enhancements | `Not Started` | 0% | Build a free-tier LLM data generation script for future curriculum seeding to avoid literal word-by-word translations. |
+| **Contextual LLM Translation Pipeline** | Phase 6: Future Enhancements | `Complete` | 100% | Implemented July 27: `add_thai_translations_to_lesson()` now makes a single `gemini-3.5-flash` call with full lesson JSON context. Produces natural, idiomatic Thai instead of literal word-by-word. `--no-translate` flag added for quota-efficient two-pass generation. |
 | **Production Deployment & Custom Domains** | Phase 6: Future Enhancements | `Not Started` | 0% | Docker containerization, Vercel deployment, and setup of a clean, branded custom domain. |
 | **Automated Test Suite** | Phase 6: Future Enhancements | `Not Started` | 0% | Mock backend API testing (Jest/Supertest) and frontend component testing. |
 | **Authentication Stability Fix** | Maintenance & Bug Fixes | `Complete` | 100% | Resolved case-sensitivity login failures in `auth.js` and removed syntax errors in `app.js` blocking session loads. |
@@ -51,6 +52,12 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Transactional Seeding Skip Optimization** | Maintenance & Bug Fixes | `Complete` | 100% | Implemented check-and-skip seeder validation, transaction rollback, and interactive CLI prompts to prevent redundant Turso writes. |
 | **Quota-Aware HSK Curriculum Generator Optimizations** | Maintenance & Bug Fixes | `Complete` | 100% | Removed quiz logic, optimized token limits (~30% saving), added uncorrupting garbage-collection, and resume capability. |
 | **HSK 3.0 (2026 Standard) Remapping & Dynamic Clustering Overhaul** | Maintenance & Bug Fixes | `Complete` | 100% | Remapped all 11,092 terms to 2026 standard levels; clustered dynamically (26 themes HSK 1, 19 themes HSK 2); resolved double day prefix bugs; cleaned delete_hsk1.js; seeded Day 1-8. |
+| **Google Translate → LLM Translation Migration** | Maintenance & Bug Fixes | `Complete` | 100% | Replaced stateless per-field `translate_en_to_th()` Google Translate calls with a single `gemini-3.5-flash` contextual LLM call per lesson. Migrated from deprecated `google-generativeai` to `google.genai` SDK. Added `--no-translate` CLI flag and `patch_thai_translations.py` for targeted Turso UPDATE patching. Confirmed `gemini-3.5-flash` working; `gemini-2.0-flash` quota-exhausted. |
+| **HSK Level Prefix Rendering Fix** | Maintenance & Bug Fixes | `Complete` | 100% | Updated `app.js` lesson ID regex from hardcoded `hsk1_day` to generic `/^hsk\d_day/` so Day numbers render correctly for HSK 2+ levels. |
+| **Thai Translation Patch (HSK1 & HSK2)** | Maintenance & Bug Fixes | `Not Started` | 0% | Run `patch_thai_translations.py --level hsk1` and `--level hsk2` in daily batches (5 lessons/run) to replace poor Google-Translate Thai with LLM-contextual Thai via targeted Turso UPDATE SQL. |
+| **Language-Contamination Validation Guardrails** | Maintenance & Bug Fixes | `Complete` | 100% | Added `find_thai_contamination()`, `find_incomplete_practice()`, and `find_chinese_field_contamination()` checks to `generate_hsk_full.py`'s validation block, feeding the existing retry loop so contaminated LLM responses (wrong language, missing example sentences, broken answer arrays) trigger automatic regeneration instead of being saved. |
+| **Thai/Chinese Contamination Data Repair** | Maintenance & Bug Fixes | `Complete` | 100% | Repaired all discovered corruption via targeted Turso `UPDATE` scripts (no reseeding): 5 lessons / 74 fields of Thai text in English fields, 16 grammar-practice records with missing/broken practice exercises, 35 grammar-practice Thai translations with dropped/mistranslated Chinese, and 32 `deconstruct`/`explanation` fields answered fully in Chinese instead of English. |
+| **CJK/Pinyin-Preserving Translation Rewrite** | Maintenance & Bug Fixes | `Complete` | 100% | Rewrote `translate_en_to_th()` from segment-split translation to placeholder-substitution, preserving embedded Chinese sentences and pinyin citations while fixing whitespace-collapsing and broken-grammar artifacts from the prior approach. |
 ----
 
 ## Phase-wise Breakdown
@@ -78,8 +85,8 @@ gantt
 ### Phase Progress Breakdown
 
 1. **Phase 1: Database & Backend** (SQLite, REST API, Seeding)
-   - **Progress**: 60%
-   - *Next Action*: Generate and seed the remaining HSK 2 (19 days) and HSK 3 curriculum data.
+   - **Progress**: 78%
+   - *Next Action*: Generate HSK 2 Days 18–21 (`python generate_hsk_full.py --limit 4 --no-translate`), then seed (`node insert_generated_lessons.js`). After that, run Thai patch for HSK1 & HSK2 (`python patch_thai_translations.py`). Then proceed with HSK 3.
 2. **Phase 2: Diagnostic & Assessment** (Placement & Gating)
    - **Progress**: 100%
    - *Next Action*: Complete.
