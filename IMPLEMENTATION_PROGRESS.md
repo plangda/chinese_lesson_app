@@ -4,11 +4,11 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 
 ## Overall Implementation Summary
 
-- **Total Tasks**: 26 (excluding Maintenance & Bug Fixes)
-- **Completed Tasks**: 18
+- **Total Tasks**: 27 (excluding Maintenance & Bug Fixes)
+- **Completed Tasks**: 19
 - **In-Progress Tasks**: 1
 - **Not Started Tasks**: 7
-- **Overall Project Completion**: **~72%** (Core Web App: **~95%**)
+- **Overall Project Completion**: **~74%** (Core Web App: **~95%**)
 
 ---
 
@@ -54,8 +54,9 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **HSK 3.0 (2026 Standard) Remapping & Dynamic Clustering Overhaul** | Maintenance & Bug Fixes | `Complete` | 100% | Remapped all 11,092 terms to 2026 standard levels; clustered dynamically (26 themes HSK 1, 19 themes HSK 2); resolved double day prefix bugs; cleaned delete_hsk1.js; seeded Day 1-8. |
 | **Google Translate → LLM Translation Migration** | Maintenance & Bug Fixes | `Complete` | 100% | Replaced stateless per-field `translate_en_to_th()` Google Translate calls with a single `gemini-3.5-flash` contextual LLM call per lesson. Migrated from deprecated `google-generativeai` to `google.genai` SDK. Added `--no-translate` CLI flag and `patch_thai_translations.py` for targeted Turso UPDATE patching. Confirmed `gemini-3.5-flash` working; `gemini-2.0-flash` quota-exhausted. |
 | **HSK Level Prefix Rendering Fix** | Maintenance & Bug Fixes | `Complete` | 100% | Updated `app.js` lesson ID regex from hardcoded `hsk1_day` to generic `/^hsk\d_day/` so Day numbers render correctly for HSK 2+ levels. |
-| **Thai Translation Patch (HSK1 & HSK2)** | Maintenance & Bug Fixes | `Not Started` | 0% | Run `patch_thai_translations.py --level hsk1` and `--level hsk2` in daily batches (5 lessons/run) to replace poor Google-Translate Thai with LLM-contextual Thai via targeted Turso UPDATE SQL. |
+| **Thai Translation Patch (HSK1 & HSK2) with Field Masking** | Maintenance & Bug Fixes | `In Progress` | 15% | Field masking implemented (commit 4518e2e) to prevent LLM cn/py field corruption. hsk1_day4 retry pending API quota reset (2026-07-30). Unit tests pass (test_field_masking.py). Quota-efficient progressive rollout: 5 lessons/day batching. Full strategy documented in memory/deployment_quota_strategy.md. |
 | **Language-Contamination Validation Guardrails** | Maintenance & Bug Fixes | `Complete` | 100% | Added `find_thai_contamination()`, `find_incomplete_practice()`, and `find_chinese_field_contamination()` checks to `generate_hsk_full.py`'s validation block, feeding the existing retry loop so contaminated LLM responses (wrong language, missing example sentences, broken answer arrays) trigger automatic regeneration instead of being saved. |
+| **Field Masking for LLM JSON Structure Protection** | Maintenance & Bug Fixes | `Complete` | 100% | Implemented `_mask_untranslatable_fields()` and `_unmask_fields()` to prevent LLM from modifying cn/py/character/pinyin fields in JSON. Masking hides fields before LLM call, unmasking restores after response. Unit test suite (test_field_masking.py) validates full pipeline without API calls. Resolves hsk1_day4 validation failures caused by LLM modifying fields despite "NEVER modify" prompt instructions. |
 | **Thai/Chinese Contamination Data Repair** | Maintenance & Bug Fixes | `Complete` | 100% | Repaired all discovered corruption via targeted Turso `UPDATE` scripts (no reseeding): 5 lessons / 74 fields of Thai text in English fields, 16 grammar-practice records with missing/broken practice exercises, 35 grammar-practice Thai translations with dropped/mistranslated Chinese, and 32 `deconstruct`/`explanation` fields answered fully in Chinese instead of English. |
 | **CJK/Pinyin-Preserving Translation Rewrite** | Maintenance & Bug Fixes | `Complete` | 100% | Rewrote `translate_en_to_th()` from segment-split translation to placeholder-substitution, preserving embedded Chinese sentences and pinyin citations while fixing whitespace-collapsing and broken-grammar artifacts from the prior approach. |
 ----
