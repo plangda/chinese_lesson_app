@@ -157,6 +157,67 @@ def find_translation_corruption(original, translated):
     _check_field_translation(original.get("title"), translated.get("title_th"), "title_th", errors)
     return errors[0] if errors else None
 
+def _mask_untranslatable_fields(data):
+    """Create a deep copy with cn/py/character/pinyin renamed to masked versions.
+    This prevents the LLM from seeing and modifying these fields."""
+    masked = copy.deepcopy(data)
+
+    # Mask vocab fields
+    for v in masked.get("vocab", []):
+        if "character" in v:
+            v["_character_masked"] = v.pop("character")
+        if "pinyin" in v:
+            v["_pinyin_masked"] = v.pop("pinyin")
+
+    # Mask grammar example fields
+    for g in masked.get("grammar", []):
+        for ex in g.get("examples", []):
+            if "cn" in ex:
+                ex["_cn_masked"] = ex.pop("cn")
+            if "py" in ex:
+                ex["_py_masked"] = ex.pop("py")
+
+    # Mask dialogue line fields
+    dial = masked.get("dialogue")
+    if dial:
+        for line in dial.get("lines", []):
+            if "cn" in line:
+                line["_cn_masked"] = line.pop("cn")
+            if "py" in line:
+                line["_py_masked"] = line.pop("py")
+
+    return masked
+
+def _unmask_fields(data):
+    """Restore masked field names (cn→_cn_masked, etc.) back to originals."""
+    unmasked = copy.deepcopy(data)
+
+    # Unmask vocab fields
+    for v in unmasked.get("vocab", []):
+        if "_character_masked" in v:
+            v["character"] = v.pop("_character_masked")
+        if "_pinyin_masked" in v:
+            v["pinyin"] = v.pop("_pinyin_masked")
+
+    # Unmask grammar example fields
+    for g in unmasked.get("grammar", []):
+        for ex in g.get("examples", []):
+            if "_cn_masked" in ex:
+                ex["cn"] = ex.pop("_cn_masked")
+            if "_py_masked" in ex:
+                ex["py"] = ex.pop("_py_masked")
+
+    # Unmask dialogue line fields
+    dial = unmasked.get("dialogue")
+    if dial:
+        for line in dial.get("lines", []):
+            if "_cn_masked" in line:
+                line["cn"] = line.pop("_cn_masked")
+            if "_py_masked" in line:
+                line["py"] = line.pop("_py_masked")
+
+    return unmasked
+
 def _apply_translated_fields(lesson_data, translated):
     lesson_data["title_th"] = translated.get("title_th", "")
     for orig_v, new_v in zip(lesson_data.get("vocab", []), translated.get("vocab", [])):
@@ -181,6 +242,8 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
     if not lesson_data:
         return
     original = copy.deepcopy(lesson_data)
+    masked_lesson = _mask_untranslatable_fields(lesson_data)
+
     prompt = f"""
     You are a professional Chinese-to-Thai pedagogical translator for children
     aged 8-15 learning Chinese as a foreign language.
@@ -191,11 +254,15 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
     -> "deconstruct_th", "explanation" -> "explanation_th", "prompt" ->
     "prompt_th", "en" -> "th", "title" -> "title_th").
 
+    CRITICAL: The JSON includes fields with names like "_character_masked", "_cn_masked",
+    "_py_masked" — these are preserved fields that must NOT be translated or modified.
+    Copy them through unchanged in the output.
+
     STRICT RULES:
-    - Do NOT translate word-for-word; use natural spoken Thai grammar.
+    - Do NOT translate word-for-byte; use natural spoken Thai grammar.
     - Explain grammar particles by their function in Thai, not their literal name.
     - Use simple, warm, kid-friendly language, not academic/formal register.
-    - NEVER modify "character", "pinyin", "cn", or "py" fields — copy them through unchanged.
+    - NEVER modify fields named "_*_masked" — copy them through unchanged.
     - Any Chinese characters or pinyin cited inside an English field (e.g. '禾' (hé, grain))
       MUST be preserved byte-for-byte, identical, inside the translated Thai field.
     - Return the EXACT SAME JSON structure and field names as the input, with
@@ -204,7 +271,7 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
     - Output valid JSON only. No markdown code fences, no extra commentary.
 
     Lesson JSON:
-    {json.dumps(lesson_data, ensure_ascii=False)}
+    {json.dumps(masked_lesson, ensure_ascii=False)}
     """
 
     for attempt in range(max_retries):
@@ -220,6 +287,8 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
                 text = re.sub(r"^```(?:json)?\n?", "", text)
                 text = re.sub(r"\n?```$", "", text)
             translated = json.loads(text)
+            # Unmask the LLM response to restore original field names
+            translated = _unmask_fields(translated)
             corruption = find_translation_corruption(original, translated)
             if corruption:
                 raise ValueError(f"Translation corruption detected: {corruption}")
