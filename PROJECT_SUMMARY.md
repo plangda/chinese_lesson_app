@@ -147,3 +147,25 @@ The application implements three distinct quiz types, all handled dynamically in
 - **Placeholder-Substitution Translation Strategy (July 28):** Segment-splitting text into protected/translatable chunks and translating each chunk independently (the first guardrail approach) proved unreliable — Google Translate trims whitespace from short isolated fragments and breaks grammatical continuity when a sentence is chopped around a citation (e.g. "由 X 和 Y 组成" fragmenting into disconnected words like "Depend on X and Y Composition"). Switched to placeholder substitution instead: replace protected spans with a marker token, translate the whole string as one coherent unit, then restore the original spans afterward. This produced fluent, correctly-spaced output and is now used by both `translate_en_to_th()` and the standalone Chinese→English repair script.
 - **Field Masking for JSON Structure Preservation (July 29):** hsk1_day4 retry failed validation with "vocab[你]: character/pinyin field altered" and "grammar[...].examples: cn/py field altered" despite explicit LLM prompt instructions "NEVER modify 'character', 'pinyin', 'cn', or 'py' fields." Root cause analysis revealed the pattern-based protection (`_CJK_PROTECT_PATTERN`) designed to protect citations *within text* has zero effect on JSON *field names or values* — the LLM still receives raw `"cn": "..."` and `"py": "..."` keys and can modify them. Attempted solution of stricter prompt instructions proved insufficient; LLM instruction-following is probabilistic, not guaranteed. Implemented structural field masking instead: (1) Before sending to LLM, rename untranslatable fields using a masking function (`_mask_untranslatable_fields`): `character → _character_masked`, `pinyin → _pinyin_masked`, `cn → _cn_masked`, `py → _py_masked` across vocab, grammar examples, and dialogue lines. (2) Send the masked JSON to LLM with an updated prompt informing it about `_*_masked` fields. (3) After LLM response, unmask the response (`_unmask_fields`) to restore original field names. This approach is **structurally airtight** because the LLM never sees the original field names — it cannot modify what it cannot see. Unit test suite (`test_field_masking.py`) validates all four test cases without consuming API quota: masking removes original names, unmasking restores values, validation passes on correct responses, and validation correctly detects altered fields. Tomorrow's retry of hsk1_day4 will confirm masking works with live LLM responses. This masking pattern generalizes: any future fields requiring preservation can be added to the mask/unmask functions without changing the LLM prompt or validation logic.
 
+
+---
+
+## 5. Supporting Documentation for Tomorrow (2026-07-30)
+
+**READ THESE BEFORE STARTING:**
+1. **TOMORROW_ACTION_PLAN.md** — Step-by-step action plan with exact commands and timeline
+2. **MASKING_IMPLEMENTATION_STATUS.md** — Technical implementation details and confidence level
+3. **PATTERN_ANALYSIS_DAY4.md** — Why pattern-based protection couldn't help, why masking does
+4. **memory/deployment_quota_strategy.md** — Full quota-efficient deployment strategy for all 43 lessons
+5. **test_field_masking.py** — Unit test proving masking logic works (can run anytime without API)
+
+**What's Already Committed:**
+- `commit 4518e2e` — Field masking implementation + unit tests
+- `commit f57593a` — Progress + strategy documentation updates
+
+**Key Success Indicators for Tomorrow:**
+- ✓ API quota resets (available by morning)
+- ✓ hsk1_day4 retry succeeds with masking fix (validation passes)
+- ✓ 4-5 more HSK1 lessons patch successfully
+- ✓ Stay under 20-call daily quota (~8-10 calls for Phase 1)
+- ✓ All translations pushed to Turso with `patch_thai_to_turso.js`
