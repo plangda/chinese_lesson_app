@@ -3,21 +3,27 @@ import csv
 import json
 import re
 import time
+import copy
 import argparse
 import urllib.request
 import urllib.parse
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from dotenv import load_dotenv
 
 # Load API key
 load_dotenv(os.path.expanduser('~/.env'))
-load_dotenv('.env') # Load the local .env containing Turso credentials
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+load_dotenv('.env')
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 CSV_PATH = 'hsk30.csv'
 
-# Set up the Gemini model with JSON response type
-model = genai.GenerativeModel('gemini-2.5-flash', generation_config={"response_mime_type": "application/json"})
+GENERATION_MODEL = 'gemini-2.5-flash'
+TRANSLATION_MODEL = 'gemini-3.5-flash'
+JSON_CONFIG = types.GenerateContentConfig(response_mime_type="application/json")
+TRANSLATION_CONFIG = types.GenerateContentConfig(
+    response_mime_type="application/json", max_output_tokens=16384
+)
 
 def get_youdao_meaning(word):
     clean_word = word.split('|')[0]
@@ -60,9 +66,9 @@ def _raw_translate(text, target_lang="th"):
 # doesn't get swallowed as if it were part of the citation.
 _CJK_PROTECT_PATTERN = re.compile(
     r"("
-    r"'[一-鿿]+'(?:\s*\([^)]{1,35}\))?"
-    r"|“[^”]+”(?:\s*\([^)]{1,35}\))?"
-    r"|[一-鿿　-〿＀-￯_]+(?:\s*\([^)]{1,35}\))?"
+    r"'[一-鿿]+'(?:\s*\([^-,)]*\))?"
+    r"|“[^”]+”(?:\s*\([^-,)]*\))?"
+    r"|[一-鿿　-〿＀-￯_]+(?:\s*\([^-,)]*\))?"
     r")"
 )
 
@@ -87,6 +93,147 @@ def translate_en_to_th(text):
         return citations[idx] if idx < len(citations) else m.group(0)
 
     return re.sub(r"CITEMARK(\d+)", restore, translated)
+
+def _normalize_ws(text):
+    return re.sub(r"\s+", "", text or "")
+
+def _check_field_translation(source_val, translated_val, label, errors):
+    if not source_val:
+        return
+    if not isinstance(translated_val, str):
+        errors.append(f"{label}: translation field is not a string (got {type(translated_val).__name__})")
+        return
+    citations = _extract_citations(source_val)
+    translated_norm = _normalize_ws(translated_val)
+    for citation in citations:
+        if _normalize_ws(citation) not in translated_norm:
+            errors.append(f"{label}: citation '{citation}' dropped or altered")
+            return
+    if not translated_val:
+        errors.append(f"{label}: missing Thai translation")
+    elif not citations and not contains_thai(translated_val):
+        errors.append(f"{label}: Thai field has no Thai script (likely untranslated)")
+
+def _extract_citations(text):
+    if not text:
+        return []
+    return [m.group(0) for m in _CJK_PROTECT_PATTERN.finditer(text)]
+
+def find_translation_corruption(original, translated):
+    errors = []
+    orig_vocab, new_vocab = original.get("vocab", []), translated.get("vocab", [])
+    if len(orig_vocab) != len(new_vocab):
+        return "vocab array length changed"
+    for ov, tv in zip(orig_vocab, new_vocab):
+        if ov.get("character") != tv.get("character") or ov.get("pinyin") != tv.get("pinyin"):
+            return f"vocab[{ov.get('character')}]: character/pinyin field altered"
+        label = f"vocab[{ov.get('character')}]"
+        _check_field_translation(ov.get("meaning"), tv.get("translation_th"), f"{label}.translation_th", errors)
+        _check_field_translation(ov.get("deconstruct"), tv.get("deconstruct_th"), f"{label}.deconstruct_th", errors)
+        _check_field_translation(ov.get("example_translation_en"), tv.get("example_translation_th"), f"{label}.example_translation_th", errors)
+    orig_grammar, new_grammar = original.get("grammar", []), translated.get("grammar", [])
+    if len(orig_grammar) != len(new_grammar):
+        return "grammar array length changed"
+    for og, tg in zip(orig_grammar, new_grammar):
+        label = f"grammar[{og.get('title')}]"
+        _check_field_translation(og.get("explanation"), tg.get("explanation_th"), f"{label}.explanation_th", errors)
+        orig_examples, new_examples = og.get("examples", []), tg.get("examples", [])
+        if len(orig_examples) != len(new_examples):
+            return f"{label}.examples array length changed"
+        for oe, te in zip(orig_examples, new_examples):
+            if oe.get("cn") != te.get("cn") or oe.get("py") != te.get("py"):
+                return f"{label}.examples: cn/py field altered"
+            _check_field_translation(oe.get("en"), te.get("th"), f"{label}.examples.th", errors)
+        o_prac, t_prac = og.get("practice") or {}, tg.get("practice") or {}
+        _check_field_translation(o_prac.get("prompt"), t_prac.get("prompt_th"), f"{label}.practice.prompt_th", errors)
+    orig_dial, new_dial = original.get("dialogue") or {}, translated.get("dialogue") or {}
+    orig_lines, new_lines = orig_dial.get("lines", []), new_dial.get("lines", [])
+    if len(orig_lines) != len(new_lines):
+        return "dialogue.lines array length changed"
+    for ol, tl in zip(orig_lines, new_lines):
+        if ol.get("cn") != tl.get("cn") or ol.get("py") != tl.get("py"):
+            return "dialogue.lines: cn/py field altered"
+        _check_field_translation(ol.get("en"), tl.get("th"), "dialogue.lines.th", errors)
+    _check_field_translation(original.get("title"), translated.get("title_th"), "title_th", errors)
+    return errors[0] if errors else None
+
+def _apply_translated_fields(lesson_data, translated):
+    lesson_data["title_th"] = translated.get("title_th", "")
+    for orig_v, new_v in zip(lesson_data.get("vocab", []), translated.get("vocab", [])):
+        orig_v["translation_th"] = new_v.get("translation_th", "")
+        orig_v["deconstruct_th"] = new_v.get("deconstruct_th", "")
+        orig_v["example_translation_th"] = new_v.get("example_translation_th", "")
+    for orig_g, new_g in zip(lesson_data.get("grammar", []), translated.get("grammar", [])):
+        orig_g["title_th"] = new_g.get("title_th", "")
+        orig_g["explanation_th"] = new_g.get("explanation_th", "")
+        for orig_ex, new_ex in zip(orig_g.get("examples", []), new_g.get("examples", [])):
+            orig_ex["th"] = new_ex.get("th", "")
+        if orig_g.get("practice") is not None:
+            orig_g["practice"]["prompt_th"] = (new_g.get("practice") or {}).get("prompt_th", "")
+    orig_dial = lesson_data.get("dialogue")
+    new_dial = translated.get("dialogue") or {}
+    if orig_dial:
+        orig_dial["title_th"] = new_dial.get("title_th", "")
+        for orig_line, new_line in zip(orig_dial.get("lines", []), new_dial.get("lines", [])):
+            orig_line["th"] = new_line.get("th", "")
+
+def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
+    if not lesson_data:
+        return
+    original = copy.deepcopy(lesson_data)
+    prompt = f"""
+    You are a professional Chinese-to-Thai pedagogical translator for children
+    aged 8-15 learning Chinese as a foreign language.
+
+    Below is a full lesson JSON for a Chinese class. Translate every English
+    field into natural, idiomatic, kid-friendly Thai and populate the matching
+    "_th" field for each one (e.g. "meaning" -> "translation_th", "deconstruct"
+    -> "deconstruct_th", "explanation" -> "explanation_th", "prompt" ->
+    "prompt_th", "en" -> "th", "title" -> "title_th").
+
+    STRICT RULES:
+    - Do NOT translate word-for-word; use natural spoken Thai grammar.
+    - Explain grammar particles by their function in Thai, not their literal name.
+    - Use simple, warm, kid-friendly language, not academic/formal register.
+    - NEVER modify "character", "pinyin", "cn", or "py" fields — copy them through unchanged.
+    - Any Chinese characters or pinyin cited inside an English field (e.g. '禾' (hé, grain))
+      MUST be preserved byte-for-byte, identical, inside the translated Thai field.
+    - Return the EXACT SAME JSON structure and field names as the input, with
+      every "_th"/"th" field now filled in. Do NOT add, remove, or reorder any
+      array items.
+    - Output valid JSON only. No markdown code fences, no extra commentary.
+
+    Lesson JSON:
+    {json.dumps(lesson_data, ensure_ascii=False)}
+    """
+
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model=TRANSLATION_MODEL, contents=prompt, config=TRANSLATION_CONFIG
+            )
+            finish_reason = response.candidates[0].finish_reason if response.candidates else None
+            if finish_reason == types.FinishReason.MAX_TOKENS:
+                raise ValueError("Response truncated (hit max_output_tokens) before completing JSON")
+            text = (response.text or "").strip()
+            if text.startswith("```"):
+                text = re.sub(r"^```(?:json)?\n?", "", text)
+                text = re.sub(r"\n?```$", "", text)
+            translated = json.loads(text)
+            corruption = find_translation_corruption(original, translated)
+            if corruption:
+                raise ValueError(f"Translation corruption detected: {corruption}")
+            _apply_translated_fields(lesson_data, translated)
+            lesson_data["_th_source"] = "llm"
+            return
+        except Exception as e:
+            print(f"  [Thai LLM translation attempt {attempt+1}/{max_retries} failed] {e}")
+            time.sleep(5)
+
+    print(f"  [Thai LLM translation] All {max_retries} attempts failed for "
+          f"'{original.get('id', original.get('title'))}'. Falling back to Google Translate.")
+    add_thai_translations_to_lesson(lesson_data)
+    lesson_data["_th_source"] = "fallback"
 
 def read_hsk_words(level):
     words = []
@@ -208,7 +355,9 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
     }}
     """
     
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model=GENERATION_MODEL, contents=prompt, config=JSON_CONFIG
+    )
     try:
         data = json.loads(response.text)
         # Validation checks
@@ -401,7 +550,7 @@ def run_generation(level=2, chunk_size=10, limit=None, existing_ids=None):
                 try:
                     lesson_data = generate_lesson_content(chunk, day_number, hsk_id, t_name)
                     if lesson_data:
-                        add_thai_translations_to_lesson(lesson_data)
+                        add_thai_translations_to_lesson_llm(lesson_data)
                         insert_lesson_to_db(None, lesson_data, day_number, hsk_id)
                         print(f"  OK Day {day_number} saved successfully.")
                         success = True
@@ -458,7 +607,7 @@ def run_generation(level=2, chunk_size=10, limit=None, existing_ids=None):
                 try:
                     lesson_data = generate_lesson_content(chunk, day_number, hsk_id)
                     if lesson_data:
-                        add_thai_translations_to_lesson(lesson_data)
+                        add_thai_translations_to_lesson_llm(lesson_data)
                         insert_lesson_to_db(None, lesson_data, day_number, hsk_id)
                         print(f"  OK Day {day_number} saved successfully.")
                         success = True
