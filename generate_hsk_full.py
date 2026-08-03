@@ -104,6 +104,11 @@ def _strip_practice_prompt_gloss(prompt):
     prompt = _TRAILING_GLOSS_PATTERN.sub(r"\1\2", prompt)
     return prompt
 
+_RESTORATION_PATTERN = re.compile(
+    r"(?:__CIT_|\[\[CIT_|CITEMARK|ไซท์มาร์ก|ไซต์มาร์ก|ไซมาร์ก|ซายท์มาร์ก)\s*(\d+)(?:\]\]|__)?",
+    re.IGNORECASE
+)
+
 def translate_en_to_th(text):
     if not text:
         return ""
@@ -116,20 +121,25 @@ def translate_en_to_th(text):
         # `tail` (a free-text meaning gloss, if any) is left in place so it
         # gets sent to Google Translate and rendered into Thai like the rest
         # of the sentence, instead of staying stuck in English forever.
-        return f" CITEMARK{len(citations) - 1} {tail}"
+        return f" __CIT_{len(citations) - 1}__ {tail}"
 
     placeholder_text = _CJK_PROTECT_PATTERN.sub(replacer, text)
-    remaining = re.sub(r"CITEMARK\d+", "", placeholder_text).strip()
+    remaining = _RESTORATION_PATTERN.sub("", placeholder_text).strip()
     if not remaining:
         return text  # nothing but protected content; no translation needed
 
     translated = _raw_translate(placeholder_text)
+    if not translated:
+        return text  # preserve original text if network translation fails
 
     def restore(m):
-        idx = int(m.group(1))
-        return citations[idx] if idx < len(citations) else m.group(0)
+        try:
+            idx = int(m.group(1))
+            return citations[idx] if 0 <= idx < len(citations) else m.group(0)
+        except (ValueError, IndexError):
+            return m.group(0)
 
-    return re.sub(r"CITEMARK(\d+)", restore, translated)
+    return _RESTORATION_PATTERN.sub(restore, translated)
 
 def _normalize_ws(text):
     return re.sub(r"\s+", "", text or "")

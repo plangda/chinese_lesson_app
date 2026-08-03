@@ -8,7 +8,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from generate_hsk_full import _strip_untranslatable_fields, find_translation_corruption
+from generate_hsk_full import _strip_untranslatable_fields, find_translation_corruption, translate_en_to_th
 
 def _make_lesson():
     return {
@@ -173,12 +173,57 @@ def test_validation_catches_real_translation_defects():
     assert corruption == "vocab array length changed", f"Got: {corruption}"
     print("  [OK] Array length mismatch detected")
 
+def test_translate_en_to_th_citemark_restoration():
+    """Test placeholder creation and restoration across standard text, single citation,
+    multi-digit citations, and legacy transliterated Thai strings."""
+    print("\nTest 6: translate_en_to_th CITEMARK & __CIT_ restoration")
+
+    # 1. Standard text (no citations)
+    std_text = "Expressing possession using a clear grammatical structure."
+    translated_std = translate_en_to_th(std_text)
+    assert isinstance(translated_std, str) and len(translated_std) > 0, "Standard text should return translated string"
+    assert "__CIT_" not in translated_std and "CITEMARK" not in translated_std, "No placeholders in standard text output"
+    print("  [OK] Standard text handles cleanly without placeholders")
+
+    # 2. Single citation (Index 0)
+    single_cit_text = "In Chinese, '你好' (nǐ hǎo) means hello."
+    translated_single = translate_en_to_th(single_cit_text)
+    assert "'你好' (nǐ hǎo)" in translated_single, f"Single citation should be restored verbatim, got: {translated_single}"
+    assert "__CIT_" not in translated_single, "Placeholder token should be replaced by original citation"
+    print("  [OK] Single citation restored verbatim")
+
+    # 3. Multi-digit citations & Legacy Transliterated Restoration Test
+    from generate_hsk_full import _RESTORATION_PATTERN
+    citations = ["'你好' (nǐ hǎo)"] + [f"'C_{i}' (py_{i})" for i in range(1, 15)]
+
+    # Test clean multi-digit placeholder restoration
+    raw_multi = "ใช้ __CIT_10__ เมื่อขอบคุณ และ __CIT_12__ เมื่อจากไป"
+    def restore_fn(m):
+        try:
+            idx = int(m.group(1))
+            return citations[idx] if 0 <= idx < len(citations) else m.group(0)
+        except (ValueError, IndexError):
+            return m.group(0)
+
+    restored_multi = _RESTORATION_PATTERN.sub(restore_fn, raw_multi)
+    assert "'C_10' (py_10)" in restored_multi, f"Multi-digit 10 should restore, got: {restored_multi}"
+    assert "'C_12' (py_12)" in restored_multi, f"Multi-digit 12 should restore, got: {restored_multi}"
+    print("  [OK] Multi-digit citations (Index 10, Index 12) restored cleanly")
+
+    # Test legacy transliterated Thai placeholder restoration (e.g. ไซท์มาร์ก0, ไซต์มาร์ก10)
+    raw_transliterated = "ในภาษาจีน ไซท์มาร์ก0 หมายถึงสวัสดี และ ไซต์มาร์ก10 หมายถึงขอบคุณ"
+    restored_transliterated = _RESTORATION_PATTERN.sub(restore_fn, raw_transliterated)
+    assert "'你好' (nǐ hǎo)" in restored_transliterated, "Legacy ไซท์มาร์ก0 should restore citation 0"
+    assert "'C_10' (py_10)" in restored_transliterated, "Legacy ไซต์มาร์ก10 should restore citation 10"
+    print("  [OK] Legacy transliterated Thai placeholders (ไซท์มาร์ก) successfully restored")
+
 if __name__ == "__main__":
     test_stripping_removes_untranslatable_fields()
     test_stripping_does_not_affect_translatable_context()
     test_validation_passes_on_a_well_behaved_response()
     test_validation_ignores_an_ideal_but_unnecessary_echo()
     test_validation_catches_real_translation_defects()
+    test_translate_en_to_th_citemark_restoration()
 
     print("\n" + "="*60)
     print("All tests passed! [OK] Strip-and-validate implementation is correct")
