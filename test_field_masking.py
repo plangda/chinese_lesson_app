@@ -1,21 +1,17 @@
 """
-Unit test for field masking/unmasking logic.
+Unit test for the untranslatable-field stripping and corruption-detection logic.
 Tests the implementation WITHOUT calling the real Gemini API.
 """
 
-import json
 import copy
 import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from generate_hsk_full import _mask_untranslatable_fields, _unmask_fields, find_translation_corruption
+from generate_hsk_full import _strip_untranslatable_fields, find_translation_corruption
 
-def test_masking_unmasking():
-    """Test that masking hides fields and unmasking restores them correctly."""
-
-    # Minimal lesson structure for testing
-    lesson = {
+def _make_lesson():
+    return {
         "id": "hsk1_day4",
         "title": "Family Lesson",
         "vocab": [
@@ -56,127 +52,134 @@ def test_masking_unmasking():
         }
     }
 
-    # Test 1: Masking removes original field names
-    print("Test 1: Masking removes original field names")
-    masked = _mask_untranslatable_fields(lesson)
+def test_stripping_removes_untranslatable_fields():
+    """Stripping must remove character/pinyin/cn/py entirely so the LLM never sees them."""
+    print("Test 1: Stripping removes untranslatable fields from the payload")
+    lesson = _make_lesson()
+    stripped = _strip_untranslatable_fields(lesson)
 
-    # Check vocab is masked
-    assert "_character_masked" in masked["vocab"][0], "vocab character should be masked"
-    assert "character" not in masked["vocab"][0], "vocab character should not exist"
-    assert "_pinyin_masked" in masked["vocab"][0], "vocab pinyin should be masked"
-    assert "pinyin" not in masked["vocab"][0], "vocab pinyin should not exist"
+    assert "character" not in stripped["vocab"][0], "vocab character should be stripped"
+    assert "pinyin" not in stripped["vocab"][0], "vocab pinyin should be stripped"
+    assert "cn" not in stripped["grammar"][0]["examples"][0], "grammar cn should be stripped"
+    assert "py" not in stripped["grammar"][0]["examples"][0], "grammar py should be stripped"
+    assert "cn" not in stripped["dialogue"]["lines"][0], "dialogue cn should be stripped"
+    assert "py" not in stripped["dialogue"]["lines"][0], "dialogue py should be stripped"
 
-    # Check grammar examples are masked
-    assert "_cn_masked" in masked["grammar"][0]["examples"][0], "grammar cn should be masked"
-    assert "cn" not in masked["grammar"][0]["examples"][0], "grammar cn should not exist"
-    assert "_py_masked" in masked["grammar"][0]["examples"][0], "grammar py should be masked"
-    assert "py" not in masked["grammar"][0]["examples"][0], "grammar py should not exist"
+    # The original lesson object must be untouched (we deep-copy before stripping).
+    assert lesson["vocab"][0]["character"] == "的", "original lesson must not be mutated"
+    print("  [OK] Untranslatable fields stripped, original left untouched")
 
-    # Check dialogue lines are masked
-    assert "_cn_masked" in masked["dialogue"]["lines"][0], "dialogue cn should be masked"
-    assert "cn" not in masked["dialogue"]["lines"][0], "dialogue cn should not exist"
-    assert "_py_masked" in masked["dialogue"]["lines"][0], "dialogue py should be masked"
-    assert "py" not in masked["dialogue"]["lines"][0], "dialogue py should not exist"
+def test_stripping_does_not_affect_translatable_context():
+    print("\nTest 2: Stripping leaves translation-relevant fields alone")
+    lesson = _make_lesson()
+    stripped = _strip_untranslatable_fields(lesson)
 
-    print("  [OK] All fields correctly masked")
+    assert stripped["vocab"][0]["meaning"] == "possessive particle"
+    assert stripped["grammar"][0]["examples"][0]["en"] == "This is my friend."
+    assert stripped["dialogue"]["lines"][0]["en"] == "Hello"
+    print("  [OK] English/context fields preserved for translation")
 
-    # Test 2: Unmasking restores original field names and values
-    print("\nTest 2: Unmasking restores original fields")
-
-    # Simulate LLM response: masked fields preserved, _th fields added
-    llm_response = {
+def test_validation_passes_on_a_well_behaved_response():
+    """A normal, well-behaved LLM response (no character/cn/py fields at all,
+    since they were never sent) should pass validation."""
+    print("\nTest 3: Validation passes on a well-behaved response")
+    lesson = _make_lesson()
+    response = {
         "id": "hsk1_day4",
         "title": "Family Lesson",
-        "title_th": "บทเรียนครอบครัว",  # LLM must provide this
+        "title_th": "บทเรียนครอบครัว",
         "vocab": [
             {
-                "_character_masked": "的",
-                "_pinyin_masked": "de",
                 "meaning": "possessive particle",
-                "translation_th": "อนุภาค ที่แสดงความเป็นเจ้าของ",
-                "deconstruct": "radical + phonetic",
-                "deconstruct_th": "หมวดนำ + เสียงอ่าน",
-                "example_translation_en": "example",
-                "example_translation_th": "ตัวอย่าง"
+                "translation_th": "อนุภาคที่แสดงความเป็นเจ้าของ",
             }
         ],
         "grammar": [
             {
                 "title": "Possession with 的",
-                "explanation": "Used to show possession",
-                "explanation_th": "ใช้แสดงการครอบครัว",
-                "examples": [
-                    {
-                        "_cn_masked": "这是我的朋友。",
-                        "_py_masked": "Zhè shì wǒ de péngyou.",
-                        "en": "This is my friend.",
-                        "th": "นี่คือเพื่อนของฉัน"
-                    }
-                ],
-                "practice": {
-                    "prompt": "Fill blank",
-                    "prompt_th": "กรอกข้อมูลในช่องว่าง",
-                    "words": [],
-                    "answer": []
-                }
+                "explanation_th": "ใช้แสดงการครอบครอง",
+                "examples": [{"th": "นี่คือเพื่อนของฉัน"}],
+                "practice": {"prompt_th": ""}
             }
         ],
         "dialogue": {
-            "title": "Family Dialog",
             "title_th": "บทสนทนาครอบครัว",
-            "lines": [
-                {
-                    "_cn_masked": "你好",
-                    "_py_masked": "Nǐ hǎo",
-                    "en": "Hello",
-                    "th": "สวัสดี"
-                }
-            ]
+            "lines": [{"th": "สวัสดี"}]
         }
     }
 
-    unmasked = _unmask_fields(llm_response)
-
-    # Check vocab is unmasked correctly
-    assert unmasked["vocab"][0]["character"] == "的", "character should be restored"
-    assert unmasked["vocab"][0]["pinyin"] == "de", "pinyin should be restored"
-    assert "_character_masked" not in unmasked["vocab"][0], "masked name should be removed"
-    assert "_pinyin_masked" not in unmasked["vocab"][0], "masked name should be removed"
-
-    # Check grammar examples are unmasked correctly
-    assert unmasked["grammar"][0]["examples"][0]["cn"] == "这是我的朋友。", "cn should be restored"
-    assert unmasked["grammar"][0]["examples"][0]["py"] == "Zhè shì wǒ de péngyou.", "py should be restored"
-    assert "_cn_masked" not in unmasked["grammar"][0]["examples"][0], "masked name should be removed"
-    assert "_py_masked" not in unmasked["grammar"][0]["examples"][0], "masked name should be removed"
-
-    # Check dialogue lines are unmasked correctly
-    assert unmasked["dialogue"]["lines"][0]["cn"] == "你好", "dialogue cn should be restored"
-    assert unmasked["dialogue"]["lines"][0]["py"] == "Nǐ hǎo", "dialogue py should be restored"
-    assert "_cn_masked" not in unmasked["dialogue"]["lines"][0], "masked name should be removed"
-    assert "_py_masked" not in unmasked["dialogue"]["lines"][0], "masked name should be removed"
-
-    print("  [OK] All fields correctly unmasked with original values preserved")
-
-    # Test 3: Validation passes when unmasked data is compared to original
-    print("\nTest 3: Validation should pass with correctly unmasked data")
-
-    corruption = find_translation_corruption(lesson, unmasked)
+    corruption = find_translation_corruption(lesson, response)
     assert corruption is None, f"Validation should pass but got: {corruption}"
     print("  [OK] Validation passed: no corruption detected")
 
-    # Test 4: Validation fails if fields are altered
-    print("\nTest 4: Validation correctly detects altered fields")
+def test_validation_ignores_an_ideal_but_unnecessary_echo():
+    """Even if the LLM (incorrectly, or helpfully) includes character/cn/py in its
+    response, validation must not depend on it — those fields are never read back
+    downstream, so their presence or absence must not affect the verdict."""
+    print("\nTest 4: Validation is indifferent to an unrequested character/cn/py echo")
+    lesson = _make_lesson()
+    response = {
+        "title_th": "บทเรียนครอบครัว",
+        "vocab": [{"meaning": "possessive particle", "translation_th": "อนุภาคที่แสดงความเป็นเจ้าของ", "character": "不同"}],
+        "grammar": [{
+            "title": "Possession with 的",
+            "explanation_th": "ใช้แสดงการครอบครอง",
+            "examples": [{"th": "นี่คือเพื่อนของฉัน", "cn": "completely different sentence"}],
+            "practice": {"prompt_th": ""}
+        }],
+        "dialogue": {"title_th": "บทสนทนาครอบครัว", "lines": [{"th": "สวัสดี", "cn": "something else"}]}
+    }
 
-    corrupted_response = copy.deepcopy(unmasked)
-    corrupted_response["vocab"][0]["character"] = "不同"  # Change the character
+    corruption = find_translation_corruption(lesson, response)
+    assert corruption is None, (
+        f"An LLM echoing back character/cn/py (even incorrectly) must not fail "
+        f"validation, since those fields are never used downstream. Got: {corruption}"
+    )
+    print("  [OK] Validation correctly ignores fields that aren't consumed downstream")
 
-    corruption = find_translation_corruption(lesson, corrupted_response)
-    assert corruption is not None and "character/pinyin" in corruption, f"Should detect character change, got: {corruption}"
-    print("  [OK] Correctly detected character/pinyin alteration")
+def test_validation_catches_real_translation_defects():
+    """Validation must still catch the things that actually matter: dropped
+    citations, empty/untranslated _th fields, and array-length mismatches."""
+    print("\nTest 5: Validation still catches real translation defects")
+    lesson = _make_lesson()
+    lesson["vocab"][0]["deconstruct"] = "Contains the radical '心' (xīn, heart)."
 
-    print("\n" + "="*60)
-    print("All tests passed! [OK] Field masking implementation is correct")
-    print("="*60)
+    # Missing citation in the Thai translation.
+    bad_citation = {
+        "title_th": "บทเรียนครอบครัว",
+        "vocab": [{
+            "meaning": "possessive particle",
+            "translation_th": "อนุภาคที่แสดงความเป็นเจ้าของ",
+            "deconstruct_th": "ไม่มีการอ้างอิงถึงตัวอักษรเลย",
+        }],
+        "grammar": [{
+            "title": "Possession with 的",
+            "explanation_th": "ใช้แสดงการครอบครอง",
+            "examples": [{"th": "นี่คือเพื่อนของฉัน"}],
+            "practice": {"prompt_th": ""}
+        }],
+        "dialogue": {"title_th": "บทสนทนาครอบครัว", "lines": [{"th": "สวัสดี"}]}
+    }
+    corruption = find_translation_corruption(lesson, bad_citation)
+    assert corruption is not None and "citation" in corruption, (
+        f"Should detect a dropped citation, got: {corruption}"
+    )
+    print("  [OK] Dropped citation detected")
+
+    # Array length mismatch (a vocab item silently disappeared).
+    short_vocab = copy.deepcopy(bad_citation)
+    short_vocab["vocab"] = []
+    corruption = find_translation_corruption(lesson, short_vocab)
+    assert corruption == "vocab array length changed", f"Got: {corruption}"
+    print("  [OK] Array length mismatch detected")
 
 if __name__ == "__main__":
-    test_masking_unmasking()
+    test_stripping_removes_untranslatable_fields()
+    test_stripping_does_not_affect_translatable_context()
+    test_validation_passes_on_a_well_behaved_response()
+    test_validation_ignores_an_ideal_but_unnecessary_echo()
+    test_validation_catches_real_translation_defects()
+
+    print("\n" + "="*60)
+    print("All tests passed! [OK] Strip-and-validate implementation is correct")
+    print("="*60)

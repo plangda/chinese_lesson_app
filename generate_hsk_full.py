@@ -1,4 +1,5 @@
 import os
+import sys
 import csv
 import json
 import re
@@ -9,7 +10,17 @@ import urllib.request
 import urllib.parse
 from google import genai
 from google.genai import types
+from google.genai import errors as genai_errors
 from dotenv import load_dotenv
+import json_repair
+
+# Windows consoles default to cp1252, which can't encode CJK/Thai characters
+# frequently present in error messages we print (e.g. dropped-citation
+# diagnostics) — reconfigure to UTF-8 so those prints don't crash the retry
+# loop before it can log the real error or fall back.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 # Load API key
 load_dotenv(os.path.expanduser('~/.env'))
@@ -58,19 +69,40 @@ def _raw_translate(text, target_lang="th"):
     return ""
 
 # Matches CJK ideographs, CJK/fullwidth punctuation, blank-marker underscores, and a
-# short trailing parenthetical (pinyin/gloss) directly attached to a citation —
-# anything matched here is preserved verbatim instead of sent through translation, so
-# an embedded Chinese example sentence — or its attached pinyin, e.g. '禾' (hé, grain)
-# — never gets mistranslated/dropped/garbled. The parenthetical length is capped so a
-# full English gloss sentence following the citation (e.g. "(It's snowing outside...)")
-# doesn't get swallowed as if it were part of the citation.
+# short trailing parenthetical (pinyin/gloss) directly attached to a citation. The
+# parenthetical excludes sentence-ending punctuation, so a full English gloss sentence
+# following the citation (e.g. "(This is my classmate.)" or "(It's snowing outside...)")
+# isn't swallowed as if it were part of the citation. Hyphens are allowed (unlike
+# sentence-ending punctuation) since many citations use "(pinyin - meaning)" as an
+# alternative to "(pinyin, meaning)", e.g. "'亻' (rén - person)". The 80-char cap is
+# generous headroom above the longest real gloss in this dataset (69 chars) rather than
+# a tight content boundary — the actual "don't require a whole English clause to survive
+# translation" guarantee comes from _split_citation() below, which only ever requires
+# the leading pinyin token (if any) to survive, never the attached meaning gloss.
+_CJK_GLOSS_SUFFIX = r"(?:\s*\([^.!?)]{1,80}\))?"
 _CJK_PROTECT_PATTERN = re.compile(
     r"("
-    r"'[一-鿿]+'(?:\s*\([^-,)]*\))?"
-    r"|“[^”]+”(?:\s*\([^-,)]*\))?"
-    r"|[一-鿿　-〿＀-￯_]+(?:\s*\([^-,)]*\))?"
+    r"'[一-鿿]+'" + _CJK_GLOSS_SUFFIX +
+    r"|“[^”]+”" + _CJK_GLOSS_SUFFIX +
+    r"|[一-鿿　-〿＀-￯_]+" + _CJK_GLOSS_SUFFIX +
     r")"
 )
+
+# Grammar practice prompts are answered by dragging Chinese words into the blank —
+# the drag-word pool already shows the candidate answers, so any translation/hint
+# the LLM adds is either redundant (whole-sentence gloss with the blank left blank)
+# or an outright answer leak (a gloss attached to a specific blank, e.g.
+# "你有 ___(สอง)___(个) 铅笔吗？" spells out both blanks' answers). Strip both shapes
+# instead of asking a translator to preserve them untranslated.
+_TRAILING_GLOSS_PATTERN = re.compile(r"([一-鿿　-〿＀-￯])([\"'“”]*)\s*\([^()]*\)\s*$")
+_BLANK_HINT_PATTERN = re.compile(r"(_+)\s*\([^()]*\)")
+
+def _strip_practice_prompt_gloss(prompt):
+    if not prompt:
+        return prompt
+    prompt = _BLANK_HINT_PATTERN.sub(r"\1", prompt)
+    prompt = _TRAILING_GLOSS_PATTERN.sub(r"\1\2", prompt)
+    return prompt
 
 def translate_en_to_th(text):
     if not text:
@@ -78,8 +110,13 @@ def translate_en_to_th(text):
     citations = []
 
     def replacer(m):
-        citations.append(m.group(0))
-        return f" CITEMARK{len(citations) - 1} "
+        core, tail = _split_citation(m.group(0))
+        citations.append(core)
+        # Only `core` (character + pinyin) is frozen behind the placeholder;
+        # `tail` (a free-text meaning gloss, if any) is left in place so it
+        # gets sent to Google Translate and rendered into Thai like the rest
+        # of the sentence, instead of staying stuck in English forever.
+        return f" CITEMARK{len(citations) - 1} {tail}"
 
     placeholder_text = _CJK_PROTECT_PATTERN.sub(replacer, text)
     remaining = re.sub(r"CITEMARK\d+", "", placeholder_text).strip()
@@ -114,10 +151,54 @@ def _check_field_translation(source_val, translated_val, label, errors):
     elif not citations and not contains_thai(translated_val):
         errors.append(f"{label}: Thai field has no Thai script (likely untranslated)")
 
+# Distinguishes a pinyin syllable (must survive verbatim in translation) from a
+# free-text English meaning gloss attached in the same parenthetical (fine, and
+# often better, to translate) -- e.g. in "'禾' (huò, grain/harvest)", only "huò"
+# is required to survive; "grain/harvest" is not. Toned syllables are detected
+# by their tone-mark diacritic; a handful of common neutral-tone particles in
+# this curriculum (de, le, ne...) carry no diacritic, so they're listed explicitly.
+_TONE_MARK_CHARS = "āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜÜü"
+_TONELESS_PINYIN_PARTICLES = {"de", "le", "ne", "ma", "ba", "a", "ya", "men", "er"}
+
+def _looks_like_pinyin(token):
+    token = token.strip()
+    if not token:
+        return False
+    if token.lower() in _TONELESS_PINYIN_PARTICLES:
+        return True
+    return any(ch in _TONE_MARK_CHARS for ch in token)
+
+def _split_citation(full):
+    """Split a raw _CJK_PROTECT_PATTERN match into (core, tail): `core` is the
+    part that must never be altered by translation -- the character, plus a
+    leading pinyin token if the attached parenthetical starts with one -- and
+    `tail` is everything else (a free-text meaning gloss, if any), which is
+    safe, and often preferable, to translate. Used by both the LLM-path
+    validator (which requires `core` to survive verbatim) and the
+    Google-Translate fallback (which protects only `core` from translation,
+    letting `tail` be translated normally instead of frozen in English).
+    Index-based slicing keeps core+tail == full exactly, regardless of the
+    original text's whitespace, so callers can always safely concatenate them."""
+    paren_idx = full.find("(")
+    if paren_idx == -1:
+        return full, ""
+    char_part = full[:paren_idx].rstrip()
+    inner_start = paren_idx + 1
+    inner = full[inner_start:-1]
+    first_token = re.split(r"[,\s]", inner, 1)[0]
+    if _looks_like_pinyin(first_token):
+        core_end = inner_start + len(first_token)
+        return full[:core_end], full[core_end:]
+    return char_part, full[len(char_part):]
+
 def _extract_citations(text):
     if not text:
         return []
-    return [m.group(0) for m in _CJK_PROTECT_PATTERN.finditer(text)]
+    citations = []
+    for m in _CJK_PROTECT_PATTERN.finditer(text):
+        core, _tail = _split_citation(m.group(0))
+        citations.append(core)
+    return citations
 
 def find_translation_corruption(original, translated):
     errors = []
@@ -125,8 +206,6 @@ def find_translation_corruption(original, translated):
     if len(orig_vocab) != len(new_vocab):
         return "vocab array length changed"
     for ov, tv in zip(orig_vocab, new_vocab):
-        if ov.get("character") != tv.get("character") or ov.get("pinyin") != tv.get("pinyin"):
-            return f"vocab[{ov.get('character')}]: character/pinyin field altered"
         label = f"vocab[{ov.get('character')}]"
         _check_field_translation(ov.get("meaning"), tv.get("translation_th"), f"{label}.translation_th", errors)
         _check_field_translation(ov.get("deconstruct"), tv.get("deconstruct_th"), f"{label}.deconstruct_th", errors)
@@ -141,8 +220,6 @@ def find_translation_corruption(original, translated):
         if len(orig_examples) != len(new_examples):
             return f"{label}.examples array length changed"
         for oe, te in zip(orig_examples, new_examples):
-            if oe.get("cn") != te.get("cn") or oe.get("py") != te.get("py"):
-                return f"{label}.examples: cn/py field altered"
             _check_field_translation(oe.get("en"), te.get("th"), f"{label}.examples.th", errors)
         o_prac, t_prac = og.get("practice") or {}, tg.get("practice") or {}
         _check_field_translation(o_prac.get("prompt"), t_prac.get("prompt_th"), f"{label}.practice.prompt_th", errors)
@@ -151,72 +228,33 @@ def find_translation_corruption(original, translated):
     if len(orig_lines) != len(new_lines):
         return "dialogue.lines array length changed"
     for ol, tl in zip(orig_lines, new_lines):
-        if ol.get("cn") != tl.get("cn") or ol.get("py") != tl.get("py"):
-            return "dialogue.lines: cn/py field altered"
         _check_field_translation(ol.get("en"), tl.get("th"), "dialogue.lines.th", errors)
     _check_field_translation(original.get("title"), translated.get("title_th"), "title_th", errors)
     return errors[0] if errors else None
 
-def _mask_untranslatable_fields(data):
-    """Create a deep copy with cn/py/character/pinyin renamed to masked versions.
-    This prevents the LLM from seeing and modifying these fields."""
-    masked = copy.deepcopy(data)
+def _strip_untranslatable_fields(data):
+    """Create a deep copy with cn/py/character/pinyin removed entirely.
+    These fields are never read back from the LLM response (see
+    _apply_translated_fields), so they are never sent in the first place —
+    nothing sent means nothing for the LLM to alter or mis-echo."""
+    stripped = copy.deepcopy(data)
 
-    # Mask vocab fields
-    for v in masked.get("vocab", []):
-        if "character" in v:
-            v["_character_masked"] = v.pop("character")
-        if "pinyin" in v:
-            v["_pinyin_masked"] = v.pop("pinyin")
+    for v in stripped.get("vocab", []):
+        v.pop("character", None)
+        v.pop("pinyin", None)
 
-    # Mask grammar example fields
-    for g in masked.get("grammar", []):
+    for g in stripped.get("grammar", []):
         for ex in g.get("examples", []):
-            if "cn" in ex:
-                ex["_cn_masked"] = ex.pop("cn")
-            if "py" in ex:
-                ex["_py_masked"] = ex.pop("py")
+            ex.pop("cn", None)
+            ex.pop("py", None)
 
-    # Mask dialogue line fields
-    dial = masked.get("dialogue")
+    dial = stripped.get("dialogue")
     if dial:
         for line in dial.get("lines", []):
-            if "cn" in line:
-                line["_cn_masked"] = line.pop("cn")
-            if "py" in line:
-                line["_py_masked"] = line.pop("py")
+            line.pop("cn", None)
+            line.pop("py", None)
 
-    return masked
-
-def _unmask_fields(data):
-    """Restore masked field names (cn→_cn_masked, etc.) back to originals."""
-    unmasked = copy.deepcopy(data)
-
-    # Unmask vocab fields
-    for v in unmasked.get("vocab", []):
-        if "_character_masked" in v:
-            v["character"] = v.pop("_character_masked")
-        if "_pinyin_masked" in v:
-            v["pinyin"] = v.pop("_pinyin_masked")
-
-    # Unmask grammar example fields
-    for g in unmasked.get("grammar", []):
-        for ex in g.get("examples", []):
-            if "_cn_masked" in ex:
-                ex["cn"] = ex.pop("_cn_masked")
-            if "_py_masked" in ex:
-                ex["py"] = ex.pop("_py_masked")
-
-    # Unmask dialogue line fields
-    dial = unmasked.get("dialogue")
-    if dial:
-        for line in dial.get("lines", []):
-            if "_cn_masked" in line:
-                line["cn"] = line.pop("_cn_masked")
-            if "_py_masked" in line:
-                line["py"] = line.pop("_py_masked")
-
-    return unmasked
+    return stripped
 
 def _apply_translated_fields(lesson_data, translated):
     lesson_data["title_th"] = translated.get("title_th", "")
@@ -238,11 +276,19 @@ def _apply_translated_fields(lesson_data, translated):
         for orig_line, new_line in zip(orig_dial.get("lines", []), new_dial.get("lines", [])):
             orig_line["th"] = new_line.get("th", "")
 
+class QuotaExceededError(RuntimeError):
+    """Raised when the Gemini API reports quota/rate-limit exhaustion (HTTP 429)
+    twice in a row for the same lesson. Kept distinct from ordinary translation
+    failures (bad JSON, corruption) so a batch runner can stop immediately and
+    leave the remaining lessons untouched, instead of burning through retries
+    and silently falling back to Google Translate for every lesson that follows."""
+    pass
+
 def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
     if not lesson_data:
         return
     original = copy.deepcopy(lesson_data)
-    masked_lesson = _mask_untranslatable_fields(lesson_data)
+    stripped_lesson = _strip_untranslatable_fields(lesson_data)
 
     prompt = f"""
     You are a professional Chinese-to-Thai pedagogical translator for children
@@ -254,15 +300,10 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
     -> "deconstruct_th", "explanation" -> "explanation_th", "prompt" ->
     "prompt_th", "en" -> "th", "title" -> "title_th").
 
-    CRITICAL: The JSON includes fields with names like "_character_masked", "_cn_masked",
-    "_py_masked" — these are preserved fields that must NOT be translated or modified.
-    Copy them through unchanged in the output.
-
     STRICT RULES:
     - Do NOT translate word-for-byte; use natural spoken Thai grammar.
     - Explain grammar particles by their function in Thai, not their literal name.
     - Use simple, warm, kid-friendly language, not academic/formal register.
-    - NEVER modify fields named "_*_masked" — copy them through unchanged.
     - Any Chinese characters or pinyin cited inside an English field (e.g. '禾' (hé, grain))
       MUST be preserved byte-for-byte, identical, inside the translated Thai field.
     - Return the EXACT SAME JSON structure and field names as the input, with
@@ -271,9 +312,10 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
     - Output valid JSON only. No markdown code fences, no extra commentary.
 
     Lesson JSON:
-    {json.dumps(masked_lesson, ensure_ascii=False)}
+    {json.dumps(stripped_lesson, ensure_ascii=False)}
     """
 
+    consecutive_quota_errors = 0
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
@@ -286,16 +328,35 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
             if text.startswith("```"):
                 text = re.sub(r"^```(?:json)?\n?", "", text)
                 text = re.sub(r"\n?```$", "", text)
-            translated = json.loads(text)
-            # Unmask the LLM response to restore original field names
-            translated = _unmask_fields(translated)
+            try:
+                translated = json.loads(text)
+            except json.JSONDecodeError as e:
+                snippet = text[max(0, e.pos - 40):e.pos + 40]
+                print(f"  [Thai LLM translation] json.loads failed ({e}); "
+                      f"near: {snippet!r}. Retrying with json_repair.")
+                translated = json_repair.loads(text)
             corruption = find_translation_corruption(original, translated)
             if corruption:
                 raise ValueError(f"Translation corruption detected: {corruption}")
             _apply_translated_fields(lesson_data, translated)
             lesson_data["_th_source"] = "llm"
             return
+        except genai_errors.APIError as e:
+            if e.code == 429:
+                consecutive_quota_errors += 1
+                if consecutive_quota_errors >= 2:
+                    raise QuotaExceededError(
+                        f"Gemini quota/rate limit hit twice in a row while translating "
+                        f"'{original.get('id', original.get('title'))}': {e}"
+                    ) from e
+                print(f"  [Thai LLM translation attempt {attempt+1}/{max_retries}] "
+                      f"quota/rate limit hit ({e}); backing off 60s before retry.")
+                time.sleep(60)
+                continue
+            print(f"  [Thai LLM translation attempt {attempt+1}/{max_retries} failed] {e}")
+            time.sleep(5)
         except Exception as e:
+            consecutive_quota_errors = 0
             print(f"  [Thai LLM translation attempt {attempt+1}/{max_retries} failed] {e}")
             time.sleep(5)
 
@@ -407,7 +468,7 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
                     {{"cn": "...", "py": "...", "en": "..."}}
                 ],
                 "practice": {{
-                    "prompt": "MUST embed a complete example sentence in Chinese with the blank shown as '___', e.g. 'Fill in the blank: 今天天气___热。'. Do NOT write a generic instruction with no sentence.",
+                    "prompt": "MUST embed a complete example sentence in Chinese with the blank shown as '___', e.g. 'Fill in the blank: 今天天气___热。'. Do NOT write a generic instruction with no sentence. Do NOT add any parenthetical translation or hint anywhere in this field — not after the whole sentence, and NEVER attached to an individual blank (e.g. '你有 ___(two)___(个) 铅笔吗？' is forbidden because it spells out the answer for each blank). The student answers using the words list alone; no translation is needed.",
                     "words": ["word1", "word2"],
                     "answer": ["word1"] // MUST be non-empty and every element MUST also appear in "words", in the order needed to fill the blank(s).
                 }}
@@ -428,7 +489,17 @@ def generate_lesson_content(words_chunk, day_number, hsk_level="hsk2", theme_nam
         model=GENERATION_MODEL, contents=prompt, config=JSON_CONFIG
     )
     try:
-        data = json.loads(response.text)
+        try:
+            data = json.loads(response.text)
+        except json.JSONDecodeError as e:
+            snippet = response.text[max(0, e.pos - 40):e.pos + 40]
+            print(f"Day {day_number}: json.loads failed ({e}); "
+                  f"near: {snippet!r}. Retrying with json_repair.")
+            data = json_repair.loads(response.text)
+        for g in data.get("grammar", []):
+            practice = g.get("practice")
+            if practice and practice.get("prompt"):
+                practice["prompt"] = _strip_practice_prompt_gloss(practice["prompt"])
         # Validation checks
         if "vocab" not in data or "grammar" not in data or "dialogue" not in data:
             raise ValueError("Missing core section (vocab, grammar, dialogue)")

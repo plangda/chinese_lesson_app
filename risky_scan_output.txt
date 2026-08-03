@@ -1,0 +1,493 @@
+123 EN fields contain a risky homograph-prone term:
+
+[hsk1_day2] vocab.meaning(吗) matched "particle"
+  EN: 'question particle (for yes/no questions)'
+  TH: 'ไหม, หรือเปล่า (คำลงท้ายประโยคคำถาม)'
+
+[hsk1_day2] vocab.meaning(呢) matched "particle"
+  EN: "question particle (for 'how about...' or rhetorical questions)"
+  TH: 'ล่ะ, แล้ว...ล่ะ (คำลงท้ายถามกลับ)'
+
+[hsk1_day2] grammar.explanation(Verb 是 (shì) - To Be / Is / Am / Are) matched "subject"
+  EN: "是 (shì) is a fundamental verb in Chinese, equivalent to 'to be' in English. It is used to express identity, make affirmations, and describe attributes. Unlike English, 是 does not change form based on "
+  TH: "คำว่า 是 (shì) เป็นคำกริยาพื้นฐานที่สำคัญมากๆ ในภาษาจีน เทียบได้กับคำว่า 'เป็น/คือ' ในภาษาไทยเลยล่ะ! เราใช้คำนี้เพื่อบอกตัวตน ยอมรับ หรืออธิบายลักษณะต่างๆ และข้อดีสุดเจ๋งคือ ภาษาจีนไม่ต้องผันกริยาตามปร"
+
+[hsk1_day2] grammar.explanation(Asking Questions with 什么 (shénme), 谁 (shéi), and Question Particles 吗 (ma), 呢 (ne)) matched "particle"
+  EN: "Chinese uses various words and particles to form questions. \n- 什么 (shénme) means 'what'.\n- 谁 (shéi) means 'who'.\n- 吗 (ma) is a particle placed at the end of a statement to turn it into a yes/no questi"
+  TH: "ในภาษาจีนมีคำและคำลงท้ายเจ๋งๆ หลายคำเลยที่ใช้สร้างประโยคคำถาม มาดูกันเลย:\n- 什么 (shénme) แปลว่า 'อะไร'\n- 谁 (shéi) แปลว่า 'ใคร'\n- 吗 (ma) เป็นคำลงท้ายประโยคที่ใช้วางท้ายประโยคบอกเล่า เพื่อเปลี่ยนให้เป็นค"
+
+[hsk1_day3] vocab.deconstruct(人) matched "character"
+  EN: 'It is a graphic character showing the appearance of a person standing on the side.'
+  TH: 'เป็นอักษรภาพที่แสดงให้เห็นรูปคนกำลังยืนจากด้านข้างล่ะ'
+
+[hsk1_day3] vocab.deconstruct(爸爸|爸) matched "character"
+  EN: "The character '父' (fù) is the root word for father, and '巴' (bā) serves as the phonological component."
+  TH: "ตัวอักษร '父' (fù) เป็นรากศัพท์ที่แปลว่า พ่อ ส่วนตัว '巴' (bā) นำมาใช้เป็นส่วนช่วยออกเสียงนะเด็กๆ"
+
+[hsk1_day3] vocab.deconstruct(妈妈|妈) matched "character"
+  EN: "The character '女' (nǚ) means feminine, while '马' (mǎ) serves as the phonological component."
+  TH: "ตัวอักษร '女' (nǚ) หมายถึง ผู้หญิง ส่วนตัว '马' (mǎ) นำมาใช้เป็นส่วนช่วยออกเสียงจ้า"
+
+[hsk1_day3] vocab.deconstruct(儿子) matched "character"
+  EN: "The character '儿' (ér) means son or boy, and '子' (zǐ) means son or child."
+  TH: "ตัวอักษร '儿' (ér) หมายถึง ลูกชาย หรือ เด็กชาย และตัว '子' (zǐ) หมายถึง ลูก หรือ เด็ก"
+
+[hsk1_day3] vocab.deconstruct(女儿) matched "character"
+  EN: "The character '女' (nǚ) means woman and '儿' (ér) which in this context means child."
+  TH: "ตัวอักษร '女' (nǚ) หมายถึง ผู้หญิง และ '儿' (ér) ในที่นี้หมายถึง ลูก หรือ เด็ก"
+
+[hsk1_day3] grammar.explanation(Possession with '的' (de)) matched "particle"
+  EN: "The particle '的' (de) is used to indicate possession or a descriptive relationship between a noun/pronoun and a noun. It is placed between the possessor/describer and the possessed/described item. Oft"
+  TH: "คำว่า '的' (de) เป็นคำช่วยที่ใช้เพื่อแสดงความเป็นเจ้าของ หรือใช้บอกลักษณะความสัมพันธ์ระหว่างสิ่งสองสิ่งจ้า โดยเราจะวาง '的' ไว้ตรงกลางระหว่าง 'เจ้าของ' และ 'สิ่งของ' (เช่น ของฉัน, ของคุณ) แต่ถ้าหากความส"
+
+[hsk1_day3] grammar.title(None) matched "measure"
+  EN: "Using '口' (kǒu) as a Measure Word for Family Members"
+  TH: "การใช้ '口' (kǒu) เป็นลักษณนามสำหรับสมาชิกในครอบครัว"
+
+[hsk1_day3] grammar.explanation(Using '口' (kǒu) as a Measure Word for Family Members) matched "measure"
+  EN: "'口' (kǒu), meaning 'mouth', is commonly used as a specific measure word for counting the number of people in a family. It implies the number of 'mouths to feed' in a household. The structure is: Numbe"
+  TH: "คำว่า '口' (kǒu) ปกติจะแปลว่า 'ปาก' แต่ในภาษาจีนเรานิยมนำมาใช้เป็นคำลักษณนามเฉพาะเพื่อบอกจำนวนสมาชิกในครอบครัวด้วยนะ เปรียบเสมือนการนับจำนวน 'ปากท้องที่จะต้องเลี้ยงดู' ในบ้านนั่นเองจ้า โครงสร้างง่ายๆ ก"
+
+[hsk1_day4] grammar.explanation(Expressing Possession with "的" (de)) matched "particle"
+  EN: '"的" (de) is a particle used to indicate possession or a modifying relationship. It links the possessor (or modifier) to the possessed (or modified noun). While often omitted for close family members i'
+  TH: 'คำว่า "的" (de) เป็นคำช่วยที่ใช้เพื่อแสดงความเป็นเจ้าของ หรือใช้ขยายคำนาม โดยจะทำหน้าที่เชื่อมระหว่าง \'เจ้าของ\' กับ \'สิ่งของที่เป็นเจ้าของ\' (เหมือนคำว่า \'ของ\' ในภาษาไทย) สำหรับคนในครอบครัวที่สนิทกัน เว'
+
+[hsk1_day5] vocab.deconstruct(零) matched "character"
+  EN: "The character '零' consists of the parts '雨' (rain) and '令' (order), denoting emptiness or zero."
+  TH: "ตัวอักษร '零' ประกอบด้วยส่วนประกอบ '雨' (rain) และ '令' (order) สื่อถึงความว่างเปล่าหรือเลขศูนย์"
+
+[hsk1_day5] vocab.deconstruct(个) matched "classifier"
+  EN: "Consisting of '人' (person) and '丨' (single dash), it refers to a single person or thing. Used as a general classifier"
+  TH: "ประกอบด้วย '人' (person) และ '丨' (single dash) หมายถึงคนหรือสิ่งของชิ้นเดี่ยวๆ ใช้เป็นคำลักษณนามทั่วไปที่เราเจอได้บ่อยที่สุดเลย!"
+
+[hsk1_day5] grammar.title(None) matched "classifier"
+  EN: "Using numbers with the general classifier '个 (gè)'"
+  TH: "การใช้ตัวเลขคู่กับคำลักษณนามทั่วไป '个 (gè)'"
+
+[hsk1_day5] grammar.explanation(Using numbers with the general classifier '个 (gè)') matched "classifier"
+  EN: "In Chinese, when counting the number of things or people We usually use the form 'number + classifier + noun', where '个 (gè)' is the most commonly used classifier and can be used for many types of nou"
+  TH: "ในภาษาจีน เวลาเราอยากบอกจำนวนของคนหรือสิ่งของ เรามักจะเรียงประโยคแบบนี้เลยจ้า: 'ตัวเลข + คำลักษณนาม + คำนาม' โดยคำว่า '个 (gè)' ถือเป็นคำลักษณนามที่สารพัดประโยชน์และใช้บ่อยที่สุด ใช้บอกจำนวนของคน สิ่งข"
+
+[hsk1_day5] grammar.explanation(Using the numbers '零 (líng)' and '二 (èr)' with '两 (liǎng)') matched "class"
+  EN: "'零 (líng)' means zero, used like normal zero. \n '二 (èr)' is used in counting sequences (such as second class) or in more complex numbers. \n '两 (liǎng)' is used when saying 'two' in a number of things "
+  TH: "'零 (líng)' แปลว่า ศูนย์ ใช้บอกเลขศูนย์ทั่วไปเลยจ้า\n '二 (èr)' จะใช้เวลาเรานับเลขเรียงลำดับ (เช่น ชั้นที่สอง หรือ ห้องเบอร์สอง) หรือใช้ในตัวเลขหลายๆ หลัก\n '两 (liǎng)' จะใช้เมื่อเราต้องการบอกจำนวนของคนหร"
+
+[hsk1_day6] vocab.deconstruct(千) matched "stroke"
+  EN: "The character '千' resembles a '人' (rén, person) with an extra horizontal stroke, often associated with a large number, like a thousand people standing together."
+  TH: "ตัวอักษร '千' ดูคล้ายกับตัว '人' (rén, person) ที่มีขีดแนวนอนเพิ่มขึ้นมาหนึ่งขีด มักจะสื่อถึงจำนวนที่เยอะมากๆ เหมือนมีคนมาสิบคนร้อยคนยืนรวมกันจนเป็นหลักพันคนเลยทีเดียว!"
+
+[hsk1_day6] vocab.deconstruct(两) matched "measure"
+  EN: "Composed of '入' (rù, enter) and '人' (rén, person) above '乙' (yǐ, second/bend). Often used as a general quantity word for 'two' before measure words."
+  TH: "ประกอบด้วย '入' (rù, enter) และ '人' (rén, person) ที่อยู่เหนือตัว '乙' (yǐ, second/bend) มักใช้ทำหน้าที่บอกจำนวนว่า 'สอง' เวลาอยู่หน้าคำลักษณนามจ้า"
+
+[hsk1_day6] vocab.deconstruct(少) matched "stroke"
+  EN: "Derived from '小' (xiǎo, small) with a dot or a stroke, indicating a small quantity or reduction."
+  TH: "ดัดแปลงมาจากตัวอักษร '小' (xiǎo, small) โดยเพิ่มจุดหรือขีดเข้าไป เพื่อบอกถึงปริมาณที่น้อยลงหรือเล็กน้อยจ้ะ"
+
+[hsk1_day6] vocab.deconstruct(块) matched "measure"
+  EN: "Composed of '土' (tǔ, earth/soil) and '夬' (guài, decisive/split). It depicts a piece of earth, signifying a 'chunk' or 'piece'. It is also a common informal measure word for Chinese currency, similar t"
+  TH: "ประกอบด้วย '土' (tǔ, earth/soil) และ '夬' (guài, decisive/split) สื่อถึงก้อนดิน ซึ่งหมายถึง 'ก้อน' หรือ 'ชิ้น' นอกจากนี้ยังนิยมใช้เป็นคำลักษณนามแบบเป็นกันเองสำหรับหน่วยเงินจีนด้วยนะ คล้ายๆ กับคำว่า 'บาท"
+
+[hsk1_day6] grammar.explanation(Saying 'Two': 两 (liǎng) vs. 二 (èr)) matched "measure"
+  EN: "Both 两 (liǎng) and 二 (èr) mean 'two', but they are used in different contexts.\n- 二 (èr) is used when counting numbers sequentially (一, 二, 三...), in phone numbers, in mathematical calculations, and wit"
+  TH: "คำว่า 两 (liǎng) และ 二 (èr) ต่างก็แปลว่า 'สอง' เหมือนกันเลยจ้า แต่ว่าเราจะใช้ในสถานการณ์ที่ต่างกันนะ:\n- 二 (èr) จะใช้เวลาที่เราท่องเลขเรียงลำดับ (一, 二, 三...), ใช้ในเบอร์โทรศัพท์, การคำนวณเลข, หรือใช้ในเ"
+
+[hsk1_day6] grammar.explanation(Asking 'How Many/How Much': 多少 (duōshao) vs. 几 (jǐ)) matched "measure"
+  EN: 'Both 多少 (duōshao) and 几 (jǐ) are used to ask about quantity, but with different implications.\n- 几 (jǐ) is generally used to ask about a small, indefinite number, usually implying a quantity under ten '
+  TH: 'ทั้งคำว่า 多少 (duōshao) และ 几 (jǐ) ใช้ถามเกี่ยวกับจำนวนเหมือนกัน แต่มีข้อแตกต่างกันนิดหน่อยนะเด็กๆ:\n- 几 (jǐ) มักจะใช้ถามถึงจำนวนที่น้อยๆ (ปกติแล้วจะน้อยกว่าสิบ) เช่น 你有几本书？ เธอมีหนังสืออยู่กี่เล่มเหรอ?'
+
+[hsk1_day7] vocab.deconstruct(年) matched "stem"
+  EN: "Composed of '禾' (huò, grain/harvest) and '干' (gān, dry/stem), which means the crop matures once a year."
+  TH: "ประกอบด้วย '禾' (huò, grain/harvest) และ '干' (gān, dry/stem) ซึ่งหมายความว่าพืชจะเจริญเติบโตปีละครั้ง"
+
+[hsk1_day7] grammar.explanation(表达“今天、昨天、明天” (Expressing 'Today, Yesterday, Tomorrow')) matched "subject"
+  EN: 'These three words are common words used to express a point in time. They are usually placed at the beginning of a sentence or after the subject to indicate when an action occurs.'
+  TH: 'สามคำนี้เป็นคำทั่วไปที่ใช้เพื่อแสดงจุดในเวลา โดยปกติจะวางไว้ที่จุดเริ่มต้นของประโยคหรือหลังประธานเพื่อระบุว่าการกระทำใดเกิดขึ้น'
+
+[hsk1_day9] vocab.deconstruct(早上) matched "initial"
+  EN: "Combines 早 (early) with 上 (up/on), indicating the 'upper' or initial part of the day."
+  TH: "รวม 早 (ช่วงเช้า) กับ 上 (ขึ้น/บน) เพื่อระบุ 'ส่วนบน' หรือส่วนเริ่มต้นของวัน"
+
+[hsk1_day9] vocab.deconstruct(晚上) matched "initial"
+  EN: "Combines 晚 (late/night) with 上 (up/on), indicating the 'upper' or initial part of the evening/night."
+  TH: "รวม 晚 (ดึก/กลางคืน) กับ 上 (ขึ้น/เปิด) เพื่อบ่งชี้ 'บน' หรือส่วนเริ่มต้นของตอนเย็น/กลางคืน"
+
+[hsk1_day9] grammar.explanation(Expressing Actions at Different Times of Day) matched "subject"
+  EN: 'In Chinese, time expressions like 早上 (morning), 上午 (a.m.), 中午 (noon), 下午 (p.m.), and 晚上 (evening/night) usually come *before* the verb or action. The basic structure is: Subject + Time Expression + Ve'
+  TH: 'ในภาษาจีน สำนวนเวลา เช่น 早上 (เช้า), 上午 (a.m.), 中午 (เที่ยง), 下午 (น.) และ 晚上 (เย็น/กลางคืน) มักจะมา *ก่อน* กริยาหรือการกระทำ โครงสร้างพื้นฐานคือ ประธาน + นิพจน์เวลา + กริยา/การกระทำ'
+
+[hsk1_day9] grammar.explanation(Using '她们' (They - Female) with Daily Activities) matched "subject"
+  EN: "The pronoun 她们 (tāmen) means 'they' specifically referring to females. It can be used as the subject of a sentence to describe what a group of females do. The sentence structure is: Subject (她们) + (Ti"
+  TH: "สรรพนาม 她们 (tāmen) หมายถึง 'พวกเขา' โดยเฉพาะหมายถึงผู้หญิง สามารถใช้เป็นประธานในประโยคเพื่ออธิบายสิ่งที่ผู้หญิงกลุ่มหนึ่งทำ โครงสร้างประโยคคือ: ประธาน (她们) + (สำนวนเวลา) + กริยา/การกระทำ"
+
+[hsk1_day10] grammar.title(None) matched "subject"
+  EN: 'Basic Sentence Structure: Subject + Verb + Object'
+  TH: 'โครงสร้างประโยคพื้นฐาน: ประธาน + กริยา + วัตถุ'
+
+[hsk1_day10] grammar.explanation(Basic Sentence Structure: Subject + Verb + Object) matched "subject"
+  EN: 'In Chinese, a basic sentence often follows the Subject + Verb + Object (SVO) order, similar to English. This is crucial for expressing actions like eating or drinking. Mastering this simple structure '
+  TH: 'ในภาษาจีน ประโยคพื้นฐานมักจะเป็นไปตามลำดับประธาน + กริยา + วัตถุ (SVO) คล้ายกับภาษาอังกฤษ นี่เป็นสิ่งสำคัญในการแสดงการกระทำ เช่น การรับประทานอาหารหรือการดื่ม การเรียนรู้โครงสร้างที่เรียบง่ายนี้จะช่วยใ'
+
+[hsk1_day11] vocab.deconstruct(面条儿) matched "measure"
+  EN: "面 (miàn) means 'flour' or 'noodles', 条 (tiáo) is a measure word for long, thin objects, and 儿 (ér) is a diminutive suffix, often indicating a slightly softer pronunciation in some dialects."
+  TH: "เลดี้ (miàn) หมายถึง 'แป้ง' หรือ 'บะหมี่' 条 (tiáo) เป็นคำที่ใช้วัดวัตถุที่ยาวและบาง และ 儿 (ér) เป็นคำต่อท้ายจิ๋ว ซึ่งมักบ่งบอกถึงการออกเสียงที่เบากว่าเล็กน้อยในภาษาถิ่นบางภาษา"
+
+[hsk1_day11] vocab.deconstruct(问) matched "character"
+  EN: "The character consists of 门 (mén), meaning 'door' or 'gate', and 口 (kǒu), meaning 'mouth'. This combination visually suggests asking questions at a gate or entrance."
+  TH: "ตัวอักษรประกอบด้วย 门 (mén) แปลว่า 'ประตู' หรือ 'ประตู' และ 口 (kǒu) แปลว่า 'ปาก' การรวมกันนี้แสดงให้เห็นการถามคำถามที่ประตูหรือทางเข้าด้วยสายตา"
+
+[hsk1_day11] grammar.explanation(“很 + 形容词” (hěn + adjective) - Adjective as Predicate) matched "degree"
+  EN: "In Chinese, when an adjective is used as a predicate, '很' (hěn) usually needs to be added in front of it. '很' placed before an adjective usually does not indicate the degree of “非常”, but only serves a"
+  TH: "ในภาษาจีน เมื่อใช้คำคุณศัพท์เป็นภาคแสดง โดยปกติแล้วจะต้องเพิ่ม '很' (hěn) นำหน้าคำคุณศัพท์  '很' ที่วางหน้าคำคุณศัพท์มักจะไม่ได้ระบุระดับของ “非常” แต่ทำหน้าที่เป็นลิงก์เพื่อทำให้โครงสร้างประโยคสมบูรณ์ยิ่"
+
+[hsk1_day12] vocab.deconstruct(店) matched "character"
+  EN: 'An independent Chinese character, often referring to a small shop, or as a component of a compound word.'
+  TH: 'ตัวอักษรจีนอิสระ มักหมายถึงร้านค้าเล็กๆ หรือเป็นส่วนประกอบของคำประสม'
+
+[hsk1_day13] grammar.explanation('在' (zài) + 地点 (location) (Using 'zài' with locations)) matched "subject"
+  EN: "The preposition '在 (zài)' means 'at', 'in', or 'on'. It is used before a location word to indicate where an action happens or where something is located. The basic structure is: Subject + 在 + Location"
+  TH: "คำบุพบท '在 (zài)' แปลว่า 'at', 'in' หรือ 'on' ใช้นำหน้าคำระบุสถานที่เพื่อระบุว่ามีการกระทำเกิดขึ้นที่ไหนหรืออยู่ที่ไหน โครงสร้างพื้นฐานคือ: ประธาน + 在 + ตำแหน่ง + (คำกริยาวลี) หากเพียงระบุถึงการมีอยู่"
+
+[hsk1_day14] vocab.deconstruct(些) matched "measure"
+  EN: "此 (this) + 皿 (dish), originally meaning 'to move slowly' or 'hesitate'. Now used as a measure word."
+  TH: "此 (นี่) + 皿 (จาน) เดิมหมายถึง 'เคลื่อนช้าๆ' หรือ 'ลังเล' ตอนนี้ใช้เป็นคำวัด"
+
+[hsk1_day14] grammar.explanation(在哪里？(Zài nǎlǐ?) - Where is it?) matched "subject"
+  EN: 'To express location in Chinese, we often use the structure: Subject + 在 (zài) + Location. The location can be a place noun or a place noun combined with a directional word like 里 (lǐ), 外 (wài), 上 (shà'
+  TH: 'ในการแสดงตำแหน่งในภาษาจีน เรามักใช้โครงสร้าง: ประธาน + 在 (zài) + ตำแหน่ง ตำแหน่งอาจเป็นคำนามสถานที่หรือคำนามสถานที่รวมกับคำบอกทิศทาง เช่น 里 (lǐ), 外 (wài), 上 (shàng), 下 (xià), 前 (qián), 后 (hòu) หรือ 边 '
+
+[hsk1_day14] grammar.explanation(住在中国 (Zhù zài Zhōngguó) - Living in China) matched "subject"
+  EN: 'To specifically talk about where someone lives or resides, we use the verb 住 (zhù). The structure is: Subject + 住 (zhù) + 在 (zài) + Location. It emphasizes the action of dwelling.'
+  TH: 'หากต้องการพูดถึงสถานที่ที่บุคคลอาศัยอยู่หรืออาศัยอยู่โดยเฉพาะ เราใช้คำกริยา 住 (zhù) โครงสร้างคือ: ประธาน + 住 (zhù) + 在 (zài) + ตำแหน่ง เน้นการกระทำของการอยู่อาศัย'
+
+[hsk1_day15] vocab.deconstruct(去) matched "character"
+  EN: "The character depicts a person with a foot leaving, often interpreted as 'going away'. The top part resembles the radical 土 (earth) and the bottom 厶 (private/myself), indicating 'leaving one's own spa"
+  TH: 'ตัวละครนี้พรรณนาถึงบุคคลที่ก้าวเท้าออกไป ซึ่งมักตีความว่าเป็น "การจากไป" ส่วนบนมีลักษณะเป็นรูปราก 土 (ดิน) และด้านล่าง 厶 (ส่วนตัว/ตัวฉันเอง) บ่งบอกว่า \'ออกจากพื้นที่ของตัวเอง\''
+
+[hsk1_day15] vocab.deconstruct(来) matched "character"
+  EN: "The character for 'come' is an ancient pictograph resembling a stalk of wheat or grain, which 'comes' to maturity or is harvested. It symbolizes 'arrival'."
+  TH: "ตัวอักษรของคำว่า 'มา' เป็นรูปสัญลักษณ์โบราณที่มีลักษณะคล้ายก้านข้าวสาลีหรือเมล็ดพืช ซึ่ง 'มาถึง' โตเต็มที่หรือเก็บเกี่ยวแล้ว มันเป็นสัญลักษณ์ของ 'การมาถึง'"
+
+[hsk1_day15] vocab.deconstruct(回) matched "character"
+  EN: "The character is an ideogram depicting a spiral or something returning to its origin. It looks like an outer box enclosing an inner box, symbolizing 'returning'."
+  TH: "ตัวละครเป็นอุดมคติที่แสดงถึงเกลียวหรือบางสิ่งที่กลับคืนสู่ต้นกำเนิด ดูเหมือนกล่องด้านนอกล้อมรอบกล่องด้านในซึ่งเป็นสัญลักษณ์ของ 'การกลับมา'"
+
+[hsk1_day15] vocab.deconstruct(到) matched "final"
+  EN: 'Composed of 至 (zhì - to arrive, to reach) and 刀 (dāo - knife). 至 itself conveys the meaning of arrival, while 刀 might emphasize a decisive or final arrival point.'
+  TH: 'ประกอบด้วย 至 (zhì - มาถึง, ไปถึง) และ 刀 (dāo - มีด) 至 สื่อถึงความหมายของการมาถึง ในขณะที่ 刀 อาจเน้นถึงจุดชี้ขาดหรือจุดสิ้นสุดสุดท้าย'
+
+[hsk1_day15] vocab.deconstruct(坐) matched "character"
+  EN: "The character shows two people (两人) sitting on the ground (土). It literally means 'to sit' and figuratively 'to take' a form of transport."
+  TH: "ตัวละครแสดงคนสองคน (两人) นั่งอยู่บนพื้น (土) แท้จริงแล้วหมายถึง 'นั่ง' และเปรียบเปรย 'ใช้' รูปแบบการขนส่ง"
+
+[hsk1_day15] vocab.deconstruct(开) matched "character"
+  EN: "The character depicts two hands (廾, an ancient radical for hands) pulling something apart, symbolizing 'to open' or 'to start'."
+  TH: "ตัวละครแสดงให้เห็นมือทั้งสองข้าง (廾 ซึ่งเป็นคำโบราณที่แปลว่ามือ) กำลังดึงบางสิ่งบางอย่างออกจากกัน ซึ่งเป็นสัญลักษณ์ของ 'เปิด' หรือ 'เริ่มต้น'"
+
+[hsk1_day16] vocab.meaning(课) matched "class"
+  EN: 'class; lesson; course; subject; levy'
+  TH: 'บทเรียน, คาบเรียน, วิชา'
+
+[hsk1_day16] vocab.deconstruct(上课) matched "class"
+  EN: "Combines '上' (up/attend) and '课' (class). To go to/start class."
+  TH: "รวม '上' (ขึ้น/เข้าร่วม) และ '课' (ชั้นเรียน) เพื่อไป/เริ่มชั้นเรียน"
+
+[hsk1_day16] vocab.meaning(上课) matched "class"
+  EN: 'attend class; go to class; give a class'
+  TH: 'เข้าเรียน, สอนหนังสือ'
+
+[hsk1_day16] vocab.deconstruct(下课) matched "class"
+  EN: "Combines '下' (down/finish) and '课' (class). Class finishes."
+  TH: "รวม '下' (ลง/จบ) และ '课' (คลาส) ชั้นเรียนเสร็จสิ้น"
+
+[hsk1_day16] vocab.meaning(下课) matched "class"
+  EN: 'finish class; class is over; dismiss the class'
+  TH: 'เลิกเรียน, พักเรียน'
+
+[hsk1_day16] grammar.explanation(是 (shì)... 吗 (ma)? - Asking Questions) matched "particle"
+  EN: '是 (shì) means "to be" (am, is, are). 吗 (ma) is a question particle placed at the end of a statement to turn it into a yes/no question. The structure is: Subject + 是 + Noun + 吗?'
+  TH: '是 (shì) แปลว่า "เป็น" (เป็น, เป็น, เป็น) 吗 (ma) เป็นคำนามคำถามที่อยู่ท้ายประโยคเพื่อเปลี่ยนเป็นคำถามใช่หรือไม่ใช่ โครงสร้างคือ: ประธาน + 是 + คำนาม + 吗?'
+
+[hsk1_day16] grammar.explanation(Verbs for Learning Activities: 学习, 读书, 上课, 上学) matched "class"
+  EN: "This lesson introduces several verbs related to studying and going to school:\n- 学习 (xuéxí): General 'to study' or 'to learn'. Can take an object (e.g., 学习汉语).\n- 读书 (dúshū): Literally 'read books', but"
+  TH: "บทเรียนนี้จะแนะนำคำกริยาหลายคำที่เกี่ยวข้องกับการเรียนและการไปโรงเรียน:\n- 学习 (xuéxí): ทั่วไป 'เรียน' หรือ 'เรียนรู้' สามารถรับสิ่งของได้ (เช่น 学习汉语)\n- 读书 (dúshū): แปลตรงตัวว่า 'อ่านหนังสือ' แต่มักหมาย"
+
+[hsk1_day17] vocab.deconstruct(汉字) matched "character"
+  EN: '汉 (Hàn) refers to the Han ethnic group. 字 (zì) means character or word.'
+  TH: '汉 (Hàn) หมายถึง กลุ่มชาติพันธุ์ฮั่น 字 (zì) หมายถึง ตัวอักษรหรือคำ'
+
+[hsk1_day17] vocab.meaning(字) matched "character"
+  EN: 'word; character; be betrothed'
+  TH: 'คำ; ตัวอักษร'
+
+[hsk1_day17] grammar.title(None) matched "complement"
+  EN: 'Resultative Complement: Verb + 见 (jiàn)'
+  TH: 'ส่วนเสริมผลลัพธ์: กริยา + 见 (jiàn)'
+
+[hsk1_day17] grammar.explanation(Resultative Complement: Verb + 见 (jiàn)) matched "complement"
+  EN: 'The character 见 (jiàn) can be used as a resultative complement after certain verbs, most commonly 听 (tīng) and 看 (kàn). It indicates that the action of the verb has successfully resulted in perception'
+  TH: "อักขระ 见 (jiàn) สามารถใช้เป็นส่วนเสริมเชิงผลลัพธ์ตามหลังคำกริยาบางคำ โดยทั่วไปคือ 听 (tīng) และ 看 (kàn) แสดงว่าการกระทำของกริยามีผลให้เกิดการรับรู้ได้สำเร็จ 听见 (tīngjiàn) แปลว่า 'ได้ยินสำเร็จ' และ 看见 ("
+
+[hsk1_day17] grammar.explanation(说 (shuō) vs. 说话 (shuōhuà)) matched "object"
+  EN: "Both 说 (shuō) and 说话 (shuōhuà) mean 'to speak' or 'to talk', but they are used in slightly different contexts. 说 (shuō) is often followed by an object (e.g., a language, a topic, a sentence) and empha"
+  TH: "ทั้ง说 (shuō) และ 说话 (shuōhuà) หมายถึง 'พูด' หรือ 'พูด' แต่จะใช้ในบริบทที่แตกต่างกันเล็กน้อย 说 (shuō) มักตามด้วยวัตถุ (เช่น ภาษา หัวข้อ ประโยค) และเน้น *สิ่งที่* กำลังพูด 说话 (shuōhuà) เป็นคำกริยาอกรรมก"
+
+[hsk1_day18] vocab.deconstruct(的) matched "particle"
+  EN: 'Composed of 白 (bái, white) and 勺 (sháo, ladle). Often used as a possessive particle.'
+  TH: 'ประกอบด้วย 白 (ไป่ สีขาว) และ 勺 (เฉา ทัพพี) มักใช้เป็นอนุภาคแสดงความเป็นเจ้าของ'
+
+[hsk1_day18] vocab.deconstruct(本) matched "stroke"
+  EN: "Originates from 木 (mù, wood/tree) with an added horizontal stroke at the bottom indicating the 'root' or 'basis'. As a classifier, it's used for books."
+  TH: "มาจากคำว่า 木 (mù, ไม้/ต้นไม้) โดยมีเส้นขีดแนวนอนเพิ่มที่ด้านล่างเพื่อระบุถึง 'ราก' หรือ 'ฐาน' ใช้เป็นลักษณนามสำหรับหนังสือ"
+
+[hsk1_day18] grammar.title(None) matched "particle"
+  EN: "The Possessive Particle '的 (de)'"
+  TH: "อนุภาคแห่งความเป็นเจ้าของ '的 (de)'"
+
+[hsk1_day18] grammar.explanation(The Possessive Particle '的 (de)') matched "particle"
+  EN: '的 (de) is a structural particle used to indicate possession or a modifying relationship. It is placed between the possessor/modifier and the possessed/modified noun. For personal pronouns and nouns re'
+  TH: '的 (de) เป็นอนุภาคโครงสร้างที่ใช้บ่งชี้การครอบครองหรือการเปลี่ยนแปลงความสัมพันธ์ อยู่ระหว่างคำนามผู้ครอบครอง/ผู้แก้ไข และคำนามผู้ครอบครอง/ผู้แก้ไข สำหรับคำสรรพนามส่วนตัวและคำนามที่อ้างถึงบุคคล 的 มักจะถ'
+
+[hsk1_day18] grammar.title(None) matched "measure"
+  EN: 'Classifiers (Measure Words)'
+  TH: 'ตัวแยกประเภท (คำวัด)'
+
+[hsk1_day18] grammar.explanation(Classifiers (Measure Words)) matched "classifier"
+  EN: "In Chinese, a classifier (or measure word) must be used between a number and a noun. Each noun typically has one or more associated classifiers. For example, '本 (běn)' is a common classifier for books"
+  TH: "ในภาษาจีน ต้องใช้ตัวแยกประเภท (หรือคำที่ใช้วัด) ระหว่างตัวเลขและคำนาม โดยทั่วไปคำนามแต่ละคำจะมีตัวแยกประเภทที่เกี่ยวข้องตั้งแต่หนึ่งตัวขึ้นไป ตัวอย่างเช่น '本 (běn)' เป็นตัวแยกประเภททั่วไปสำหรับหนังสือ"
+
+[hsk1_day19] vocab.deconstruct(上班) matched "class"
+  EN: '"上" (shàng) means up/go to. "班" (bān) refers to a shift or a class. So, to go to one\'s shift/work.'
+  TH: '"上" (shàng) แปลว่า ขึ้น/ไป "班" (bān) หมายถึงกะหรือชั้นเรียน ดังนั้นเพื่อไปกะ/ทำงาน'
+
+[hsk1_day19] vocab.deconstruct(下班) matched "class"
+  EN: '"下" (xià) means down/finish. "班" (bān) refers to a shift or a class. So, to finish one\'s shift/work.'
+  TH: '下 (xià) แปลว่า ลง/เสร็จสิ้น "班" (bān) หมายถึงกะหรือชั้นเรียน ดังนั้นเพื่อทำงาน/กะให้เสร็จ'
+
+[hsk1_day19] vocab.deconstruct(做) matched "character"
+  EN: 'The character "做" (zuò) is composed of "亻" (rén, person radical) indicating an action by a person, and "故" (gù) which here primarily acts as a phonetic component.'
+  TH: 'อักขระ "做" (zuò) ประกอบด้วย "亻" (rén บุคคลหัวรุนแรง) ที่บ่งบอกถึงการกระทำของบุคคล และ "故" (gù) ซึ่งในที่นี้ทำหน้าที่เป็นส่วนประกอบของการออกเสียงเป็นหลัก'
+
+[hsk1_day19] vocab.deconstruct(买) matched "character"
+  EN: 'The character "买" (mǎi) depicts a net "罒" (wǎng, now flattened as 四) over "贝" (bèi, shell, ancient currency), implying catching or acquiring goods.'
+  TH: 'อักขระ "买" (mǎi) แสดงถึงตาข่าย "罒" (wǎng ปัจจุบันถูกแบนเป็น 四) เหนือ "贝" (bèi เปลือกหอย สกุลเงินโบราณ) ซึ่งหมายถึงการจับหรือการรับสินค้า'
+
+[hsk1_day19] vocab.deconstruct(件) matched "measure"
+  EN: 'As a measure word, "件" (jiàn) combines "亻" (rén, person radical) with "牛" (niú, ox), which serves as a phonetic component.'
+  TH: 'ในฐานะที่เป็นคำวัด "件" (jiàn) ผสมผสาน "亻" (ren, บุคคลที่รุนแรง) กับ "牛" (niú, ox) ซึ่งทำหน้าที่เป็นองค์ประกอบการออกเสียง'
+
+[hsk1_day20] vocab.deconstruct(觉得) matched "particle"
+  EN: 'Made of 觉 (jué - to feel/sense) and 得 (de - a structural particle). 觉 contains 见 (jiàn - to see), implying perception.'
+  TH: 'ทำจาก 觉 (jué - รู้สึก/สัมผัส) และ 得 (de - อนุภาคโครงสร้าง) 觉 มีคำว่า 见 (jiàn - ดู) แปลว่า การรับรู้'
+
+[hsk1_day21] vocab.deconstruct(有的) matched "particle"
+  EN: "有 (yǒu, to have/exist) + 的 (de, possessive/modifying particle). Refers to 'some of them' or 'there are some that...'."
+  TH: "有 (yǒu, มี/มีอยู่) + 的 (de, แสดงความเป็นเจ้าของ/แก้ไขอนุภาค) หมายถึง 'บางส่วน' หรือ 'มีบางอย่างที่...'"
+
+[hsk1_day21] vocab.deconstruct(一半) matched "character"
+  EN: '一 (yī, one) + 半 (bàn, half). The character 半 originally depicted two halves of an object.'
+  TH: '一 (yī หนึ่ง) + 半 (bàn ครึ่งหนึ่ง) อักขระ 半 เดิมแสดงวัตถุสองซีก'
+
+[hsk1_day21] grammar.explanation(Describing Conditions and Degrees: 一点儿 (yīdiǎnr) with Adjectives) matched "subject"
+  EN: 'To describe a condition or state, we often use adjectives. `很 (hěn)` is commonly placed before an adjective (e.g., 很大, 很忙) and often serves to link the subject and adjective, rather than always meanin'
+  TH: 'เพื่ออธิบายสภาวะหรือสถานะ เรามักใช้คำคุณศัพท์ `很 (hěn)` โดยทั่วไปจะวางไว้หน้าคำคุณศัพท์ (เช่น 很大, 很忙) และมักใช้เพื่อเชื่อมโยงประธานและคำคุณศัพท์ แทนที่จะมีความหมายว่า "มาก" เสมอไป หากต้องการแสดงคำว่า '
+
+[hsk1_day22] vocab.deconstruct(都) matched "character"
+  EN: "It is a character composed of 阝 (yì - city) and 者 (zhě - person, thing) denoting 'all' or 'everything'."
+  TH: "เป็นอักขระที่ประกอบด้วย 阝 (yì - เมือง) และ 者 (zhě - คน สิ่งของ) ซึ่งหมายถึง 'ทั้งหมด' หรือ 'ทุกสิ่ง'"
+
+[hsk1_day22] grammar.title(None) matched "degree"
+  EN: 'Adverbs of Degree: 很, 非常, 太, 真'
+  TH: 'คำวิเศษณ์ของปริญญา: 很, 非常, 太, 真'
+
+[hsk1_day22] grammar.explanation(Adverbs of Degree: 很, 非常, 太, 真) matched "subject"
+  EN: "These adverbs are used to express the degree or intensity of an adjective or verb. \n- **很 (hěn)**: The most common and often functions as a linker between subject and adjective, not always implying 'v"
+  TH: "คำวิเศษณ์เหล่านี้ใช้เพื่อแสดงระดับหรือความรุนแรงของคำคุณศัพท์หรือคำกริยา \n- **很 (hěn)**: คำที่ใช้บ่อยที่สุดและมักทำหน้าที่เป็นตัวเชื่อมระหว่างประธานและคำคุณศัพท์ ไม่ได้หมายความถึงระดับที่ 'มาก' มากเสม"
+
+[hsk1_day22] grammar.explanation(Adverbs of Scope: 也 (yě) and 都 (dōu)) matched "subject"
+  EN: "These adverbs indicate scope or inclusion.\n- **也 (yě)**: Means 'also' or 'too', indicating that something applies to another subject or situation.\n- **都 (dōu)**: Means 'all' or 'both', indicating that"
+  TH: "คำวิเศษณ์เหล่านี้บ่งบอกถึงขอบเขตหรือการรวม\n- **也 (yě)**: หมายถึง 'ด้วย' หรือ 'เกินไป' ซึ่งบ่งชี้ว่ามีบางสิ่งที่ใช้กับเรื่องหรือสถานการณ์อื่นได้\n- **都 (dōu)**: หมายถึง 'ทั้งหมด' หรือ 'ทั้งสอง' ซึ่งบ่งช"
+
+[hsk1_day23] vocab.meaning(吧) matched "particle"
+  EN: 'particle (suggestion/soft command/agreement)'
+  TH: 'เถอะ; สิ; ใช่มั้ย (คำเสริมน้ำเสียง)'
+
+[hsk1_day23] vocab.meaning(了) matched "particle"
+  EN: 'particle (completed action/change of state)'
+  TH: 'แล้ว (คำเสริมกริยา/วลี แสดงการกระทำที่เสร็จสิ้น/การเปลี่ยนแปลงสภาพ)'
+
+[hsk1_day24] grammar.title(None) matched "degree"
+  EN: '使用 “太…了” (tài…le) 来表达程度 (Expressing degree with “太…了”)'
+  TH: '使用 “太…了” (tài…le) 来表达程度 (แสดงระดับด้วย “太…了”)'
+
+[hsk1_day24] grammar.explanation(使用 “太…了” (tài…le) 来表达程度 (Expressing degree with “太…了”)) matched "degree"
+  EN: '“太…了” (tài…le) is a very commonly used structure used to express a certain degree of too high or too low, equivalent to “too… / very…” in English. It can be used to describe weather, emotions, things,'
+  TH: '“太…了” (tài…le) เป็นโครงสร้างที่ใช้กันทั่วไปในการแสดงระดับที่สูงหรือต่ำเกินไป ซึ่งเทียบเท่ากับ “too… / very…” ในภาษาอังกฤษ สามารถใช้เพื่ออธิบายสภาพอากาศ อารมณ์ สิ่งของ ฯลฯ เมื่อแก้ไขด้วยคำคุณศัพท์ โดยป'
+
+[hsk1_day25] vocab.deconstruct(还) matched "root"
+  EN: "The radical 辶 (chuò) means 'walk' or 'movement', and 艮 (gèn) indicates 'stopping' or 'root'. Together, it suggests moving back to an origin or returning."
+  TH: "รากศัพท์ 辶 (chuò) หมายถึง 'เดิน' หรือ 'การเคลื่อนไหว' และ 艮 (gèn) หมายถึง 'หยุด' หรือ 'ราก' เมื่อรวมกันแล้วจะเป็นการบอกถึงการเคลื่อนกลับไปยังจุดกำเนิดหรือการกลับมา"
+
+[hsk1_day25] vocab.meaning(回) matched "measure"
+  EN: 'to return; to go back; to answer; a measure word for times'
+  TH: 'กลับ, ตอบ, รอบ'
+
+[hsk1_day25] vocab.deconstruct(两) matched "measure"
+  EN: 'Historically related to 輛 (liàng), a measure word for vehicles. It depicts two units.'
+  TH: 'Historically related to 輛 (liàng), a measure word for vehicles. แสดงให้เห็นสองหน่วย'
+
+[hsk1_day25] vocab.meaning(两) matched "measure"
+  EN: 'two (used before measure words, not for counting)'
+  TH: 'สอง (ใช้กับลักษณะนาม)'
+
+[hsk1_day25] vocab.deconstruct(下) matched "stroke"
+  EN: "An ideograph showing a short stroke under a horizontal line, representing 'below' or 'down'."
+  TH: "ภาพอุดมคติที่แสดงจังหวะสั้น ๆ ใต้เส้นแนวนอน แสดงถึง 'ด้านล่าง' หรือ 'ลง'"
+
+[hsk1_day25] vocab.deconstruct(了) matched "tone"
+  EN: "Originally a pictograph of a child's head, it evolved to represent completion or understanding. (Note: The particle 'le' is unstressed, while 'liǎo' carries a tone for these meanings)."
+  TH: "เดิมทีเป็นภาพศีรษะของเด็ก แต่พัฒนามาเพื่อแสดงถึงความสมบูรณ์หรือความเข้าใจ (หมายเหตุ: อนุภาค 'le' ไม่มีเสียงหนัก ในขณะที่ 'liǎo' มีน้ำเสียงสำหรับความหมายเหล่านี้)"
+
+[hsk1_day26] vocab.deconstruct(本) matched "root"
+  EN: "Based on '木' (mù, wood/tree) with a horizontal line at the bottom indicating the root or base."
+  TH: "อิงตาม '木' (mù, ไม้/ต้นไม้) โดยมีเส้นแนวนอนด้านล่างแสดงถึงรากหรือฐาน"
+
+[hsk1_day26] vocab.meaning(本) matched "measure"
+  EN: 'this; current; capital; principal; basis; (measure word for books)'
+  TH: 'นี้; ปัจจุบัน; ต้นทุน; หลัก; พื้นฐาน; (คำลักษณนามสำหรับหนังสือ)'
+
+[hsk2_day1] vocab.deconstruct(事情) matched "mood"
+  EN: "'事' (story, business) + '情' (mood, situation) together mean stories or situations."
+  TH: "'เรื่องราว ธุรกิจ' + 'อารมณ์ สถานการณ์' รวมหมายถึงเรื่องราวหรือสถานการณ์"
+
+[hsk2_day1] vocab.deconstruct(啊) matched "root"
+  EN: "It is an exclamation expressing surprise, wonder, understanding, or emphasis. It has the root '口' (mouth), which indicates the sound that comes from the mouth."
+  TH: "เป็นเครื่องหมายอัศเจรีย์แสดงความประหลาดใจ ประหลาดใจ เข้าใจ หรือเน้นย้ำ มีรากศัพท์ว่า '口' (ปาก) ซึ่งบ่งบอกถึงเสียงที่ออกจากปาก"
+
+[hsk2_day2] vocab.deconstruct(个子) matched "classifier"
+  EN: '个 (individual/general classifier) + 子 (noun suffix). Refers to physical height or build.'
+  TH: '个 (ตัวแยกประเภทบุคคล/ทั่วไป) \u200b\u200b+ 子 (คำต่อท้ายคำนาม) หมายถึงความสูงหรือโครงสร้างทางกายภาพ'
+
+[hsk2_day2] grammar.title(None) matched "measure"
+  EN: "The polite measure word '位' (wèi)"
+  TH: "คำวัดสุภาพ '位' (wèi)"
+
+[hsk2_day2] grammar.explanation(The polite measure word '位' (wèi)) matched "classifier"
+  EN: "While '个' (gè) is the generic classifier for people, '位' (wèi) is used to show politeness or respect towards elders, guests, or professionals (such as grandparents, teachers, or husbands)."
+  TH: "แม้ว่า '个' (gè) เป็นตัวแยกประเภททั่วไปสำหรับผู้คน แต่ '位' (wèi) ใช้เพื่อแสดงความสุภาพหรือความเคารพต่อผู้อาวุโส แขก หรือผู้เชี่ยวชาญ (เช่น ปู่ย่าตายาย ครู หรือสามี)"
+
+[hsk2_day3] vocab.deconstruct(时) matched "measure"
+  EN: '日 (sun/day) + 寸 (inch/measure); indicates measuring time by the sun'
+  TH: '日 (อาทิตย์/วัน) + 寸 (นิ้ว/หน่วยวัด); ระบุเวลาการวัดโดยดวงอาทิตย์'
+
+[hsk2_day3] grammar.explanation(Using '已经...了' to indicate completed action or state) matched "particle"
+  EN: "The adverb '已经' (yǐjīng) means 'already' and is placed before the verb or adjective. It is usually paired with the particle '了' (le) at the end of the sentence to show completion or a change of state."
+  TH: "คำวิเศษณ์ '已经' (yǐjīng) แปลว่า 'แล้ว' และวางไว้หน้าคำกริยาหรือคำคุณศัพท์ โดยปกติจะจับคู่กับคำช่วย '了' (le) ที่ท้ายประโยคเพื่อแสดงถึงความสมบูรณ์หรือการเปลี่ยนแปลงสถานะ"
+
+[hsk2_day5] vocab.deconstruct(班) matched "class"
+  EN: 'Combining 王 (jade, representing authority/organization) and 𠚏 (to divide with a knife). It originally meant dividing jade, later evolving to mean a divided group or class.'
+  TH: 'การรวม 王 (หยก เป็นตัวแทนของอำนาจ/องค์กร) และ 𠚏 (ใช้มีดหาร) เดิมหมายถึงการแบ่งหยก ต่อมาพัฒนาเพื่อหมายถึงกลุ่มหรือชนชั้นที่แตกแยก'
+
+[hsk2_day5] vocab.meaning(班) matched "class"
+  EN: 'class; team; squad; shift; rank'
+  TH: 'ชั้นเรียน, ห้องเรียน, กลุ่ม'
+
+[hsk2_day5] vocab.meaning(题) matched "subject"
+  EN: 'topic; subject; problem; question'
+  TH: 'ข้อ, โจทย์, หัวข้อ'
+
+[hsk2_day5] grammar.title(None) matched "complement"
+  EN: 'Verb + 懂 (dǒng) as a Resultative Complement'
+  TH: 'กริยา + 懂 (dǒng) เป็นส่วนเสริมเชิงผลลัพธ์'
+
+[hsk2_day5] grammar.explanation(Verb + 懂 (dǒng) as a Resultative Complement) matched "subject"
+  EN: 'In Chinese, the result of an action can be expressed by placing a resultative verb directly after the main verb. Using 懂 (to understand) after perception verbs like 听 (to listen) or 看 (to look/read) i'
+  TH: 'ในภาษาจีน ผลของการกระทำสามารถแสดงได้โดยการวางกริยาผลลัพธ์ไว้หลังกริยาหลักโดยตรง การใช้ 懂 (เข้าใจ) ตามหลังคำกริยาการรับรู้ เช่น 听 (ฟัง) หรือ 看 (ดู/อ่าน) บ่งชี้ว่าผู้ถูกสัมภาษณ์เข้าใจข้อมูลที่รับรู้หรือ'
+
+[hsk2_day5] grammar.explanation(Double Objects with the Verb 教 (jiāo)) matched "subject"
+  EN: 'The verb 教 (to teach) can take two objects. The first object (indirect object) is usually the person being taught, and the second object (direct object) is the subject or skill being taught.'
+  TH: 'คำกริยา 教 (สอน) สามารถใช้วัตถุได้สองอย่าง วัตถุชิ้นแรก (วัตถุทางอ้อม) มักจะเป็นผู้ถูกสอน และวัตถุชิ้นที่สอง (วัตถุทางตรง) คือวิชาหรือทักษะที่กำลังสอน'
+
+[hsk2_day6] vocab.deconstruct(飞) matched "character"
+  EN: "Pictographic character representing a bird's wings in flight."
+  TH: 'ตัวละครที่เป็นตัวแทนของปีกนกที่กำลังบิน'
+
+[hsk2_day6] grammar.explanation(Taking Transportation: 坐 (zuò) vs 打车 (dǎchē)) matched "object"
+  EN: "The verb '坐' (zuò) literally means 'to sit' and is used as 'to ride/take' before vehicles like 地铁 (subway) and 公交车 (bus). On the other hand, '打车' (dǎchē) is a verb-object phrase meaning 'to hail/take "
+  TH: "คำกริยา '坐' (zuò) แปลว่า 'นั่ง' อย่างแท้จริง และใช้เป็น 'ขี่/ขึ้น' หน้ายานพาหนะ เช่น 地铁 (รถไฟใต้ดิน) และ 公交车 (รถบัส) ในทางกลับกัน '打车' (dǎchē) เป็นคำกริยา-กรรมวลีที่มีความหมายว่า 'ทักทาย/ขึ้นแท็กซี่' "
+
+[hsk2_day7] grammar.explanation(Expressing Distance with 'A 离 B + [远 / 近]') matched "degree"
+  EN: "The preposition '离' (lí) is used to express the distance between two locations. The structure is: Location A + 离 + Location B + [Adverb of Degree] + 远/近."
+  TH: "คำบุพบท '离' (lí) ใช้เพื่อแสดงระยะห่างระหว่างสถานที่สองแห่ง โครงสร้างคือ: ตำแหน่ง A + 离 + ตำแหน่ง B + [คำวิเศษณ์ของปริญญา] + 远/近"
+
+[hsk2_day8] grammar.title(None) matched "object"
+  EN: "Expressing Location with '在 + Place/Object + Direction Word'"
+  TH: "การแสดงตำแหน่งด้วย '在 + Place/Object + Direction Word'"
+
+[hsk2_day8] grammar.explanation(Expressing Location with '在 + Place/Object + Direction Word') matched "subject"
+  EN: 'In Chinese, to indicate the location of an object or person relative to something else, use the pattern: Subject + 在 (zài) + Object + Directional noun (e.g., 旁边, 里面, 上面, 下面).'
+  TH: 'ในภาษาจีน เพื่อระบุตำแหน่งของวัตถุหรือบุคคลที่สัมพันธ์กับสิ่งอื่น ให้ใช้รูปแบบ: ประธาน + ใน (zài) + วัตถุ + คำนามทิศทาง (เช่น ถัดจาก, ภายใน, ด้านบน, ด้านล่าง)'
+
+[hsk2_day11] vocab.deconstruct(本子) matched "classifier"
+  EN: '本 (root/classifier for books) + 子 (noun suffix)'
+  TH: 'หนังสือ (root/ลักษณนามสำหรับหนังสือ) + เด็ก (คำนามต่อท้าย)'
+
+[hsk2_day11] grammar.explanation(Using '花' (huā) to express spending money or time) matched "subject"
+  EN: "The verb '花' (huā) is commonly used to express spending resources, specifically money (钱 qián) or time (时间 shíjiān). The basic structure is: Subject + 花 + Money/Time + (on) Action/Noun."
+  TH: "คำกริยา '花' (huā) มักใช้เพื่อแสดงทรัพยากรการใช้จ่าย โดยเฉพาะเงิน (钱 qián) หรือเวลา (时间 shíjiān) โครงสร้างพื้นฐานคือ: ประธาน + ดอกไม้ + เงิน/เวลา + (เปิด) การกระทำ/คำนาม"
+
+[hsk2_day11] grammar.title(None) matched "object"
+  EN: "The double-object construction with '送' (sòng)"
+  TH: "การก่อสร้างวัตถุคู่ด้วย '送' (sòng)"
+
+[hsk2_day11] grammar.explanation(The double-object construction with '送' (sòng)) matched "subject"
+  EN: "The verb '送' (sòng) means 'to give as a gift'. It takes a double object: the indirect object (the receiver, usually a person) followed by the direct object (the gift). Structure: Subject + 送 + Person "
+  TH: "คำกริยา '送' (sòng) แปลว่า 'ให้เป็นของขวัญ' ต้องใช้วัตถุสองชิ้น: วัตถุทางอ้อม (ผู้รับ ซึ่งมักจะเป็นบุคคล) ตามด้วยวัตถุทางตรง (ของขวัญ) โครงสร้าง: หัวเรื่อง + 送 + บุคคล + ของขวัญ"
+
+[hsk2_day12] grammar.explanation(Using Color Words as Adjectives with '的' (de)) matched "particle"
+  EN: "To describe a noun with a color, we place the color word before the noun and usually connect them with the particle '的' (de). The structure is: Color + 的 + Noun."
+  TH: "ในการอธิบายคำนามด้วยสี เราจะวางคำที่มีสีไว้หน้าคำนาม และมักจะเชื่อมโยงกับคำนาม '的' (de) โครงสร้างคือ: สี + 的 + คำนาม"
+
+[hsk2_day12] grammar.title(None) matched "measure"
+  EN: "The Measure Word '条' (tiáo) for Long, Narrow Objects"
+  TH: "คำวัด '条' (tiáo) สำหรับวัตถุที่ยาวและแคบ"
+
+[hsk2_day12] grammar.explanation(The Measure Word '条' (tiáo) for Long, Narrow Objects) matched "measure"
+  EN: "The measure word '条' (tiáo) is used to count long, thin, flexible items such as rivers, fish, pants, scarves, and paths. The structure is: Number + 条 + Noun."
+  TH: "คำว่า '条' (tiáo) ใช้ในการนับสิ่งของที่ยาว บาง และยืดหยุ่นได้ เช่น แม่น้ำ ปลา กางเกง ผ้าพันคอ และทางเดิน โครงสร้างคือ: ตัวเลข + 条 + คำนาม"
+
+[hsk2_day14] grammar.title(None) matched "object"
+  EN: 'Using Separable Verbs (Verb-Object)'
+  TH: 'การใช้คำกริยาแยกส่วน (คำกริยา + กรรม)'
+
+[hsk2_day14] grammar.explanation(Using Separable Verbs (Verb-Object)) matched "particle"
+  EN: 'Verbs like 跑步 (pǎobù), 跳舞 (tiàowǔ), and 上网 (shàngwǎng) are separable verb-object compound words. The first character acts as the action verb, while the second acts as the object. If you insert a durat'
+  TH: 'คำกริยาอย่างเช่น 跑步 (วิ่ง), 跳舞 (เต้น) และ 上网 (เล่นเน็ต) เป็นคำกริยาผสมที่สามารถแยกออกจากกันได้ (Verb-Object) โดยอักษรตัวแรกจะทำหน้าที่เป็นคำกริยาหลัก ส่วนตัวหลังจะทำหน้าที่เป็นกรรมที่รองรับการกระทำนั้'
+
+[hsk2_day15] vocab.deconstruct(那么) matched "particle"
+  EN: "A compound of '那' (that, with right side town/radical) and '么' (a common grammatical suffix/particle)."
+  TH: "เกิดจากคำว่า '那' (นั่น/นั้น มีหมวดนำรูปเมืองอยู่ทางขวา) และคำว่า '么' (คำเสริมน้ำเสียงทางไวยากรณ์ที่ใช้บ่อย)"
+
+[hsk2_day15] vocab.deconstruct(这么) matched "particle"
+  EN: "A compound of '这' (this, featuring the movement radical 辶) and '么' (grammatical particle)."
+  TH: "เกิดจากคำว่า '这' (นี่/นี้ ซึ่งมีหมวดนำเกี่ยวกับการเคลื่อนที่ 辶) และคำว่า '么' (คำเสริมน้ำเสียงทางไวยากรณ์)"
+
+[hsk2_day15] grammar.explanation(Demonstrative Intensifiers: '这么' (zhème) and '那么' (nàme)) matched "degree"
+  EN: "'这么' (this much / so) and '那么' (that much / so) are placed before adjectives to magnify or emphasize their degree. '这么' refers to something close to the speaker, while 'soliciting/pointing' at somethi"
+  TH: "คำว่า '这么' (ขนาดนี้ / อย่างนี้) และ '那么' (ขนาดนั้น / อย่างนั้น) จะใช้วางไว้หน้าคำคุณศัพท์เพื่อเน้นย้ำหรือขยายระดับของคำคุณศัพท์นั้นๆ ให้ชัดเจนขึ้น โดยเราจะใช้ '这么' กับสิ่งของหรือสถานการณ์ที่อยู่ใกล้ตั"
+
+[hsk2_day17] vocab.deconstruct(帮忙) matched "object"
+  EN: 'A verb-object compound consisting of 帮 (to help) and 忙 (busy/business).'
+  TH: ''
+
+[hsk2_day17] vocab.deconstruct(起来) matched "complement"
+  EN: 'A compound of 起 (to rise) and 来 (to come), often used as a directional complement.'
+  TH: ''
+
+[hsk2_day17] grammar.explanation(Expressing Prohibition with '别' (bié)) matched "tone"
+  EN: "'别' is placed before a verb or verb phrase to form a negative imperative command, meaning 'don't doing something'. It is often paired with '了' (le) at the end of the sentence to soften the tone or sug"
+  TH: ''
+
+[hsk2_day17] grammar.explanation(The difference between '帮' (bāng) and '帮忙' (bāngmáng)) matched "object"
+  EN: "'帮' is a transitive verb that can take a direct object (e.g., 帮我). '帮忙' is a verb-object compound (separable verb) and cannot take a direct object. You cannot say '帮忙我'. Instead, you should insert the"
+  TH: ''
