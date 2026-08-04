@@ -1958,9 +1958,22 @@ function playTone(text) {
   // Use real human-recorded MP3s for flawless pronunciation!
   const url = `https://www.purpleculture.net/mp3/${base}${toneNumber}.mp3`;
   const audio = new Audio(url);
+
+  let fallbackTriggered = false;
+  const fallbackToTTS = () => {
+    if (fallbackTriggered) return;
+    fallbackTriggered = true;
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-CN';
+      utterance.rate = 0.8;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  audio.onerror = fallbackToTTS;
   audio.play().catch(err => {
-    console.error("Audio playback failed:", err);
-    alert('Audio playback failed. Make sure your volume is up and you are connected to the internet.');
+    fallbackToTTS();
   });
 }
 

@@ -8,7 +8,7 @@ import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from generate_hsk_full import _strip_untranslatable_fields, find_translation_corruption, translate_en_to_th
+from generate_hsk_full import _strip_untranslatable_fields, find_translation_corruption, translate_en_to_th, _extract_citations
 
 def _make_lesson():
     return {
@@ -217,6 +217,22 @@ def test_translate_en_to_th_citemark_restoration():
     assert "'C_10' (py_10)" in restored_transliterated, "Legacy ไซต์มาร์ก10 should restore citation 10"
     print("  [OK] Legacy transliterated Thai placeholders (ไซท์มาร์ก) successfully restored")
 
+def test_citation_extraction_refinements():
+    """Test stripping of trailing sentence punctuation and prompt instruction prefixes from citations."""
+    print("\nTest 7: Citation extraction punctuation stripping & prompt instruction prefix removal")
+
+    # 1. Trailing Chinese period stripping
+    text_with_period = "'今' (jīn, present) + '天' (tiān, day) = 今天。"
+    citations = _extract_citations(text_with_period)
+    assert "今天" in citations and "今天。" not in citations, f"Trailing period should be stripped, got: {citations}"
+    print("  [OK] Trailing Chinese period stripped from citation core")
+
+    # 2. Prompt instruction prefix stripping
+    prompt_text = "填空：他______吃面条儿。"
+    citations_prompt = _extract_citations(prompt_text)
+    assert "他______吃面条儿" in citations_prompt and "填空：" not in citations_prompt[0], f"Instruction prefix '填空：' should be stripped, got: {citations_prompt}"
+    print("  [OK] Prompt instruction prefix '填空：' stripped from citation core")
+
 if __name__ == "__main__":
     test_stripping_removes_untranslatable_fields()
     test_stripping_does_not_affect_translatable_context()
@@ -224,6 +240,7 @@ if __name__ == "__main__":
     test_validation_ignores_an_ideal_but_unnecessary_echo()
     test_validation_catches_real_translation_defects()
     test_translate_en_to_th_citemark_restoration()
+    test_citation_extraction_refinements()
 
     print("\n" + "="*60)
     print("All tests passed! [OK] Strip-and-validate implementation is correct")

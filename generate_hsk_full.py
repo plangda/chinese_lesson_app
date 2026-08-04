@@ -201,13 +201,18 @@ def _split_citation(full):
         return full[:core_end], full[core_end:]
     return char_part, full[len(char_part):]
 
+_INSTRUCTION_PREFIX_PATTERN = re.compile(r"^(?:填空|选词填空|填写空白)[：:\s]*")
+
 def _extract_citations(text):
     if not text:
         return []
     citations = []
     for m in _CJK_PROTECT_PATTERN.finditer(text):
         core, _tail = _split_citation(m.group(0))
-        citations.append(core)
+        core = core.rstrip("。，！？；：、,!? ")
+        core = _INSTRUCTION_PREFIX_PATTERN.sub("", core).strip()
+        if core:
+            citations.append(core)
     return citations
 
 def find_translation_corruption(original, translated):
