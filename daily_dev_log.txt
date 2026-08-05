@@ -69,12 +69,22 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Found two more mistranslation patterns via a broader homograph audit ("character" -> ตัวละคร instead of ตัวอักษร, 7 instances; the character 面 replaced by เลดี้, 3 instances) -- fix drafted and dry-run-verified (fix_character_mistranslations.py) but deliberately NOT applied, since none of the affected lessons have been through the rollout yet and patch_thai_translations.py fully regenerates _th fields on its next pass regardless of outcome, which would silently overwrite a Thai-only patch. Established this as a standing operating principle for future hand-patches.
 - Found hsk1_day5's live DB content had drifted entirely from generated_lessons.jsonl (stale pre-rollout translation); root-caused to the seeder's intentional idempotent skip-if-already-seeded behavior. A full audit across every column in lessons/vocab/grammar/grammar_practice/dialogue_lines (all 43 lessons) found zero other drifted rows -- confirmed one-off, not systemic. Synced and fixed.
 - Documented (but did not fix) a separate, pre-existing bug in translate_en_to_th()'s placeholder mechanism: Google Translate occasionally transliterates the literal CITEMARK0 marker into Thai script instead of leaving it untouched, breaking the exact-match restore step and silently losing the real citation. Live example confirmed still in the DB (hsk1_day5's "Additional Vocabulary" prompt_th ends in a garbled "ไซท์มาร์ก0" where the real Chinese question should be). Deferred as a separate follow-up since it only affects the Google-Translate fallback path, not the LLM path.
-72: - Updated PROJECT_SUMMARY.md, IMPLEMENTATION_PROGRESS.md, and this log with full detail on all of the above, plus refreshed the quota-strategy planning notes, so a fresh agent can resume the rollout tomorrow without re-deriving any of today's findings.
-73: 
-74: 2026-08-04:
-75: - Resumed HSK1 Thai translation rollout via patch_thai_translations.py: upgraded 6 new lessons (hsk1_day7, day9, day10, day11, day13, day14) to "llm" state in patched_lessons_state.json and Turso DB. Total HSK1 LLM-patched lessons reached 12 lessons.
-76: - Verified QuotaExceededError handling on hsk1_day12 when hitting daily Gemini API quota ceiling (20 req/day); execution backed off and stopped safely without file or database corruption.
-77: - Refined validation engine in generate_hsk_full.py: stripped trailing sentence punctuation (。，！？) and prompt instruction prefixes (填空：, 选词填空：, 填写空白) from extracted citation cores, eliminating false-positive validation rejections for natural LLM translations.
-78: - Added Test 7 (test_citation_extraction_refinements) to test_field_masking.py; all 7 unit tests passed 100%.
-79: - Updated insert_pinyin_rules.js with bilingual (_en/_th) columns for 4 core Pinyin rules (The Four Tones, Third Tone Sandhi, Tone Change for Yi/Bu, and the 'ü' Rule) and seeded hsk1_day0 into Turso DB (0 LLM quota used).
-80: - Implemented universal Web Speech API SpeechSynthesis (zh-CN) fallback in app.js playTone() for audio playback errors, fixing missing/broken audio for rare Pinyin syllables (e.g. tei) across the entire Pinyin chart.
+- Updated PROJECT_SUMMARY.md, IMPLEMENTATION_PROGRESS.md, and this log with full detail on all of the above, plus refreshed the quota-strategy planning notes, so a fresh agent can resume the rollout tomorrow without re-deriving any of today's findings.
+
+2026-08-04:
+- Resumed HSK1 Thai translation rollout via patch_thai_translations.py: upgraded 6 new lessons (hsk1_day7, day9, day10, day11, day13, day14) to "llm" state in patched_lessons_state.json and Turso DB. Total HSK1 LLM-patched lessons reached 12 lessons.
+- Verified QuotaExceededError handling on hsk1_day12 when hitting daily Gemini API quota ceiling (20 req/day); execution backed off and stopped safely without file or database corruption.
+- Refined validation engine in generate_hsk_full.py: stripped trailing sentence punctuation (。，！？) and prompt instruction prefixes (填空：, 选词填空：, 填写空白) from extracted citation cores, eliminating false-positive validation rejections for natural LLM translations.
+- Added Test 7 (test_citation_extraction_refinements) to test_field_masking.py; all 7 unit tests passed 100%.
+- Updated insert_pinyin_rules.js with bilingual (_en/_th) columns for 4 core Pinyin rules (The Four Tones, Third Tone Sandhi, Tone Change for Yi/Bu, and the 'ü' Rule) and seeded hsk1_day0 into Turso DB (0 LLM quota used).
+- Implemented universal Web Speech API SpeechSynthesis (zh-CN) fallback in app.js playTone() for audio playback errors, fixing missing/broken audio for rare Pinyin syllables (e.g. tei) across the entire Pinyin chart.
+
+2026-08-05:
+- Refactored Lesson 0 Pinyin Suite into a visual 5-tab suite (📊 Syllable Matrix, 👄 Mouth & Airflow Guide, 🎵 Tone & General Rules, 🎧 Tone Pairs Practice, ⌨️ Pinyin Typing Game).
+- Added SVG anatomical cut-away tongue profiles for Retroflex (zh/ch/sh/r), Palatal (j/q/x), Dental (z/c/s), and Tissue Paper Test (Aspirated vs. Unaspirated consonants).
+- Integrated pre-commit language purity assertion (validateLanguagePurity) in insert_pinyin_rules.js scanning _en and _th columns before committing to Turso DB, enforcing 0% mixed English-Thai text.
+- Implemented client-side 0ms in-memory caching (state.pinyinLessonData) in app.js for instant TH ↔ EN language toggling without network round-trip latency.
+- Redesigned Pinyin Typing Simulator game loop: hidden initial Hanzi prompt (❓ ❓) + audio listen button -> type pinyin -> IME candidate selection -> Hanzi reveal + TTS celebration.
+- Self-hosted open-access human MP3 audio files (public/audio/pinyin/a1.mp3 through a4.mp3, e1 through e4) in repository, eliminating third-party commercial CDN dependencies and 404 failovers.
+- Updated playTone() fallback to map ASCII Pinyin strings (a1, zhi1, chi1) directly to native Chinese Hanzi characters (啊, 知, 吃), forcing browser SpeechSynthesis to activate native Mandarin voice engines instead of reading ASCII letters ("zhi-one").
+- Updated PROJECT_SUMMARY.md, IMPLEMENTATION_PROGRESS.md, retrospective_report.md, and daily_dev_log.txt.

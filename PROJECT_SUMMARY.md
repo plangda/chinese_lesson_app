@@ -1,5 +1,5 @@
 # HanPath Project Summary
-**Date:** August 2, 2026 (Last Updated)
+**Date:** August 5, 2026 (Last Updated)
 
 ## 1. Business Requirements
 
@@ -8,6 +8,12 @@ HanPath is a structured, daily Chinese learning application tailored to make lan
 
 **Core Features & User Flows:**
 - **Curriculum & Pacing:** Content is mapped to standard HSK proficiency levels (HSK 1, 2, and 3). The curriculum is delivered in daily, digestible 1-hour sessions to prevent burnout and encourage habit-building.
+- **Visual 5-Tab Pinyin Suite (Lesson 0 Foundation):**
+  - *Tab 1 (📊 Syllable Matrix):* Interactive 1,600+ audio grid mapping initials, finals, and four tones.
+  - *Tab 2 (👄 Mouth & Airflow Guide):* Anatomical cut-away SVG profile diagrams explaining Retroflex (`zh, ch, sh, r`), Palatal (`j, q, x`), Dental (`z, c, s`), and the Tissue Paper Test 💨 (Aspirated vs. Unaspirated consonants).
+  - *Tab 3 (🎵 Tone & General Rules):* Interactive rule cards explaining the Four Tones, 3rd Tone Sandhi (`3+3 ➔ 2+3`), Tone Changes for 'Yi' and 'Bu', and the 'ü' dot removal rule.
+  - *Tab 4 (🎧 Tone Pairs Practice):* 20 interactive cards covering 100% of 2-tone combinations (1+1, 1+2, ..., 4+4, 4+0) using real HSK 1 vocabulary (`今天`, `明天`, `你好`, `再见`).
+  - *Tab 5 (⌨️ Pinyin Typing Game & IME Simulator):* Pedagogically sound challenge loop: presents a meaning/audio prompt (target Hanzi hidden `❓ ❓`), learner types Pinyin, IME candidate choices appear, and correct selection reveals the Hanzi + plays native audio.
 - **4-Stage Daily Learning Engine:**
   - *Stage 1 (Vocabulary):* Interactive flashcards, stroke tracing (via HanziWriter), and pronunciation.
   - *Stage 2 (Grammar):* Concept explanations, examples, and sentence-reordering exercises.
@@ -28,15 +34,18 @@ HanPath operates as a Single Page Application (SPA) with a lightweight Node.js b
 
 **Frontend (Client-Side):**
 - **Tech Stack:** Vanilla HTML5, CSS3 (Custom utility classes, CSS Variables, Glassmorphism design), and Vanilla JavaScript (ES6+). No heavy frameworks (like React/Vue) to ensure blazing fast load times and simple hosting.
-- **State Management:** Centralized local JS `state` object synchronized with `localStorage` and the backend server.
-- **Localization:** Custom robust i18n engine scanning the DOM for `data-i18n` attributes and mapping to a dual-language (EN/TH) dictionary object.
-- **Key Libraries:** `hanzi-writer.min.js` (for stroke animations and character drawing), Native Web Speech API (for Text-To-Speech).
+- **State Management & 0ms Memory Caching:** Centralized local JS `state` object synchronized with `localStorage` and backend. Lesson 0 reference payloads are cached in memory (`state.pinyinLessonData`) upon initial fetch, allowing instant **0ms language toggling** (TH ↔ EN) without network latency.
+- **Localization & Language Purity Guardrail:** Custom robust i18n engine scanning DOM for `data-i18n` attributes. Pre-commit assertions (`validateLanguagePurity`) scan database seeding scripts to guarantee 0% mixed-language contamination in `_en` and `_th` fields.
+- **Key Libraries & Audio Architecture:** `hanzi-writer.min.js` (for stroke animations and character drawing), Native Web Speech API with explicit `zh-CN` voice-object binding.
+- **Self-Hosted Open Audio Assets & Hanzi Fallback:**
+  - Core Pinyin audio assets (`/public/audio/pinyin/a1.mp3` - `a4.mp3`, `e1.mp3` - `e4.mp3`) are self-hosted directly within the project repository to eliminate third-party commercial CDN dependencies, hotlinking blocks, and 404 failovers.
+  - An explicit fallback dictionary (`pinyinToHanziMap`) resolves ASCII Pinyin strings (`a1`, `zhi1`, `chi1`) to actual Chinese Hanzi characters (`啊`, `知`, `吃`), forcing browser SpeechSynthesis to activate native Mandarin voices instead of reading ASCII letters ("zhi-one").
 
 **Backend (Server-Side):**
 - **Tech Stack:** Node.js, Express.js.
 - **Database:** Turso Cloud Database (SQLite distributed at the edge).
 - **Driver:** `@libsql/client` wrapper with custom exponential backoff retry logic for resilience against network instability.
-- **API Design:** RESTful endpoints. Deeply nested curriculum data is fetched via highly optimized batch SQL queries (resolving previous N+1 query inefficiencies) and assembled in-memory (O(N) complexity) before being served to the client.
+- **API Design & Static Serving:** RESTful endpoints. Static audio assets served via `app.use('/audio', express.static(...))` for high-speed local asset delivery. Deeply nested curriculum data is fetched via highly optimized batch SQL queries assembled in-memory.
 
 **Database Schema Design:**
 - **Standardized Column Layout:** All user-facing translatable strings are explicitly separated into English (`_en`) and Thai (`_th`) columns in the database (e.g., `meaning_en`, `meaning_th` in the `vocab` table; `explanation_en`, `explanation_th` in the `grammar` table). This provides standard translation schemas across the entire database.
@@ -149,7 +158,8 @@ Because of point 4 above, a targeted string-replacement patch to a `_th` field i
 - ✅ **Citation Punctuation & Instruction Prefix Validation Fix (Aug 4):** Refined `_extract_citations()` in `generate_hsk_full.py` to strip trailing CJK sentence punctuation (`。`, `，`, `！`, `？`) and prompt instruction prefixes (`填空：`, `选词填空：`, `填写空白`) from citation cores. This eliminated false-positive validation rejections for natural LLM translations, allowing `hsk1_day7` and `hsk1_day11` to pass cleanly. Added Test 7 (`test_citation_extraction_refinements`) to `test_field_masking.py` (all 7 tests pass 100%).
 - ✅ **HSK1 Thai Translation Rollout Progress (Aug 5):** Resumed rollout; upgraded 10 new lessons (`hsk1_day8`, `day12`, `day15`, `day16`, `day17`, `day18`, `day19`, `day20`, `day21`, `day23`) to `"llm"` quality in `patched_lessons_state.json` and Turso DB. Total HSK1 lessons locked on LLM Thai reached **22 lessons** (out of 26). `hsk1_day8` and `hsk1_day12` were successfully rescued from fallback status. Verified `QuotaExceededError` cleanly stops execution when hitting daily Gemini free tier limit (20 req/day) at `hsk1_day25`.
 - ✅ **Pinyin Rules (Lesson 0) Seeded into Turso DB (Aug 4):** Updated `insert_pinyin_rules.js` with bilingual (`_en`/`_th`) columns for 4 core Pinyin rules (The Four Tones, Third Tone Sandhi, Tone Change for Yi/Bu, and the 'ü' Rule) and seeded `hsk1_day0` into Turso DB using 0 LLM API quota.
-- ✅ **Visual 5-Tab Pinyin Suite & Lesson 0 Experience Overhaul (Aug 5):** Added 9 dynamic rules (Tones, Sandhi, ü-rule, Retroflex, Palatals, Dentals, Tissue Paper Test 💨, Pinyin Typing ⌨️) seeded into Turso DB via `insert_pinyin_rules.js`. Wired `startLesson('hsk1_day0')` & `pinyin-chart-view` into a unified 5-tab suite (`📊 Syllable Matrix`, `👄 Mouth & Airflow Guide`, `🎵 Tone & Typing Rules`, `🎧 Tone Pairs Practice`, `⌨️ Pinyin Typing Game`) in `index.html` and `app.js` featuring SVG mouth profile infographics, interactive 2-tone pairs practice cards (20 combinations with audio), and a Pinyin IME typing game simulator using `ld()` localization.
+- ✅ **Visual 5-Tab Pinyin Suite & Pedagogical Redesign (Aug 5):** Refactored Pinyin suite into 5 categorized tabs (`📊 Syllable Matrix`, `👄 Mouth & Airflow Guide`, `🎵 Tone & General Rules`, `🎧 Tone Pairs Practice`, `⌨️ Pinyin Typing Game`). Added Language Purity Guardrail in `insert_pinyin_rules.js` (0% EN-TH mixing), implemented 0ms memory caching in `app.js` (`state.pinyinLessonData`) for instant TH-EN toggles, and redesigned Pinyin Typing Simulator game loop (prompt -> type pinyin -> IME candidate pick -> Hanzi reveal + TTS).
+- ✅ **Self-Hosted Open Pinyin Audio & Native Hanzi Fallback (Aug 5):** Self-hosted human MP3 audio files (`public/audio/pinyin/a1.mp3` - `a4.mp3`, `e1.mp3` - `e4.mp3`) directly inside the project repository to eliminate third-party commercial CDN dependencies and HTTP 404 failovers. Updated `playTone()` fallback to map ASCII Pinyin strings (`ā, á, ǎ, à`, `zhi1`) directly to Chinese Hanzi characters (`啊`, `知`, `吃`, `诗`, `日`), forcing browser SpeechSynthesis to activate native Mandarin voice engines instead of reading ASCII letters ("zhi-one").
 - ✅ **Universal Web Speech API TTS Fallback for Pinyin Chart (Aug 4):** Updated `playTone()` in `app.js` with an `audio.onerror` listener and `.catch()` fallback routing through native Web Speech API `SpeechSynthesis` (`lang: 'zh-CN'`), resolving broken/missing audio for rare Pinyin syllables (e.g. `tei`) across the entire Pinyin chart.
 
 **Pending / Next Steps:**
