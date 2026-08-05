@@ -2060,7 +2060,7 @@ function renderTonePairs() {
     card.style.cssText = 'padding: 1rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; border-top: 3px solid var(--accent-color, #feca57);';
     card.onmouseover = () => { card.style.transform = 'translateY(-3px)'; };
     card.onmouseout = () => { card.style.transform = 'none'; };
-    card.onclick = () => playTone(item.play || item.pinyin);
+    card.onclick = () => speakText(item.cn);
 
     const desc = lang === 'th' ? item.th : item.en;
     card.innerHTML = `
@@ -2169,12 +2169,7 @@ function playTone(text) {
   const fallbackToTTS = () => {
     if (fallbackTriggered) return;
     fallbackTriggered = true;
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'zh-CN';
-      utterance.rate = 0.8;
-      window.speechSynthesis.speak(utterance);
-    }
+    speakText(text);
   };
 
   audio.onerror = fallbackToTTS;
