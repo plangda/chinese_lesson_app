@@ -28,25 +28,25 @@ async function insertPinyinRules() {
       {
         title_en: "1. Retroflex Group: zh, ch, sh, r",
         title_th: "1. กลุ่มพยัญชนะม้วนลิ้น (Retroflex): zh, ch, sh, r",
-        explanation_en: "The initials **zh, ch, sh, and r** require you to **curl the tip of your tongue backward** toward the roof of your mouth without touching it!\n- **zh**: Like 'j' in 'jump', with tongue curled UP (จ - ม้วนลิ้น)\n- **ch**: Like 'ch' in 'chair', with tongue curled UP + puff of air (ช - ม้วนลิ้นพ่นลม)\n- **sh**: Like 'sh' in 'shoe', with tongue curled UP (ซ - ม้วนลิ้น)\n- **r**: Voiced sound, like 'z' in 'pleasure' with tongue curled UP (ย/ร - ม้วนลิ้น ไม่รัวลิ้น!)",
+        explanation_en: "The initials **zh, ch, sh, and r** require you to **curl the tip of your tongue backward** toward the roof of your mouth without touching it!\n- **zh**: Soft 'j' sound with tongue curled UP.\n- **ch**: 'ch' sound with tongue curled UP + strong puff of air.\n- **sh**: Soft 'sh' sound with tongue curled UP.\n- **r**: Voiced sound, like 'z' in 'pleasure' with tongue curled UP.",
         explanation_th: "พยัญชนะ **zh, ch, sh, r** เป็นกลุ่มเสียง **ม้วนลิ้น (Retroflex)** โดยการงอปลายลิ้นขึ้นไปหาเพดานปาก!\n- **zh**: คล้าย จ (งอปลายลิ้นขึ้นแตะเพดานปาก)\n- **ch**: คล้าย ช (ม้วนลิ้น + พ่นลมแรง)\n- **sh**: คล้าย ซ (ม้วนลิ้นให้ลมลอดผ่าน)\n- **r**: คล้าย ยผสมร (ม้วนลิ้น ออกเสียงสั่นในลำคอ ไม่รัวลิ้น!)"
       },
       {
         title_en: "2. Palatal Group: j, q, x",
         title_th: "2. กลุ่มพยัญชนะแบนลิ้นแตะฟันล่าง (Palatal): j, q, x",
-        explanation_en: "For **j, q, and x**, keep your tongue **FLAT** with the tip resting behind your **LOWER front teeth**. Pull the corners of your lips back into a smile! 😊\n- **j**: Unaspirated, soft 'j' (จิ)\n- **q**: Aspirated, sharp 'ch' with strong puff of air (ชิ - พ่นลมแรง)\n- **x**: Soft 'sh/s' sound (ซิ)",
+        explanation_en: "For **j, q, and x**, keep your tongue **FLAT** with the tip resting behind your **LOWER front teeth**. Pull the corners of your lips back into a smile! 😊\n- **j**: Unaspirated, soft 'j' sound.\n- **q**: Aspirated, sharp 'ch' with a strong puff of air.\n- **x**: Soft 'sh/s' sound.",
         explanation_th: "พยัญชนะ **j, q, x** ให้ **แบนลิ้น** วางปลายลิ้นแตะไว้หลัง **ฟันล่าง** และยิ้มกว้าง 😊!\n- **j**: เสียง จิ (เบา ไม่พ่นลม)\n- **q**: เสียง ชิ (พ่นลมแรง)\n- **x**: เสียง ซิ (เสียงลมลอดผ่านซอกฟัน)"
       },
       {
         title_en: "3. Dental Sibilants: z, c, s",
         title_th: "3. กลุ่มพยัญชนะแบนลิ้นแตะหลังฟันบน (Dental): z, c, s",
-        explanation_en: "For **z, c, and s**, keep your tongue **FLAT** (do NOT curl!) with the tip touching the back of your **UPPER front teeth**.\n- **z**: Unaspirated (จึ)\n- **c**: Aspirated with strong puff of air (ชึ - พ่นลมแรง)\n- **s**: Soft hiss sound (ซึ)",
+        explanation_en: "For **z, c, and s**, keep your tongue **FLAT** (do NOT curl!) with the tip touching the back of your **UPPER front teeth**.\n- **z**: Unaspirated sound.\n- **c**: Aspirated with a strong puff of air.\n- **s**: Soft hiss sound.",
         explanation_th: "พยัญชนะ **z, c, s** ให้ **แบนลิ้น** (ห้ามม้วนลิ้นเด็ดขาด!) แล้วแตะปลายลิ้นที่หลัง **ฟันบน**\n- **z**: เสียง จึ (ไม่พ่นลม)\n- **c**: เสียง ชึ (พ่นลมแรง)\n- **s**: เสียง ซึ (เสียงซ่าผ่านซอกฟัน)"
       },
       {
         title_en: "Aspirated vs. Unaspirated Consonants 💨",
         title_th: "พยัญชนะพ่นลม vs ไม่พ่นลม (The Tissue Paper Test 💨)",
-        explanation_en: "Chinese consonants are grouped into **Unaspirated (No Air)** vs. **Aspirated (Strong Air)** pairs:\n- **b (ป)** vs **p (พ - 💨)**\n- **d (ต)** vs **t (ท - 💨)**\n- **g (ก)** vs **k (ค - 💨)**\n- **j (จิ)** vs **q (ชิ - 💨)**\n- **zh (จ)** vs **ch (ช - 💨)**\n- **z (จึ)** vs **c (ชึ - 💨)**\n\n💡 **The Tissue Paper Test:** Hold a paper tissue in front of your mouth. Aspirated sounds (p, t, k, q, ch, c) will blow the tissue paper forward strongly!",
+        explanation_en: "Chinese consonants are grouped into **Unaspirated (No Air)** vs. **Aspirated (Strong Air)** pairs:\n- **b** vs **p (💨)**\n- **d** vs **t (💨)**\n- **g** vs **k (💨)**\n- **j** vs **q (💨)**\n- **zh** vs **ch (💨)**\n- **z** vs **c (💨)**\n\n💡 **The Tissue Paper Test:** Hold a paper tissue in front of your mouth. Aspirated sounds (p, t, k, q, ch, c) will blow the tissue paper forward strongly!",
         explanation_th: "พยัญชนะจีนแบ่งเป็นคู่ **ไม่พ่นลม** กับ **พ่นลมแรง (Aspirated)**:\n- **b (ป)** คู่กับ **p (พ - พ่นลมแรง 💨)**\n- **d (ต)** คู่กับ **t (ท - พ่นลมแรง 💨)**\n- **g (ก)** คู่กับ **k (ค - พ่นลมแรง 💨)**\n- **j (จิ)** คู่กับ **q (ชิ - พ่นลมแรง 💨)**\n- **zh (จ-ม้วนลิ้น)** คู่กับ **ch (ช-ม้วนลิ้น พ่นลมแรง 💨)**\n- **z (จึ)** คู่กับ **c (ชึ - พ่นลมแรง 💨)**\n\n💡 **ทดสอบด้วยทิชชู (Tissue Paper Test):** ถือแผ่นทิชชูไว้หน้าปาก เมื่อออกเสียงกลุ่มพ่นลม (p, t, k, q, ch, c) แผ่นทิชชูจะขยับปลิวอย่างชัดเจน!"
       },
 
@@ -87,6 +87,13 @@ async function insertPinyinRules() {
     
     for (let i = 0; i < grammarRules.length; i++) {
         const rule = grammarRules[i];
+        
+        // Language Purity Guardrail Assertion
+        const hasThaiInEn = /[\u0E00-\u0E7F]/.test(rule.title_en + rule.explanation_en);
+        if (hasThaiInEn) {
+          throw new Error(`🚨 GUARDRAIL ABORT: English field for rule '${rule.title_en}' contains Thai characters!`);
+        }
+
         console.log(`Inserting grammar: ${rule.title_en}`);
         await db.run(
             'INSERT INTO grammar (lesson_id, title_en, title_th, explanation_en, explanation_th, sort_order) VALUES (?, ?, ?, ?, ?, ?)',

@@ -1991,8 +1991,15 @@ window.initPinyinTypingGame = function() {
   const lang = state.currentLanguage || 'en';
   const descText = lang === 'th' ? target.th : target.en;
   
-  promptCn.textContent = target.cn;
-  promptDesc.textContent = `${descText} (${target.pyFormatted})`;
+  // Hide Hanzi initially to create an authentic learning challenge!
+  promptCn.textContent = '❓ ❓';
+  promptDesc.innerHTML = `
+    <div style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--accent);">
+      ${lang === 'th' ? 'พิมพ์พินอินของคำว่า:' : 'Type Pinyin for:'} <strong>"${descText}"</strong>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="speakText('${target.cn}')" style="margin-bottom: 0.5rem;">🔊 Listen Audio (ฟังเสียง)</button>
+  `;
+  
   input.value = '';
   candidatesBox.innerHTML = '';
   feedback.textContent = '';
@@ -2006,12 +2013,14 @@ window.initPinyinTypingGame = function() {
       candidates.forEach((cand, idx) => {
         const btn = document.createElement('button');
         btn.className = 'btn btn-secondary btn-sm';
+        btn.style.cssText = 'font-size: 1.2rem; padding: 0.5rem 1rem; border-color: var(--primary);';
         btn.textContent = `${idx + 1}. ${cand}`;
         btn.onclick = () => {
           if (cand === target.cn) {
-            feedback.textContent = lang === 'th' ? '🎉 ถูกต้อง! ยอดเยี่ยมมาก!' : '🎉 Correct! Great job!';
+            promptCn.textContent = target.cn; // Reveal Hanzi on success!
+            feedback.textContent = lang === 'th' ? `🎉 ถูกต้อง! (${target.cn} = ${target.pyFormatted})` : `🎉 Correct! (${target.cn} = ${target.pyFormatted})`;
             feedback.style.color = '#10ac84';
-            playTone(target.pinyin);
+            speakText(target.cn);
           } else {
             feedback.textContent = lang === 'th' ? '❌ ยังไม่ถูกต้อง ลองใหม่อีกครั้ง!' : '❌ Incorrect candidate, try again!';
             feedback.style.color = '#ff6b6b';
@@ -2025,11 +2034,15 @@ window.initPinyinTypingGame = function() {
 
 async function initPinyinChart() {
   try {
-    // Load Rules
-    const rulesRes = await fetch('/api/lessons/hsk1_day0');
-    if (rulesRes.ok) {
-      const lessonData = await rulesRes.json();
-      renderPinyinRules(lessonData.grammar);
+    // 0ms Memory Cache for Instant Language Toggle
+    if (state.pinyinLessonData) {
+      renderPinyinRules(state.pinyinLessonData.grammar);
+    } else {
+      const rulesRes = await fetch('/api/lessons/hsk1_day0');
+      if (rulesRes.ok) {
+        state.pinyinLessonData = await rulesRes.json();
+        renderPinyinRules(state.pinyinLessonData.grammar);
+      }
     }
 
     // Load Matrix if not loaded
