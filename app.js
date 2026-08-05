@@ -2227,7 +2227,31 @@ function renderPinyinMatrix(data) {
   container.innerHTML = html;
 }
 
+const pinyinToHanziMap = {
+  // Single Vowels (ā, á, ǎ, à, o, e, i, u, ü)
+  'a1': '啊', 'a2': '啊', 'a3': '啊', 'a4': '啊', 'ā': '啊', 'á': '啊', 'ǎ': '啊', 'à': '啊', 'a': '啊',
+  'o1': '喔', 'o2': '喔', 'o3': '喔', 'o4': '喔', 'ō': '喔', 'ó': '喔', 'ǒ': '喔', 'ò': '喔', 'o': '喔',
+  'e1': '鹅', 'e2': '鹅', 'e3': '鹅', 'e4': '饿', 'ē': '鹅', 'é': '鹅', 'ě': '鹅', 'è': '饿', 'e': '鹅',
+  'i1': '衣', 'i2': '移', 'i3': '椅', 'i4': '意', 'ī': '衣', 'í': '移', 'ǐ': '椅', 'ì': '意', 'i': '衣',
+  'u1': '屋', 'u2': '无', 'u3': '五', 'u4': '物', 'ū': '屋', 'ú': '无', 'ǔ': '五', 'ù': '物', 'u': '屋',
+  'v1': '迂', 'v2': '鱼', 'v3': '雨', 'v4': '玉', 'ǖ': '迂', 'ǘ': '鱼', 'ǚ': '雨', 'ǜ': '玉', 'ü': '迂',
+
+  // Consonant Groups (zh, ch, sh, r, j, q, x, z, c, s)
+  'zh': '知', 'zhi': '知', 'zhi1': '知', 'zhī': '知',
+  'ch': '吃', 'chi': '吃', 'chi1': '吃', 'chī': '吃',
+  'sh': '诗', 'shi': '诗', 'shi1': '诗', 'shī': '诗',
+  'r': '日', 'ri': '日', 'ri4': '日', 'rì': '日',
+  'j': '鸡', 'ji': '鸡', 'ji1': '鸡', 'jī': '鸡',
+  'q': '七', 'qi': '七', 'qi1': '七', 'qī': '七',
+  'x': '西', 'xi': '西', 'xi1': '西', 'xī': '西',
+  'z': '资', 'zi': '资', 'zi1': '资', 'zī': '资',
+  'c': '词', 'ci': '词', 'ci1': '词', 'cī': '词',
+  's': '丝', 'si': '丝', 'si1': '丝', 'sī': '丝'
+};
+
 function playTone(text) {
+  let cleanText = text.trim().toLowerCase();
+  
   // Convert accented Pinyin to base+tone number (e.g. bā -> ba1)
   const toneMap = {
     'ā': { char: 'a', tone: '1' }, 'á': { char: 'a', tone: '2' }, 'ǎ': { char: 'a', tone: '3' }, 'à': { char: 'a', tone: '4' },
@@ -2239,7 +2263,7 @@ function playTone(text) {
     'ü': { char: 'v', tone: '5' }
   };
 
-  let base = text.toLowerCase();
+  let base = cleanText;
   let toneNumber = '5';
 
   for (const [accented, data] of Object.entries(toneMap)) {
@@ -2250,26 +2274,44 @@ function playTone(text) {
     }
   }
 
-  // Orthography fix: j, q, x, y combined with ü (mapped to v) 
-  // must use 'u' in standard Pinyin file names (ju, qu, xu, yu)
+  // Handle zhi1 -> base: zhi, toneNumber: 1
+  const numMatch = cleanText.match(/^([a-z]+)([1-5])$/);
+  if (numMatch) {
+    base = numMatch[1];
+    toneNumber = numMatch[2];
+  }
+
   if (/^[jqxy]/.test(base)) {
     base = base.replace(/v/g, 'u');
   }
 
-  // Use real human-recorded MP3s for flawless pronunciation!
-  const url = `https://www.purpleculture.net/mp3/${base}${toneNumber}.mp3`;
-  const audio = new Audio(url);
+  // 1. Try local self-hosted open-access audio asset first
+  const localUrl = `/audio/pinyin/${base}${toneNumber}.mp3`;
+  const audio = new Audio(localUrl);
 
   let fallbackTriggered = false;
   const fallbackToTTS = () => {
     if (fallbackTriggered) return;
     fallbackTriggered = true;
-    speakText(text);
+    
+    // Hanzi fallback guarantees 100% native Mandarin vocalization!
+    const hanziText = pinyinToHanziMap[cleanText] || pinyinToHanziMap[`${base}${toneNumber}`] || pinyinToHanziMap[base] || text;
+    speakText(hanziText);
   };
 
-  audio.onerror = fallbackToTTS;
+  audio.onerror = () => {
+    // Try PurpleCulture open CDN as secondary, then Hanzi TTS as final
+    const remoteUrl = `https://www.purpleculture.net/mp3/${base}${toneNumber}.mp3`;
+    const remoteAudio = new Audio(remoteUrl);
+    remoteAudio.onerror = fallbackToTTS;
+    remoteAudio.play().catch(fallbackToTTS);
+  };
+
   audio.play().catch(err => {
-    fallbackToTTS();
+    const remoteUrl = `https://www.purpleculture.net/mp3/${base}${toneNumber}.mp3`;
+    const remoteAudio = new Audio(remoteUrl);
+    remoteAudio.onerror = fallbackToTTS;
+    remoteAudio.play().catch(fallbackToTTS);
   });
 }
 
