@@ -24,30 +24,7 @@ async function insertPinyinRules() {
     await db.run('DELETE FROM grammar WHERE lesson_id = ?', [lessonId]);
     
     const grammarRules = [
-      {
-        title_en: "The Four Tones",
-        title_th: "เสียงวรรณยุกต์ 4 เสียง",
-        explanation_en: "Mandarin Chinese has four main tones plus a neutral tone. The meaning of a word changes depending on the tone!\n- **1st Tone (mā)**: High and flat (—).\n- **2nd Tone (má)**: Rising, like asking a question (/).\n- **3rd Tone (mǎ)**: Dips down low then curves up (\\/).\n- **4th Tone (mà)**: Sharp and falling, like a strong command (\\).\n- **Neutral Tone (ma)**: Short, light, and soft.",
-        explanation_th: "ภาษาจีนกลางมีเสียงวรรณยุกต์หลัก 4 เสียง และเสียงเบา 1 เสียง ความหมายของคำจะเปลี่ยนไปตามระดับเสียงวรรณยุกต์!\n- **เสียงที่ 1 (mā)**: เสียงสูงและราบเรียบ (เทียบเท่าเสียงสามัญ: —)\n- **เสียงที่ 2 (má)**: เสียงชันขึ้น เหมือนถามคำถาม (เทียบเท่าเสียงจัตวา: /)\n- **เสียงที่ 3 (mǎ)**: เสียงต่ำลงแล้วโค้งขึ้น (เทียบเท่าเสียงเอก/กึ่งจัตวา: \\/)\n- **เสียงที่ 4 (mà)**: เสียงหนักและสั้นลงอย่างรวดเร็ว (เทียบเท่าเสียงโท: \\)\n- **เสียงเบา (ma)**: ออกเสียงสั้นและเบากว่าปกติ"
-      },
-      {
-        title_en: "Third Tone Sandhi (3 + 3 ➔ 2 + 3)",
-        title_th: "การเปลี่ยนเสียงวรรณยุกต์ เสียง 3 (Third Tone Sandhi)",
-        explanation_en: "When two 3rd tones appear back-to-back, the first one changes to a 2nd tone. For example, **nǐ hǎo** (both 3rd tones) is pronounced as **ní hǎo**. You still write the pinyin as nǐ hǎo, but you pronounce it with a rising tone!",
-        explanation_th: "เมื่อมีเสียงวรรณยุกต์เสียงที่ 3 อยู่ติดกัน 2 คำ คำแรกจะเปลี่ยนการออกเสียงเป็น **เสียงที่ 2** (เสียงพุ่งขึ้น)\nตัวอย่างเช่น **nǐ hǎo** (เสียง 3 ทั้งคู่) ออกเสียงจริงเป็น **ní hǎo** แต่เวลาเขียนพินอินยังคงสัญลักษณ์ nǐ hǎo เดิมไว้!"
-      },
-      {
-        title_en: "Tone Change for 'Yi' (一) and 'Bu' (不)",
-        title_th: "การเปลี่ยนเสียงของ 'Yi' (一) และ 'Bu' (不)",
-        explanation_en: "**Yi (一 - One)** is normally 1st tone. But before a 4th tone, it changes to 2nd tone (yí gè). Before any other tone, it changes to 4th tone (yì bēi).\n\n**Bu (不 - Not)** is normally 4th tone. But before another 4th tone, it changes to 2nd tone (bú shì).",
-        explanation_th: "**Yi (一 - หนึ่ง)** ตามปกติเป็นเสียงที่ 1 แต่เมื่อนำหน้าคำที่เป็น **เสียงที่ 4** จะเปลี่ยนเป็นเสียงที่ 2 (เช่น yí gè) และเมื่อนำหน้าเสียงอื่น (1, 2, 3) จะเปลี่ยนเป็นเสียงที่ 4 (เช่น yì bēi)\n\n**Bu (不 - ไม่)** ตามปกติเป็นเสียงที่ 4 แต่เมื่อนำหน้าคำที่เป็น **เสียงที่ 4** จะเปลี่ยนเป็นเสียงที่ 2 (เช่น bú shì)"
-      },
-      {
-        title_en: "The 'ü' Rule",
-        title_th: "กฎการตัดจุดของสระ 'ü'",
-        explanation_en: "The 'ü' sound (like 'ee' with rounded lips) loses its two dots when it comes after the initials **j, q, x, and y**. So `ju`, `qu`, `xu`, and `yu` are actually pronounced with the 'ü' sound, NOT the regular 'u' sound!",
-        explanation_th: "สระ 'ü' (ออกเสียง อี ทำปากจู๋) จะ **ละจุดสองจุดข้างบนออก** เมื่อประสมกับพยัญชนะ **j, q, x และ y**\nดังนั้นคำว่า `ju`, `qu`, `xu` และ `yu` จึงออกเสียงด้วยสระ 'ü' ไม่ใช่สระ 'u' (อู) ปกติ!"
-      },
+      // CATEGORY: Mouth & Airflow Guide (Tab 2) - Sort 0-3
       {
         title_en: "1. Retroflex Group: zh, ch, sh, r",
         title_th: "1. กลุ่มพยัญชนะม้วนลิ้น (Retroflex): zh, ch, sh, r",
@@ -72,6 +49,34 @@ async function insertPinyinRules() {
         explanation_en: "Chinese consonants are grouped into **Unaspirated (No Air)** vs. **Aspirated (Strong Air)** pairs:\n- **b (ป)** vs **p (พ - 💨)**\n- **d (ต)** vs **t (ท - 💨)**\n- **g (ก)** vs **k (ค - 💨)**\n- **j (จิ)** vs **q (ชิ - 💨)**\n- **zh (จ)** vs **ch (ช - 💨)**\n- **z (จึ)** vs **c (ชึ - 💨)**\n\n💡 **The Tissue Paper Test:** Hold a paper tissue in front of your mouth. Aspirated sounds (p, t, k, q, ch, c) will blow the tissue paper forward strongly!",
         explanation_th: "พยัญชนะจีนแบ่งเป็นคู่ **ไม่พ่นลม** กับ **พ่นลมแรง (Aspirated)**:\n- **b (ป)** คู่กับ **p (พ - พ่นลมแรง 💨)**\n- **d (ต)** คู่กับ **t (ท - พ่นลมแรง 💨)**\n- **g (ก)** คู่กับ **k (ค - พ่นลมแรง 💨)**\n- **j (จิ)** คู่กับ **q (ชิ - พ่นลมแรง 💨)**\n- **zh (จ-ม้วนลิ้น)** คู่กับ **ch (ช-ม้วนลิ้น พ่นลมแรง 💨)**\n- **z (จึ)** คู่กับ **c (ชึ - พ่นลมแรง 💨)**\n\n💡 **ทดสอบด้วยทิชชู (Tissue Paper Test):** ถือแผ่นทิชชูไว้หน้าปาก เมื่อออกเสียงกลุ่มพ่นลม (p, t, k, q, ch, c) แผ่นทิชชูจะขยับปลิวอย่างชัดเจน!"
       },
+
+      // CATEGORY: Tone & General Rules (Tab 3) - Sort 4-7
+      {
+        title_en: "The Four Tones",
+        title_th: "เสียงวรรณยุกต์ 4 เสียง",
+        explanation_en: "Mandarin Chinese has four main tones plus a neutral tone. The meaning of a word changes depending on the tone!\n- **1st Tone (mā)**: High and flat (—).\n- **2nd Tone (má)**: Rising, like asking a question (/).\n- **3rd Tone (mǎ)**: Dips down low then curves up (\\/).\n- **4th Tone (mà)**: Sharp and falling, like a strong command (\\).\n- **Neutral Tone (ma)**: Short, light, and soft.",
+        explanation_th: "ภาษาจีนกลางมีเสียงวรรณยุกต์หลัก 4 เสียง และเสียงเบา 1 เสียง ความหมายของคำจะเปลี่ยนไปตามระดับเสียงวรรณยุกต์!\n- **เสียงที่ 1 (mā)**: เสียงสูงและราบเรียบ (เทียบเท่าเสียงสามัญ: —)\n- **เสียงที่ 2 (má)**: เสียงชันขึ้น เหมือนถามคำถาม (เทียบเท่าเสียงจัตวา: /)\n- **เสียงที่ 3 (mǎ)**: เสียงต่ำลงแล้วโค้งขึ้น (เทียบเท่าเสียงเอก/กึ่งจัตวา: \\/)\n- **เสียงที่ 4 (mà)**: เสียงหนักและสั้นลงอย่างรวดเร็ว (เทียบเท่าเสียงโท: \\)\n- **เสียงเบา (ma)**: ออกเสียงสั้นและเบากว่าปกติ"
+      },
+      {
+        title_en: "Third Tone Sandhi (3 + 3 ➔ 2 + 3)",
+        title_th: "การเปลี่ยนเสียงวรรณยุกต์ เสียง 3 (Third Tone Sandhi)",
+        explanation_en: "When two 3rd tones appear back-to-back, the first one changes to a 2nd tone. For example, **nǐ hǎo** (both 3rd tones) is pronounced as **ní hǎo**. You still write the pinyin as nǐ hǎo, but you pronounce it with a rising tone!",
+        explanation_th: "เมื่อมีเสียงวรรณยุกต์เสียงที่ 3 อยู่ติดกัน 2 คำ คำแรกจะเปลี่ยนการออกเสียงเป็น **เสียงที่ 2** (เสียงพุ่งขึ้น)\nตัวอย่างเช่น **nǐ hǎo** (เสียง 3 ทั้งคู่) ออกเสียงจริงเป็น **ní hǎo** แต่เวลาเขียนพินอินยังคงสัญลักษณ์ nǐ hǎo เดิมไว้!"
+      },
+      {
+        title_en: "Tone Change for 'Yi' (一) and 'Bu' (不)",
+        title_th: "การเปลี่ยนเสียงของ 'Yi' (一) และ 'Bu' (不)",
+        explanation_en: "**Yi (一 - One)** is normally 1st tone. But before a 4th tone, it changes to 2nd tone (yí gè). Before any other tone, it changes to 4th tone (yì bēi).\n\n**Bu (不 - Not)** is normally 4th tone. But before another 4th tone, it changes to 2nd tone (bú shì).",
+        explanation_th: "**Yi (一 - หนึ่ง)** ตามปกติเป็นเสียงที่ 1 แต่เมื่อนำหน้าคำที่เป็น **เสียงที่ 4** จะเปลี่ยนเป็นเสียงที่ 2 (เช่น yí gè) และเมื่อนำหน้าเสียงอื่น (1, 2, 3) จะเปลี่ยนเป็นเสียงที่ 4 (เช่น yì bēi)\n\n**Bu (不 - ไม่)** ตามปกติเป็นเสียงที่ 4 แต่เมื่อนำหน้าคำที่เป็น **เสียงที่ 4** จะเปลี่ยนเป็นเสียงที่ 2 (เช่น bú shì)"
+      },
+      {
+        title_en: "The 'ü' Rule",
+        title_th: "กฎการตัดจุดของสระ 'ü'",
+        explanation_en: "The 'ü' sound (like 'ee' with rounded lips) loses its two dots when it comes after the initials **j, q, x, and y**. So `ju`, `qu`, `xu`, and `yu` are actually pronounced with the 'ü' sound, NOT the regular 'u' sound!",
+        explanation_th: "สระ 'ü' (ออกเสียง อี ทำปากจู๋) จะ **ละจุดสองจุดข้างบนออก** เมื่อประสมกับพยัญชนะ **j, q, x และ y**\nดังนั้นคำว่า `ju`, `qu`, `xu` และ `yu` จึงออกเสียงด้วยสระ 'ü' ไม่ใช่สระ 'u' (อู) ปกติ!"
+      },
+
+      // CATEGORY: Typing Rules (Tab 5) - Sort 8
       {
         title_en: "Pinyin Typing Rules & Zero-Initials ⌨️",
         title_th: "กฎการพิมพ์พินอินและอักษรนำศูนย์ (Zero-Initials ⌨️)",

@@ -2079,20 +2079,102 @@ function renderTonePairs() {
 }
 
 function renderPinyinRules(rules) {
-  const container = document.getElementById('pinyin-rules-container');
-  if (!container) return;
-  container.innerHTML = '';
-  
-  rules.forEach(rule => {
+  if (!rules || rules.length === 0) return;
+
+  const mouthContainer = document.getElementById('pinyin-mouth-container');
+  const rulesContainer = document.getElementById('pinyin-rules-container');
+  const typingContainer = document.getElementById('pinyin-typing-rule-container');
+
+  if (mouthContainer) mouthContainer.innerHTML = '';
+  if (rulesContainer) rulesContainer.innerHTML = '';
+  if (typingContainer) typingContainer.innerHTML = '';
+
+  rules.forEach((rule, idx) => {
     const card = document.createElement('div');
-    card.className = 'rule-card';
+    card.className = 'glass-panel rule-card';
+    card.style.cssText = 'padding: 1.25rem; border-left: 4px solid var(--accent, #00f5d4);';
+    
     const title = ld(rule, 'title');
     const explanation = ld(rule, 'explanation');
+    const tEn = rule.title || rule.title_en || '';
+    
+    let svgGraphicHtml = '';
+    if (tEn.includes('Retroflex')) {
+      card.style.borderLeftColor = 'var(--accent-orange, #ff9f43)';
+      svgGraphicHtml = `
+        <div style="background: rgba(0,0,0,0.15); border-radius: 12px; padding: 1rem; text-align: center; margin: 1rem 0;">
+          <svg width="180" height="120" viewBox="0 0 200 140" style="max-width: 100%;">
+            <path d="M 30 20 Q 120 10 160 50 Q 170 80 160 110" fill="none" stroke="var(--text-secondary)" stroke-width="3" opacity="0.4"/>
+            <path d="M 60 40 Q 110 30 140 50" fill="none" stroke="#fff" stroke-width="4"/>
+            <rect x="55" y="38" width="8" height="12" rx="2" fill="#fff"/>
+            <rect x="55" y="70" width="8" height="12" rx="2" fill="#fff"/>
+            <path d="M 40 100 Q 80 95 100 80 Q 115 60 105 48" fill="none" stroke="#ff9f43" stroke-width="8" stroke-linecap="round"/>
+            <path d="M 85 65 Q 100 65 125 70" fill="none" stroke="#54a0ff" stroke-width="3" stroke-dasharray="4,4"/>
+            <polygon points="125,65 133,70 125,75" fill="#54a0ff"/>
+          </svg>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+          <button class="btn btn-sm btn-secondary" onclick="playTone('zhi1')">🔊 zh</button>
+          <button class="btn btn-sm btn-secondary" onclick="playTone('chi1')">🔊 ch</button>
+          <button class="btn btn-sm btn-secondary" onclick="playTone('shi1')">🔊 sh</button>
+          <button class="btn btn-sm btn-secondary" onclick="playTone('ri1')">🔊 r</button>
+        </div>
+      `;
+    } else if (tEn.includes('Palatal')) {
+      card.style.borderLeftColor = 'var(--accent-green, #10ac84)';
+      svgGraphicHtml = `
+        <div style="background: rgba(0,0,0,0.15); border-radius: 12px; padding: 1rem; text-align: center; margin: 1rem 0;">
+          <svg width="180" height="120" viewBox="0 0 200 140" style="max-width: 100%;">
+            <path d="M 30 20 Q 120 10 160 50 Q 170 80 160 110" fill="none" stroke="var(--text-secondary)" stroke-width="3" opacity="0.4"/>
+            <path d="M 60 40 Q 110 30 140 50" fill="none" stroke="#fff" stroke-width="4"/>
+            <rect x="55" y="38" width="8" height="12" rx="2" fill="#fff"/>
+            <rect x="55" y="70" width="8" height="12" rx="2" fill="#fff"/>
+            <path d="M 40 100 Q 75 90 63 78" fill="none" stroke="#10ac84" stroke-width="8" stroke-linecap="round"/>
+            <path d="M 140 70 Q 155 85 170 70" fill="none" stroke="#feca57" stroke-width="3"/>
+          </svg>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+          <button class="btn btn-sm btn-secondary" onclick="playTone('ji1')">🔊 j</button>
+          <button class="btn btn-sm btn-secondary" onclick="playTone('qi1')">🔊 q</button>
+          <button class="btn btn-sm btn-secondary" onclick="playTone('xi1')">🔊 x</button>
+        </div>
+      `;
+    } else if (tEn.includes('Dental')) {
+      card.style.borderLeftColor = 'var(--accent-blue, #54a0ff)';
+      svgGraphicHtml = `
+        <div style="background: rgba(0,0,0,0.15); border-radius: 12px; padding: 1rem; text-align: center; margin: 1rem 0;">
+          <svg width="180" height="120" viewBox="0 0 200 140" style="max-width: 100%;">
+            <path d="M 30 20 Q 120 10 160 50 Q 170 80 160 110" fill="none" stroke="var(--text-secondary)" stroke-width="3" opacity="0.4"/>
+            <path d="M 60 40 Q 110 30 140 50" fill="none" stroke="#fff" stroke-width="4"/>
+            <rect x="55" y="38" width="8" height="12" rx="2" fill="#fff"/>
+            <rect x="55" y="70" width="8" height="12" rx="2" fill="#fff"/>
+            <path d="M 40 100 Q 75 90 63 46" fill="none" stroke="#54a0ff" stroke-width="8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+          <button class="btn btn-sm btn-secondary" onclick="playTone('zi1')">🔊 z</button>
+          <button class="btn btn-sm btn-secondary" onclick="playTone('ci1')">🔊 c</button>
+          <button class="btn btn-sm btn-secondary" onclick="playTone('si1')">🔊 s</button>
+        </div>
+      `;
+    }
+
     card.innerHTML = `
-      <h4>${title}</h4>
-      <p>${explanation.replace(/\n/g, '<br>')}</p>
+      <h4 style="color: var(--accent-color, #00f5d4); margin-bottom: 0.5rem;">${title}</h4>
+      ${svgGraphicHtml}
+      <p style="line-height: 1.6; color: var(--text-primary);">${explanation.replace(/\n/g, '<br>')}</p>
     `;
-    container.appendChild(card);
+
+    // Categorize into Tab containers
+    if (idx < 4 && mouthContainer) {
+      mouthContainer.appendChild(card);
+    } else if (idx >= 4 && idx < 8 && rulesContainer) {
+      rulesContainer.appendChild(card);
+    } else if (idx === 8 && typingContainer) {
+      typingContainer.appendChild(card);
+    } else if (rulesContainer) {
+      rulesContainer.appendChild(card);
+    }
   });
 }
 

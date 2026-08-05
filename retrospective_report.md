@@ -101,3 +101,22 @@ As the HanPath team progresses through the development phases, this document ser
 3. **Unit tests for LLM-adjacent logic must include an adversarial/imperfect fixture**, not just a hand-crafted ideal response, or the test will pass while the real integration still fails.
 4. **Ask before running anything that spends live API quota or significant model credits**, especially to "confirm" a fix — confirm it's structurally necessary first via a free code read.
 
+## 20. Defensive Localization & Zero Unlocalized Property Literals
+**The Error:** Toggling languages to Thai left dynamic Pinyin grammar rule titles stuck in English, while missing `_th` database columns caused silent fallbacks to English text.
+**The Cause:**
+1. Dynamic UI renderers in JavaScript accessed object properties directly (e.g. `g.title`) rather than calling localized getter helpers (`ld(g, 'title')`).
+2. Seeding scripts inserted records without verifying that both `_en` and `_th` fields were populated, triggering automatic fallback to English via `ld()`.
+**Prevention:**
+1. **Zero Raw Literals in JS Renderers:** UI renderer functions must never access literal property names (e.g. `item.title`) or hardcode text strings. Dynamic content must use `ld(item, 'field')` and static UI strings must use `t('key')` or `data-i18n`.
+2. **DB Seed Parity Validation:** Seeding scripts must include automated validation steps to ensure `_en` and `_th` fields are populated before committing rows to the database.
+
+## 21. Audio Fallback Architecture & Explicit TTS Voice Binding
+**The Error:** Audio fallbacks for Pinyin rules and 2-syllable tone pairs sounded like an accented English voice rather than native Chinese.
+**The Cause:**
+1. Single-syllable audio relies on MP3 files (e.g., `purpleculture.net/mp3/ba1.mp3`), but multi-syllable compound words (e.g. `jīntiān`, `nǐhǎo`) do not exist on single-syllable audio servers, returning a 404 error and triggering the Web Speech API fallback.
+2. When the fallback triggered `new SpeechSynthesisUtterance(text)`, setting `utterance.lang = 'zh-CN'` alone was ignored by many operating system speech engines (Windows/macOS/mobile), which defaulted to the system's primary OS voice (English), pronouncing Chinese Pinyin with English phonetics.
+**Prevention:**
+1. **Explicit Voice Binding:** Web Speech API fallbacks must find and explicitly assign a native Chinese voice object (`utterance.voice = speechVoice` where `voice.lang.includes('zh')`), rather than relying solely on `utterance.lang`.
+2. **Hanzi Audio Synthesis for Compound Words:** For multi-syllable words and tone pairs, pass actual Chinese characters (Hanzi like `今天`, `你好`) to the speech synthesizer instead of ASCII Pinyin strings. TTS engines synthesize pitch contours and natural Mandarin far more accurately when given Hanzi characters.
+
+
