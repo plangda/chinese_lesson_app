@@ -362,6 +362,8 @@ function setupEventListeners() {
           if (state.currentPane === "grammar-pane") renderGrammarPane();
           if (state.currentPane === "dialogue-pane") renderDialoguePane();
           if (state.currentPane === "quiz-pane") renderQuizQuestion();
+        } else if (state.currentView === 'pinyin-chart-view') {
+          initPinyinChart();
         } else if (state.currentView === 'welcome-view') {
           // static, translateUI is enough
         }
@@ -819,6 +821,11 @@ function renderDashboard() {
 }
 
 function startLesson(id) {
+  if (id === 'hsk1_day0') {
+    switchView('pinyin-chart-view');
+    initPinyinChart();
+    return;
+  }
   fetch(`/api/lessons/${id}`)
     .then(res => res.json())
     .then(data => {
@@ -951,9 +958,70 @@ function renderGrammarPane() {
       div.style.padding = '1.5rem';
       div.style.marginBottom = '1.5rem';
       
-      let html = `<h4 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem;">${g.title}</h4>`;
+      let title = ld(g, 'title');
+      let html = `<h4 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem;">${title}</h4>`;
       let explanation = ld(g, 'explanation');
-      html += `<p style="margin-bottom: 1rem;">${explanation}</p>`;
+      
+      // Inject SVG graphics & interactive buttons for Pinyin mouth rules
+      const tEn = g.title || g.title_en || '';
+      if (tEn.includes('Retroflex')) {
+        html += `
+          <div style="background: rgba(0,0,0,0.15); border-radius: 12px; padding: 1rem; text-align: center; margin: 1rem 0;">
+            <svg width="180" height="120" viewBox="0 0 200 140" style="max-width: 100%;">
+              <path d="M 30 20 Q 120 10 160 50 Q 170 80 160 110" fill="none" stroke="var(--text-secondary)" stroke-width="3" opacity="0.4"/>
+              <path d="M 60 40 Q 110 30 140 50" fill="none" stroke="#fff" stroke-width="4"/>
+              <rect x="55" y="38" width="8" height="12" rx="2" fill="#fff"/>
+              <rect x="55" y="70" width="8" height="12" rx="2" fill="#fff"/>
+              <path d="M 40 100 Q 80 95 100 80 Q 115 60 105 48" fill="none" stroke="#ff9f43" stroke-width="8" stroke-linecap="round"/>
+              <path d="M 85 65 Q 100 65 125 70" fill="none" stroke="#54a0ff" stroke-width="3" stroke-dasharray="4,4"/>
+              <polygon points="125,65 133,70 125,75" fill="#54a0ff"/>
+            </svg>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <button class="btn btn-sm btn-secondary" onclick="playTone('zhi1')">🔊 zh (จ-ม้วนลิ้น)</button>
+            <button class="btn btn-sm btn-secondary" onclick="playTone('chi1')">🔊 ch (ช-พ่นลม)</button>
+            <button class="btn btn-sm btn-secondary" onclick="playTone('shi1')">🔊 sh (ซ-ม้วนลิ้น)</button>
+            <button class="btn btn-sm btn-secondary" onclick="playTone('ri1')">🔊 r (ย/ร-ม้วนลิ้น)</button>
+          </div>
+        `;
+      } else if (tEn.includes('Palatal')) {
+        html += `
+          <div style="background: rgba(0,0,0,0.15); border-radius: 12px; padding: 1rem; text-align: center; margin: 1rem 0;">
+            <svg width="180" height="120" viewBox="0 0 200 140" style="max-width: 100%;">
+              <path d="M 30 20 Q 120 10 160 50 Q 170 80 160 110" fill="none" stroke="var(--text-secondary)" stroke-width="3" opacity="0.4"/>
+              <path d="M 60 40 Q 110 30 140 50" fill="none" stroke="#fff" stroke-width="4"/>
+              <rect x="55" y="38" width="8" height="12" rx="2" fill="#fff"/>
+              <rect x="55" y="70" width="8" height="12" rx="2" fill="#fff"/>
+              <path d="M 40 100 Q 75 90 63 78" fill="none" stroke="#10ac84" stroke-width="8" stroke-linecap="round"/>
+              <path d="M 140 70 Q 155 85 170 70" fill="none" stroke="#feca57" stroke-width="3"/>
+            </svg>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <button class="btn btn-sm btn-secondary" onclick="playTone('ji1')">🔊 j (จิ)</button>
+            <button class="btn btn-sm btn-secondary" onclick="playTone('qi1')">🔊 q (ชิ-พ่นลม)</button>
+            <button class="btn btn-sm btn-secondary" onclick="playTone('xi1')">🔊 x (ซิ)</button>
+          </div>
+        `;
+      } else if (tEn.includes('Dental')) {
+        html += `
+          <div style="background: rgba(0,0,0,0.15); border-radius: 12px; padding: 1rem; text-align: center; margin: 1rem 0;">
+            <svg width="180" height="120" viewBox="0 0 200 140" style="max-width: 100%;">
+              <path d="M 30 20 Q 120 10 160 50 Q 170 80 160 110" fill="none" stroke="var(--text-secondary)" stroke-width="3" opacity="0.4"/>
+              <path d="M 60 40 Q 110 30 140 50" fill="none" stroke="#fff" stroke-width="4"/>
+              <rect x="55" y="38" width="8" height="12" rx="2" fill="#fff"/>
+              <rect x="55" y="70" width="8" height="12" rx="2" fill="#fff"/>
+              <path d="M 40 100 Q 75 90 63 46" fill="none" stroke="#54a0ff" stroke-width="8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <button class="btn btn-sm btn-secondary" onclick="playTone('zi1')">🔊 z (จึ)</button>
+            <button class="btn btn-sm btn-secondary" onclick="playTone('ci1')">🔊 c (ชึ-พ่นลม)</button>
+            <button class="btn btn-sm btn-secondary" onclick="playTone('si1')">🔊 s (ซึ)</button>
+          </div>
+        `;
+      }
+      
+      html += `<p style="margin-bottom: 1rem;">${explanation.replace(/\n/g, '<br>')}</p>`;
       
       g.examples.forEach(ex => {
         let exEn = (state.currentLanguage === 'th' && ex.th) ? ex.th : ex.en;
@@ -1852,6 +1920,109 @@ function finishLessonPretest() {
 // --- PINYIN CHART LOGIC ---
 let pinyinMatrixData = null;
 
+const tonePairsData = [
+  { pair: "1 + 1", pinyin: "jīntiān", cn: "今天", th: "วันนี้", en: "Today", contour: "— —", play: "jintian" },
+  { pair: "1 + 2", pinyin: "jīnnián", cn: "今年", th: "ปีนี้", en: "This year", contour: "— /", play: "jinnian" },
+  { pair: "1 + 3", pinyin: "chīfàn", cn: "吃饭", th: "กินข้าว", en: "Eat a meal", contour: "— \\/", play: "chifan" },
+  { pair: "1 + 4", pinyin: "bāngzhù", cn: "帮助", th: "ช่วยเหลือ", en: "To help", contour: "— \\", play: "bangzhu" },
+  { pair: "1 + 0", pinyin: "māma", cn: "妈妈", th: "แม่", en: "Mom", contour: "— ·", play: "mama" },
+  
+  { pair: "2 + 1", pinyin: "míngtiān", cn: "明天", th: "พรุ่งนี้", en: "Tomorrow", contour: "/ —", play: "mingtian" },
+  { pair: "2 + 2", pinyin: "tóngxué", cn: "同学", th: "เพื่อนนักเรียน", en: "Classmate", contour: "/ /", play: "tongxue" },
+  { pair: "2 + 3", pinyin: "hánjiǎ", cn: "寒假", th: "ปิดเทอมฤดูหนาว", en: "Winter vacation", contour: "/ \\/", play: "hanjia" },
+  { pair: "2 + 4", pinyin: "shídài", cn: "时代", th: "ยุคสมัย", en: "Era", contour: "/ \\", play: "shidai" },
+  { pair: "2 + 0", pinyin: "yéye", cn: "爷爷", th: "คุณปู่", en: "Grandpa", contour: "/ ·", play: "yeye" },
+
+  { pair: "3 + 1", pinyin: "hǎochī", cn: "好吃", th: "อร่อย", en: "Delicious", contour: "\\/ —", play: "haochi" },
+  { pair: "3 + 2", pinyin: "zǐxì", cn: "仔细", th: "ละเอียดรอบคอบ", en: "Careful", contour: "\\/ /", play: "zixi" },
+  { pair: "3 + 3 (Sandhi)", pinyin: "nǐhǎo", cn: "你好", th: "สวัสดี (เปลี่ยนเป็น 2+3)", en: "Hello (pronounced níhǎo)", contour: "/ \\/", play: "nihao" },
+  { pair: "3 + 4", pinyin: "hǎokàn", cn: "好看", th: "ดูดี/สวย", en: "Good-looking", contour: "\\/ \\", play: "haokan" },
+  { pair: "3 + 0", pinyin: "xǐhuan", cn: "喜欢", th: "ชอบ", en: "To like", contour: "\\/ ·", play: "xihuan" },
+
+  { pair: "4 + 1", pinyin: "dàjiā", cn: "大家", th: "ทุกคน", en: "Everyone", contour: "\\ —", play: "dajia" },
+  { pair: "4 + 2", pinyin: "dàxué", cn: "大学", th: "มหาวิทยาลัย", en: "University", contour: "\\ /", play: "daxue" },
+  { pair: "4 + 3", pinyin: "dàxiǎo", cn: "大小", th: "ขนาด", en: "Size", contour: "\\ \\/", play: "daxia" },
+  { pair: "4 + 4", pinyin: "zàijiàn", cn: "再见", th: "ลาก่อน", en: "Goodbye", contour: "\\ \\", play: "zaijian" },
+  { pair: "4 + 0", pinyin: "xièxie", cn: "谢谢", th: "ขอบคุณ", en: "Thank you", contour: "\\ ·", play: "xiexie" }
+];
+
+window.switchPinyinTab = function(tabName) {
+  const tabs = ['matrix', 'mouth', 'rules', 'pairs', 'typing'];
+  tabs.forEach(t => {
+    const content = document.getElementById(`pinyin-tab-${t}-content`);
+    const btn = document.getElementById(`pinyin-tab-${t}-btn`);
+    if (t === tabName) {
+      if (content) content.style.display = 'block';
+      if (btn) { btn.classList.add('btn-primary', 'active'); btn.classList.remove('btn-secondary'); }
+    } else {
+      if (content) content.style.display = 'none';
+      if (btn) { btn.classList.add('btn-secondary'); btn.classList.remove('btn-primary', 'active'); }
+    }
+  });
+  if (tabName === 'typing') {
+    initPinyinTypingGame();
+  }
+};
+
+let currentTypingTarget = null;
+const pinyinTypingBank = [
+  { cn: "你好", pinyin: "nihao", pyFormatted: "nǐhǎo", en: "Hello", th: "สวัสดี", distractor: ["你号", "拟好", "泥好"] },
+  { cn: "谢谢", pinyin: "xiexie", pyFormatted: "xièxie", en: "Thank you", th: "ขอบคุณ", distractor: ["写写", "斜斜", "些些"] },
+  { cn: "再见", pinyin: "zaijian", pyFormatted: "zàijiàn", en: "Goodbye", th: "ลาก่อน", distractor: ["在件", "ใน见", "在建"] },
+  { cn: "今天", pinyin: "jintian", pyFormatted: "jīntiān", en: "Today", th: "วันนี้", distractor: ["斤天", "金天", "津天"] },
+  { cn: "明天", pinyin: "mingtian", pyFormatted: "míngtiān", en: "Tomorrow", th: "พรุ่งนี้", distractor: ["名天", "铭天", "鸣天"] },
+  { cn: "妈妈", pinyin: "mama", pyFormatted: "māma", en: "Mom", th: "แม่", distractor: ["麻麻", "马马", "骂骂"] },
+  { cn: "同学", pinyin: "tongxue", pyFormatted: "tóngxué", en: "Classmate", th: "เพื่อนนักเรียน", distractor: ["童学", "桐学", "同雪"] },
+  { cn: "帮助", pinyin: "bangzhu", pyFormatted: "bāngzhù", en: "To help", th: "ช่วยเหลือ", distractor: ["棒竹", "榜主", "帮住"] }
+];
+
+window.initPinyinTypingGame = function() {
+  const target = pinyinTypingBank[Math.floor(Math.random() * pinyinTypingBank.length)];
+  currentTypingTarget = target;
+  
+  const promptCn = document.getElementById('typing-prompt-cn');
+  const promptDesc = document.getElementById('typing-prompt-desc');
+  const input = document.getElementById('pinyin-typing-input');
+  const candidatesBox = document.getElementById('pinyin-typing-candidates');
+  const feedback = document.getElementById('pinyin-typing-feedback');
+  
+  if (!promptCn || !input || !candidatesBox) return;
+  
+  const lang = state.currentLanguage || 'en';
+  const descText = lang === 'th' ? target.th : target.en;
+  
+  promptCn.textContent = target.cn;
+  promptDesc.textContent = `${descText} (${target.pyFormatted})`;
+  input.value = '';
+  candidatesBox.innerHTML = '';
+  feedback.textContent = '';
+  feedback.style.color = '';
+  
+  input.oninput = () => {
+    const val = input.value.trim().toLowerCase();
+    candidatesBox.innerHTML = '';
+    if (val === target.pinyin) {
+      const candidates = [target.cn, ...target.distractor].sort(() => Math.random() - 0.5);
+      candidates.forEach((cand, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-secondary btn-sm';
+        btn.textContent = `${idx + 1}. ${cand}`;
+        btn.onclick = () => {
+          if (cand === target.cn) {
+            feedback.textContent = lang === 'th' ? '🎉 ถูกต้อง! ยอดเยี่ยมมาก!' : '🎉 Correct! Great job!';
+            feedback.style.color = '#10ac84';
+            playTone(target.pinyin);
+          } else {
+            feedback.textContent = lang === 'th' ? '❌ ยังไม่ถูกต้อง ลองใหม่อีกครั้ง!' : '❌ Incorrect candidate, try again!';
+            feedback.style.color = '#ff6b6b';
+          }
+        };
+        candidatesBox.appendChild(btn);
+      });
+    }
+  };
+};
+
 async function initPinyinChart() {
   try {
     // Load Rules
@@ -1869,21 +2040,56 @@ async function initPinyinChart() {
         renderPinyinMatrix(pinyinMatrixData);
       }
     }
+
+    // Render Tone Pairs
+    renderTonePairs();
   } catch (err) {
     console.error('Failed to load Pinyin chart data', err);
   }
 }
 
+function renderTonePairs() {
+  const container = document.getElementById('pinyin-tone-pairs-container');
+  if (!container) return;
+  const lang = state.currentLanguage || 'en';
+  container.innerHTML = '';
+
+  tonePairsData.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'glass-panel';
+    card.style.cssText = 'padding: 1rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; border-top: 3px solid var(--accent-color, #feca57);';
+    card.onmouseover = () => { card.style.transform = 'translateY(-3px)'; };
+    card.onmouseout = () => { card.style.transform = 'none'; };
+    card.onclick = () => playTone(item.play || item.pinyin);
+
+    const desc = lang === 'th' ? item.th : item.en;
+    card.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+        <span class="badge" style="background: rgba(254, 202, 87, 0.2); color: #feca57; font-weight: bold;">Tone ${item.pair}</span>
+        <span style="font-family: monospace; color: #54a0ff; font-weight: bold;">${item.contour}</span>
+      </div>
+      <div style="font-size: 1.4rem; font-weight: bold; margin-bottom: 0.2rem;">${item.cn} <span style="font-size: 1.1rem; color: var(--accent-orange, #ff9f43); font-weight: normal;">(${item.pinyin})</span></div>
+      <div style="font-size: 0.88rem; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between;">
+        <span>${desc}</span>
+        <span style="font-size: 1.1rem;">🔊</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
 function renderPinyinRules(rules) {
   const container = document.getElementById('pinyin-rules-container');
+  if (!container) return;
   container.innerHTML = '';
   
   rules.forEach(rule => {
     const card = document.createElement('div');
     card.className = 'rule-card';
+    const title = ld(rule, 'title');
     const explanation = ld(rule, 'explanation');
     card.innerHTML = `
-      <h4>${rule.title}</h4>
+      <h4>${title}</h4>
       <p>${explanation.replace(/\n/g, '<br>')}</p>
     `;
     container.appendChild(card);

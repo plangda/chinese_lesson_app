@@ -606,19 +606,174 @@
         <button id="pinyin-back-btn" class="btn btn-secondary btn-sm" data-i18n="btn_back_dashboard">← Back to Dashboard</button>
       </div>
 
-      <!-- Pinyin Rules Panel -->
-      <div id="pinyin-rules-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-        <!-- Rules will be injected here -->
+      <!-- Pinyin Navigation Tabs (5 Tabs) -->
+      <div class="pinyin-tabs-bar" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border-color, rgba(255,255,255,0.1)); padding-bottom: 0.5rem;">
+        <button id="pinyin-tab-matrix-btn" class="btn btn-sm btn-primary pinyin-tab-btn active" onclick="switchPinyinTab('matrix')" data-i18n="pinyin_tab_matrix">📊 Syllable Matrix</button>
+        <button id="pinyin-tab-mouth-btn" class="btn btn-sm btn-secondary pinyin-tab-btn" onclick="switchPinyinTab('mouth')" data-i18n="pinyin_tab_mouth">👄 Mouth & Airflow Guide</button>
+        <button id="pinyin-tab-rules-btn" class="btn btn-sm btn-secondary pinyin-tab-btn" onclick="switchPinyinTab('rules')" data-i18n="pinyin_tab_rules">🎵 Tone & Typing Rules</button>
+        <button id="pinyin-tab-pairs-btn" class="btn btn-sm btn-secondary pinyin-tab-btn" onclick="switchPinyinTab('pairs')" data-i18n="pinyin_tab_pairs">🎧 Tone Pairs Practice</button>
+        <button id="pinyin-tab-typing-btn" class="btn btn-sm btn-secondary pinyin-tab-btn" onclick="switchPinyinTab('typing')" data-i18n="pinyin_tab_typing">⌨️ Pinyin Typing Game</button>
       </div>
 
-      <!-- The Matrix -->
-      <div class="glass-panel pinyin-matrix-container" style="overflow-x: auto; padding: 1rem;">
-        <h3 style="margin-bottom: 1rem;" data-i18n="pinyin_interactive_title">Interactive Chart</h3>
-        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;" data-i18n="pinyin_click_hint">Click any syllable to hear its 4 tones.</p>
-        <div id="pinyin-matrix" style="min-width: 800px;">
-          <!-- Matrix will be injected here -->
+      <!-- TAB 1: The Matrix -->
+      <div id="pinyin-tab-matrix-content" class="pinyin-tab-content">
+        <div class="glass-panel pinyin-matrix-container" style="overflow-x: auto; padding: 1rem;">
+          <h3 style="margin-bottom: 0.5rem;" data-i18n="pinyin_interactive_title">Interactive Chart</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;" data-i18n="pinyin_click_hint">Click any syllable to hear its 4 tones.</p>
+          <div id="pinyin-matrix" style="min-width: 800px;">
+            <!-- Matrix will be injected here -->
+          </div>
         </div>
       </div>
+
+      <!-- TAB 2: Mouth & Airflow Visualizer (SVG Diagrams) -->
+      <div id="pinyin-tab-mouth-content" class="pinyin-tab-content" style="display: none;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1.25rem;">
+          
+          <!-- Card 1: Retroflex zh, ch, sh, r -->
+          <div class="glass-panel" style="padding: 1.25rem; border-left: 4px solid var(--accent-orange, #ff9f43);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+              <h4 style="color: var(--accent-orange, #ff9f43); margin: 0;">1. Retroflex (zh, ch, sh, r)</h4>
+              <span class="badge" style="background: rgba(255, 159, 67, 0.2); color: #ff9f43;">ม้วนลิ้นขึ้น</span>
+            </div>
+            <!-- SVG Mouth Profile Diagram -->
+            <div style="background: rgba(0,0,0,0.15); border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1rem;">
+              <svg width="180" height="120" viewBox="0 0 200 140" style="max-width: 100%;">
+                <!-- Head profile contour -->
+                <path d="M 30 20 Q 120 10 160 50 Q 170 80 160 110" fill="none" stroke="var(--text-secondary)" stroke-width="3" opacity="0.4"/>
+                <!-- Hard palate -->
+                <path d="M 60 40 Q 110 30 140 50" fill="none" stroke="#fff" stroke-width="4"/>
+                <!-- Upper teeth -->
+                <rect x="55" y="38" width="8" height="12" rx="2" fill="#fff"/>
+                <!-- Lower teeth -->
+                <rect x="55" y="70" width="8" height="12" rx="2" fill="#fff"/>
+                <!-- Tongue Curled UP -->
+                <path d="M 40 100 Q 80 95 100 80 Q 115 60 105 48" fill="none" stroke="#ff9f43" stroke-width="8" stroke-linecap="round"/>
+                <!-- Airflow Arrow -->
+                <path d="M 85 65 Q 100 65 125 70" fill="none" stroke="#54a0ff" stroke-width="3" stroke-dasharray="4,4"/>
+                <polygon points="125,65 133,70 125,75" fill="#54a0ff"/>
+              </svg>
+            </div>
+            <p style="font-size: 0.88rem; margin-bottom: 0.75rem;"><strong>Tongue Action:</strong> Curl the tip of your tongue <em>UPWARD</em> toward the roof of your mouth without touching it.</p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="btn btn-sm btn-secondary" onclick="playTone('zhi1')">🔊 zh (จ-ม้วนลิ้น)</button>
+              <button class="btn btn-sm btn-secondary" onclick="playTone('chi1')">🔊 ch (ช-พ่นลม)</button>
+              <button class="btn btn-sm btn-secondary" onclick="playTone('shi1')">🔊 sh (ซ-ม้วนลิ้น)</button>
+              <button class="btn btn-sm btn-secondary" onclick="playTone('ri1')">🔊 r (ย/ร-ม้วนลิ้น)</button>
+            </div>
+          </div>
+
+          <!-- Card 2: Palatal j, q, x -->
+          <div class="glass-panel" style="padding: 1.25rem; border-left: 4px solid var(--accent-green, #10ac84);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+              <h4 style="color: var(--accent-green, #10ac84); margin: 0;">2. Palatal (j, q, x)</h4>
+              <span class="badge" style="background: rgba(16, 172, 132, 0.2); color: #10ac84;">แบนลิ้นแตะฟันล่าง</span>
+            </div>
+            <div style="background: rgba(0,0,0,0.15); border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1rem;">
+              <svg width="180" height="120" viewBox="0 0 200 140" style="max-width: 100%;">
+                <path d="M 30 20 Q 120 10 160 50 Q 170 80 160 110" fill="none" stroke="var(--text-secondary)" stroke-width="3" opacity="0.4"/>
+                <path d="M 60 40 Q 110 30 140 50" fill="none" stroke="#fff" stroke-width="4"/>
+                <rect x="55" y="38" width="8" height="12" rx="2" fill="#fff"/>
+                <rect x="55" y="70" width="8" height="12" rx="2" fill="#fff"/>
+                <!-- Tongue FLAT touching lower teeth -->
+                <path d="M 40 100 Q 75 90 63 78" fill="none" stroke="#10ac84" stroke-width="8" stroke-linecap="round"/>
+                <!-- Smile indicator -->
+                <path d="M 140 70 Q 155 85 170 70" fill="none" stroke="#feca57" stroke-width="3"/>
+              </svg>
+            </div>
+            <p style="font-size: 0.88rem; margin-bottom: 0.75rem;"><strong>Tongue Action:</strong> Keep tongue <em>FLAT</em> with tip resting behind lower front teeth. Pull corners of lips into a smile 😊.</p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="btn btn-sm btn-secondary" onclick="playTone('ji1')">🔊 j (จิ)</button>
+              <button class="btn btn-sm btn-secondary" onclick="playTone('qi1')">🔊 q (ชิ-พ่นลม)</button>
+              <button class="btn btn-sm btn-secondary" onclick="playTone('xi1')">🔊 x (ซิ)</button>
+            </div>
+          </div>
+
+          <!-- Card 3: Dental Sibilants z, c, s -->
+          <div class="glass-panel" style="padding: 1.25rem; border-left: 4px solid var(--accent-blue, #54a0ff);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+              <h4 style="color: var(--accent-blue, #54a0ff); margin: 0;">3. Dental (z, c, s)</h4>
+              <span class="badge" style="background: rgba(84, 160, 255, 0.2); color: #54a0ff;">แบนลิ้นแตะหลังฟันบน</span>
+            </div>
+            <div style="background: rgba(0,0,0,0.15); border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1rem;">
+              <svg width="180" height="120" viewBox="0 0 200 140" style="max-width: 100%;">
+                <path d="M 30 20 Q 120 10 160 50 Q 170 80 160 110" fill="none" stroke="var(--text-secondary)" stroke-width="3" opacity="0.4"/>
+                <path d="M 60 40 Q 110 30 140 50" fill="none" stroke="#fff" stroke-width="4"/>
+                <rect x="55" y="38" width="8" height="12" rx="2" fill="#fff"/>
+                <rect x="55" y="70" width="8" height="12" rx="2" fill="#fff"/>
+                <!-- Tongue touching back of upper teeth -->
+                <path d="M 40 100 Q 75 90 63 46" fill="none" stroke="#54a0ff" stroke-width="8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p style="font-size: 0.88rem; margin-bottom: 0.75rem;"><strong>Tongue Action:</strong> Keep tongue <em>FLAT</em> (do NOT curl) with tip touching back of upper front teeth.</p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button class="btn btn-sm btn-secondary" onclick="playTone('zi1')">🔊 z (จึ)</button>
+              <button class="btn btn-sm btn-secondary" onclick="playTone('ci1')">🔊 c (ชึ-พ่นลม)</button>
+              <button class="btn btn-sm btn-secondary" onclick="playTone('si1')">🔊 s (ซึ)</button>
+            </div>
+          </div>
+
+          <!-- Card 4: Tissue Paper Test (Aspirated vs Unaspirated) -->
+          <div class="glass-panel" style="padding: 1.25rem; border-left: 4px solid var(--accent-purple, #9b59b6);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+              <h4 style="color: #9b59b6; margin: 0;">4. Tissue Paper Test 💨</h4>
+              <span class="badge" style="background: rgba(155, 89, 182, 0.2); color: #9b59b6;">พ่นลม vs ไม่พ่นลม</span>
+            </div>
+            <div style="background: rgba(0,0,0,0.15); border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1rem;">
+              <p style="font-size: 0.95rem; font-weight: bold; margin-bottom: 0.5rem; color: #feca57;">Hold a paper tissue in front of your mouth! 💨</p>
+              <p style="font-size: 0.85rem; color: var(--text-secondary);">Aspirated sounds (p, t, k, q, ch, c) blow the paper forward strongly.</p>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.85rem;">
+              <div style="background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 8px;">
+                <strong style="color: #10ac84;">No Air (ไม่พ่นลม):</strong><br>b, d, g, j, zh, z
+              </div>
+              <div style="background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 8px;">
+                <strong style="color: #ff6b6b;">Strong Air (พ่นลม 💨):</strong><br>p, t, k, q, ch, c
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 3: Dynamic Tone & Typing Rules (DB Rules) -->
+      <div id="pinyin-tab-rules-content" class="pinyin-tab-content" style="display: none;">
+        <div id="pinyin-rules-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+          <!-- Dynamic 9 rules injected from DB -->
+        </div>
+      </div>
+
+      <!-- TAB 4: Tone Pairs Practice (2-Syllable Combinations) -->
+      <div id="pinyin-tab-pairs-content" class="pinyin-tab-content" style="display: none;">
+        <div class="glass-panel" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+          <h3 style="margin-bottom: 0.5rem;">🎧 Tone Pairs Practice (การฝึกจับคู่เสียง 2 พยางค์)</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">Over 80% of Mandarin words are 2-syllable pairs. Click any card to listen and master natural speech rhythm!</p>
+        </div>
+        <div id="pinyin-tone-pairs-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+          <!-- Tone pairs injected dynamically by app.js -->
+        </div>
+      <!-- TAB 5: Pinyin Typing Simulator (IME Practice) -->
+      <div id="pinyin-tab-typing-content" class="pinyin-tab-content" style="display: none;">
+        <div class="glass-panel" style="padding: 1.5rem; max-width: 600px; margin: 0 auto 2rem auto; text-align: center;">
+          <h3 style="margin-bottom: 0.5rem;">⌨️ Pinyin Typing Simulator (เกมฝึกพิมพ์พินอิน)</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">Practice typing Pinyin like a native! Type the pinyin without tone marks and pick the matching Chinese character candidate.</p>
+          
+          <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+            <div style="font-size: 0.9rem; color: var(--accent-color, #feca57); margin-bottom: 0.5rem;">Target Word to Type:</div>
+            <div id="typing-prompt-cn" style="font-size: 2.2rem; font-weight: bold; margin-bottom: 0.2rem;">你好</div>
+            <div id="typing-prompt-desc" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">Hello (nǐhǎo)</div>
+            
+            <input type="text" id="pinyin-typing-input" placeholder="Type pinyin e.g. nihao..." style="width: 100%; max-width: 320px; padding: 0.75rem; border-radius: 8px; border: 2px solid var(--primary, #00f5d4); background: rgba(255,255,255,0.05); color: #fff; text-align: center; font-size: 1.1rem; margin-bottom: 1rem;" autocomplete="off" />
+            
+            <!-- Candidate Pick Buttons -->
+            <div id="pinyin-typing-candidates" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; min-height: 40px; margin-bottom: 1rem;"></div>
+            <div id="pinyin-typing-feedback" style="font-weight: bold; min-height: 24px;"></div>
+          </div>
+          
+          <button class="btn btn-primary" onclick="initPinyinTypingGame()">🔄 Next Word (คำถัดไป)</button>
+        </div>
+      </div>
+
     </section>
 
   </main>
