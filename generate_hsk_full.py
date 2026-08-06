@@ -249,25 +249,34 @@ def find_translation_corruption(original, translated):
 
 def _strip_untranslatable_fields(data):
     """Create a deep copy with cn/py/character/pinyin removed entirely.
-    These fields are never read back from the LLM response (see
-    _apply_translated_fields), so they are never sent in the first place —
-    nothing sent means nothing for the LLM to alter or mis-echo."""
+    Also injects empty _th fields so the LLM strictly follows the structure."""
     stripped = copy.deepcopy(data)
 
+    stripped["title_th"] = ""
     for v in stripped.get("vocab", []):
         v.pop("character", None)
         v.pop("pinyin", None)
+        v["translation_th"] = ""
+        v["deconstruct_th"] = ""
+        v["example_translation_th"] = ""
 
     for g in stripped.get("grammar", []):
+        g["title_th"] = ""
+        g["explanation_th"] = ""
         for ex in g.get("examples", []):
             ex.pop("cn", None)
             ex.pop("py", None)
+            ex["th"] = ""
+        if g.get("practice"):
+            g["practice"]["prompt_th"] = ""
 
     dial = stripped.get("dialogue")
     if dial:
+        dial["title_th"] = ""
         for line in dial.get("lines", []):
             line.pop("cn", None)
             line.pop("py", None)
+            line["th"] = ""
 
     return stripped
 
@@ -305,6 +314,15 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
     original = copy.deepcopy(lesson_data)
     stripped_lesson = _strip_untranslatable_fields(lesson_data)
 
+    lesson_str = json.dumps(stripped_lesson, ensure_ascii=False)
+    citations = []
+    def replacer(m):
+        core, tail = _split_citation(m.group(0))
+        citations.append(core)
+        return f" __CIT_{len(citations) - 1}__ {tail}"
+    
+    placeholder_lesson_str = _CJK_PROTECT_PATTERN.sub(replacer, lesson_str)
+
     prompt = f"""
     You are a professional Chinese-to-Thai pedagogical translator for children
     aged 8-15 learning Chinese as a foreign language.
@@ -319,15 +337,18 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
     - Do NOT translate word-for-byte; use natural spoken Thai grammar.
     - Explain grammar particles by their function in Thai, not their literal name.
     - Use simple, warm, kid-friendly language, not academic/formal register.
-    - Any Chinese characters or pinyin cited inside an English field (e.g. '禾' (hé, grain))
-      MUST be preserved byte-for-byte, identical, inside the translated Thai field.
+    - You will see placeholders like __CIT_0__ in the text. These represent Chinese citations.
+      You MUST preserve these placeholders exactly as they appear in the source text.
+      For example, if the source says "The word __CIT_0__ , grain) means...", 
+      translate it as "คำว่า __CIT_0__ , เมล็ดข้าว) แปลว่า...". Notice how the English word "grain" gets translated, but the placeholder remains.
+    - IMPORTANT: Do NOT add spaces around underscores in JSON keys. For example, use "translation_th" exactly, NOT "translation _ th".
     - Return the EXACT SAME JSON structure and field names as the input, with
       every "_th"/"th" field now filled in. Do NOT add, remove, or reorder any
       array items.
     - Output valid JSON only. No markdown code fences, no extra commentary.
 
     Lesson JSON:
-    {json.dumps(stripped_lesson, ensure_ascii=False)}
+    {placeholder_lesson_str}
     """
 
     consecutive_quota_errors = 0
@@ -343,6 +364,18 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
             if text.startswith("```"):
                 text = re.sub(r"^```(?:json)?\n?", "", text)
                 text = re.sub(r"\n?```$", "", text)
+            
+            def restore(m):
+                try:
+                    idx = int(m.group(1))
+                    return citations[idx] if 0 <= idx < len(citations) else m.group(0)
+                except (ValueError, IndexError):
+                    return m.group(0)
+            text = _RESTORATION_PATTERN.sub(restore, text)
+
+            # Fix spaces around underscores (e.g. "translation _ th" -> "translation_th")
+            text = re.sub(r'([a-zA-Z])\s+_\s+([a-zA-Z])', r'\1_\2', text)
+
             try:
                 translated = json.loads(text)
             except json.JSONDecodeError as e:
@@ -350,8 +383,12 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
                 print(f"  [Thai LLM translation] json.loads failed ({e}); "
                       f"near: {snippet!r}. Retrying with json_repair.")
                 translated = json_repair.loads(text)
+            
             corruption = find_translation_corruption(original, translated)
             if corruption:
+                print("RAW LLM TEXT WAS:")
+                print(text)
+                print("===================")
                 raise ValueError(f"Translation corruption detected: {corruption}")
             _apply_translated_fields(lesson_data, translated)
             lesson_data["_th_source"] = "llm"

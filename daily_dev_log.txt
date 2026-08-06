@@ -88,3 +88,10 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Self-hosted open-access human MP3 audio files (public/audio/pinyin/a1.mp3 through a4.mp3, e1 through e4) in repository, eliminating third-party commercial CDN dependencies and 404 failovers.
 - Updated playTone() fallback to map ASCII Pinyin strings (a1, zhi1, chi1) directly to native Chinese Hanzi characters (啊, 知, 吃), forcing browser SpeechSynthesis to activate native Mandarin voice engines instead of reading ASCII letters ("zhi-one").
 - Updated PROJECT_SUMMARY.md, IMPLEMENTATION_PROGRESS.md, retrospective_report.md, and daily_dev_log.txt.
+
+2026-08-06:
+- Added regex cleanup in generate_hsk_full.py to strip spaces around underscores in Gemini JSON keys (e.g., "translation _ th" -> "translation_th").
+- Re-ran patch_thai_translations.py for HSK 1, successfully upgrading the final remaining lesson (hsk1_day24) to LLM Thai (100% HSK 1 completion).
+- Started HSK 2 Thai LLM translation rollout: successfully upgraded 8 HSK 2 lessons to LLM Thai.
+- Verified graceful batch abortion due to quota limit: hit 429 RESOURCE_EXHAUSTED on hsk2_day12, safely leaving 6 lessons untouched for tomorrow.
+- Overall state: 36 lessons on LLM Thai, 1 fallback, 6 remaining untouched.

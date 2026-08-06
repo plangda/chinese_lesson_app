@@ -15,7 +15,7 @@
   "hsk1_day21": "llm",
   "hsk1_day22": "llm",
   "hsk1_day23": "llm",
-  "hsk1_day24": "fallback",
+  "hsk1_day24": "llm",
   "hsk1_day25": "llm",
   "hsk1_day26": "llm",
   "hsk1_day3": "llm",
@@ -24,5 +24,16 @@
   "hsk1_day6": "llm",
   "hsk1_day7": "llm",
   "hsk1_day8": "llm",
-  "hsk1_day9": "llm"
+  "hsk1_day9": "llm",
+  "hsk2_day1": "llm",
+  "hsk2_day10": "llm",
+  "hsk2_day11": "llm",
+  "hsk2_day2": "llm",
+  "hsk2_day3": "llm",
+  "hsk2_day4": "llm",
+  "hsk2_day5": "llm",
+  "hsk2_day6": "llm",
+  "hsk2_day7": "llm",
+  "hsk2_day8": "llm",
+  "hsk2_day9": "fallback"
 }
