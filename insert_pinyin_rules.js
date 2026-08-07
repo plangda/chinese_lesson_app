@@ -25,7 +25,7 @@ async function insertPinyinRules() {
     
     const grammarRules = [
       // ==========================================
-      // TAB 2: Mouth & Airflow Guide (Sort 0 - 4)
+      // TAB 2: Mouth & Airflow Guide (Sort 0 - 5)
       // ==========================================
       {
         title_en: "1. Retroflex Group: zh, ch, sh, r",
@@ -57,9 +57,15 @@ async function insertPinyinRules() {
         explanation_en: "How to pronounce the **'ü'** sound correctly:\n1. Say and hold the **'ee'** sound (like in 'see').\n2. Without moving your tongue, **pucker your lips tightly into a tiny circle** (like blowing a kiss or whistling!).\n3. Keep the 'ee' sound going while your lips are rounded — that's the **'ü'** sound!",
         explanation_th: "วิธีออกเสียงสระ **'ü'** ให้ถูกต้องตามหลักกายภาพ:\n1. ออกเสียง **'อี'** ค้างไว้\n2. โดยที่ **ลิ้นยังคงอยู่ที่เดิม**, ให้ **ห่อริมฝีปากจู๋แน่นๆ เป็นวงกลมเล็ก** (เหมือนกำลังส่งจูบหรือเป่านกหวีด!)\n3. เปล่งเสียง 'อี' ออกมาขณะห่อปากจู๋ — จะได้เสียง **'ü'** ที่ถูกต้องทันที!"
       },
+      {
+        title_en: "Front Nasal (-n) vs. Back Nasal (-ng) Airflow 👃",
+        title_th: "สระเสียงขึ้นจมูกหน้า (-n) vs เสียงขึ้นจมูกหลัง (-ng) 👃",
+        explanation_en: "Distinguishing nasal vowel endings:\n- **Front Nasal (-n):** (`an, en, in, un`) Tongue tip presses against your upper tooth ridge. Light and soft nasal sound.\n- **Back Nasal (-ng):** (`ang, eng, ing, ong`) Back of tongue pulls back against soft palate. Deep, resonant nasal sound!\n\n💡 Contrast: `san` (三 three) vs `sang` (嗓 throat).",
+        explanation_th: "การแยกความแตกต่างสระท้ายเสียงขึ้นจมูก:\n- **เสียงขึ้นจมูกหน้า (-n):** (`an, en, in, un`) ปลายลิ้นแตะปุ่มเหงือกบน เสียงเบาและใส (เทียบเท่ามาตราแม่กน)\n- **เสียงขึ้นจมูกหลัง (-ng):** (`ang, eng, ing, ong`) โคนลิ้นยกขึ้นแตะเพดานอ่อน เสียงทุ้มก้องในลำคอ (เทียบเท่ามาตราแม่กง)\n\n💡 ตัวอย่างเปรียบเทียบ: `san` (ซาน - เลขสาม) vs `sang` (ซาง - ลำคอ)"
+      },
 
       // ==========================================
-      // TAB 3: Tone & Phonetic Rules (Sort 5 - 12)
+      // TAB 3: Tone & Phonetic Rules (Sort 6 - 18)
       // ==========================================
       {
         title_en: "Consonants & Basic Vowels 🅰️",
@@ -80,6 +86,12 @@ async function insertPinyinRules() {
         explanation_th: "เมื่อมีเสียงวรรณยุกต์เสียงที่ 3 อยู่ติดกัน 2 คำ คำแรกจะเปลี่ยนการออกเสียงเป็น **เสียงที่ 2** (เสียงพุ่งขึ้น)\nตัวอย่างเช่น **nǐ hǎo** (เสียง 3 ทั้งคู่) ออกเสียงจริงเป็น **ní hǎo** แต่เวลาเขียนพินอินยังคงสัญลักษณ์ nǐ hǎo เดิมไว้!"
       },
       {
+        title_en: "Half 3rd Tone Sandhi (3 + 1/2/4 ➔ Low Dip) 📉",
+        title_th: "การเปลี่ยนเสียงครึ่งเสียงเอก (Half 3rd Tone Sandhi) 📉",
+        explanation_en: "When a 3rd tone is followed by a **1st, 2nd, or 4th tone**, native speakers do NOT pronounce the rising tail at the end! It simply dips low and stays low.\n- Example: **lǎoshī** (老师) ➔ `lǎo` dips low without rising.\n- Example: **hǎokàn** (好看) ➔ `hǎo` dips low without rising.",
+        explanation_th: "เมื่อเสียงที่ 3 นำหน้า **เสียงที่ 1, 2 หรือ 4** ในชีวิตประจำวันเจ้าของภาษาจะไม่กดเสียงลงแล้วสะบัดขึ้น แต่จะ **กดเสียงต่ำลงแล้วค้างไว้ (ออกเสียงเพียงครึ่งหลังแรก)**\n- ตัวอย่าง: **lǎoshī** (คุณครู) ➔ `lǎo` ออกเสียงต่ำโดยไม่สะบัดขึ้น\n- ตัวอย่าง: **hǎokàn** (น่าดู/สวย) ➔ `hǎo` ออกเสียงต่ำโดยไม่สะบัดขึ้น"
+      },
+      {
         title_en: "Tone Change for 'Yi' (一) and 'Bu' (不)",
         title_th: "การเปลี่ยนเสียงของ 'Yi' (一) และ 'Bu' (不)",
         explanation_en: "**Yi (一 - One)** is normally 1st tone. But before a 4th tone, it changes to 2nd tone (yí gè). Before any other tone, it changes to 4th tone (yì bēi).\n\n**Bu (不 - Not)** is normally 4th tone. But before another 4th tone, it changes to 2nd tone (bú shì).",
@@ -90,6 +102,18 @@ async function insertPinyinRules() {
         title_th: "กฎการตัดจุดของสระ 'ü' (j, q, x, y) 😲",
         explanation_en: "**The Dot Removal Rule:** The two dots on top of **'ü'** are dropped when combined with **j, q, x, and y** (`ju, qu, xu, yu`).\n\n💡 **Note:** When combined with **n** and **l**, the dots are **KEPT** (`nǚ, lǚ`) to avoid confusion with `nu` and `lu`!",
         explanation_th: "**กฎการละจุดของสระ 'ü':** สระ 'ü' จะ **ละจุดสองจุดข้างบนออก** เมื่อประสมกับพยัญชนะ **j, q, x และ y** (`ju, qu, xu, yu`)\n\n💡 **ข้อควรระวัง:** เมื่อประสมกับ **n** และ **l** จะ **ต้องคงจุดสองจุดไว้** เสมอ (`nǚ, lǚ`) เพื่อไม่ให้สับสนกับสระอูปกติ (`nu, lu`)!"
+      },
+      {
+        title_en: "The 'e' Sound Mutation in 'ie' & 'üe' (e ➔ eh) 🗣️",
+        title_th: "การเปลี่ยนเสียงสระ e ใน ie และ üe (e ➔ เอ) 🗣️",
+        explanation_en: "Standalone **'e'** is pronounced **'uh' (เอ๋อ)** (e.g. `gē`). However, when **'e'** follows **'i'** or **'ü'**, it changes to **'eh' (สระเอ)**!\n- **ie** ➔ *i + eh* = **'เอีย'** (e.g. `jiě` 姐, `xiè` 谢)\n- **üe / ue** ➔ *ü + eh* = **'เอวีย'** (e.g. `xué` 学, `yuè` 月)",
+        explanation_th: "สระ **'e'** เดี่ยวๆ ออกเสียง **'เอ๋อ/ออ'** (เช่น `gē`) แต่เมื่อตามหลัง **'i'** หรือ **'ü'**, เสียงสระ **'e'** จะเปลี่ยนเป็น **'เอ'** ทันที!\n- **ie** ➔ *i + eh* = **สระเอีย** (เช่น `jiě` 姐, `xiè` 谢)\n- **üe / ue** ➔ *ü + eh* = **สระเอวีย** (เช่น `xué` 学, `yuè` 月)"
+      },
+      {
+        title_en: "The 'a' Sound Mutation in 'ian' & 'üan' (a ➔ eh) 🗣️",
+        title_th: "การเปลี่ยนเสียงสระ a ใน ian และ üan (a ➔ แอน/เอียน) 🗣️",
+        explanation_en: "Standalone **'a'** is pronounced **'ah' (อา)**. However, in **'ian'** and **'üan'**, the letter **'a'** changes its sound to **'eh' (แอน / เอียน)**!\n- **ian** ➔ pronounced like *ien / เอียน* (e.g. `tiān` 天, `xiān` 先)\n- **üan / uan** (after j,q,x,y) ➔ pronounced like *üen / เอวียน* (e.g. `yuán` 元, `juǎn` 卷)",
+        explanation_th: "สระ **'a'** เดี่ยวๆ ออกเสียง **'อา'** แต่เมื่ออยู่ในสระผสม **'ian'** และ **'üan'**, ตัว **'a'** จะเปลี่ยนเสียงเป็น **'แอน / เอียน'**!\n- **ian** ➔ ออกเสียงคล้าย *เอียน* (เช่น `tiān` 天, `xiān` 先)\n- **üan / uan** (หลัง j,q,x,y) ➔ ออกเสียงคล้าย *เอวียน* (เช่น `yuán` 元, `juǎn` 卷)"
       },
       {
         title_en: "Vowel Contractions & Omitted Spelling Rules 📝",
@@ -109,9 +133,21 @@ async function insertPinyinRules() {
         explanation_en: "Sometimes you'll see an **'r'** added to the end of a word, like `nǎr` (where) or `zhèr` (here). This is called 'Erhua'. Just curl your tongue back at the end of the word, like a pirate going 'Arrr'!",
         explanation_th: "บางครั้งจะเห็นตัว **'r'** หรือ **'er' (儿)** เติมท้ายคำ เช่น `nǎr` (ที่ไหน) หรือ `zhèr` (ที่นี่) เรียกว่า 'เอ๋อร์ฮว่า'\nวิธีออกเสียงคือให้ออกเสียงคำหน้าตามปกติ แล้วม้วนปลายลิ้นขึ้นในตอนท้าย (คล้ายเสียงโจรสลัด Arrr!)"
       },
+      {
+        title_en: "Syllable Separator Apostrophe Rule (') 📍",
+        title_th: "เครื่องหมายยติภังค์คั่นพยางค์ (') 📍",
+        explanation_en: "When a syllable starting with `a`, `o`, or `e` comes directly after another syllable, use an **apostrophe (')** to separate them so they aren't misread:\n- **Xī'ān** (西安 City of Xi'an) vs **xiān** (先 First)\n- **Pí'ǎo** (皮袄 Fur coat) vs **píǎo**",
+        explanation_th: "เมื่อพยางค์ที่ขึ้นต้นด้วยสระ `a`, `o`, หรือ `e` ตามหลังพยางค์อื่น ให้ใช้ **เครื่องหมายอัญประกาศ (')** คั่นระหว่างพยางค์เพื่อป้องกันความสับสน:\n- **Xī'ān** (เมืองซีอาน) คั่นเพื่อไม่ให้สับสนกับ **xiān** (ก่อน/ล่วงหน้า)\n- **Pí'ǎo** (เสื้อขนสัตว์)"
+      },
+      {
+        title_en: "Capitalization & Word Separation Rules (正词法) 🔤",
+        title_th: "กฎการใช้ตัวพิมพ์ใหญ่และการเว้นวรรค (正词法) 🔤",
+        explanation_en: "Standard orthography rules for Pinyin:\n1. **Sentence Openers:** Capitalize the first letter of a sentence (e.g. `Nǐ hǎo.`).\n2. **Proper Nouns:** Capitalize names of people, cities, and countries (e.g. `Běijīng`, `Zhōngguó`, `Lǐ Míng`).\n3. **Word Grouping:** Write words as single units rather than separate syllables (e.g. `tóngxué` instead of `tóng xué`).",
+        explanation_th: "กฎการเขียนพินอินตามมาตรฐานสากล:\n1. **ขึ้นต้นประโยค:** ใช้ตัวพิมพ์ใหญ่ขึ้นต้นเสมอ (เช่น `Nǐ hǎo.`)\n2. **ชื่อเฉพาะ:** ชื่อคน เมือง ประเทศ ใช้ตัวพิมพ์ใหญ่ขึ้นต้น (เช่น `Běijīng`, `Zhōngguó`, `Lǐ Míng`)\n3. **การเขียนติดกัน:** คำคำเดียวกันให้เขียนพินอินติดกันเป็นคำเดียว (เช่น `tóngxué` ไม่แยกเป็น `tóng xué`)"
+      },
 
       // ==========================================
-      // TAB 5: Pinyin Typing Rules (Sort 13)
+      // TAB 5: Pinyin Typing Rules (Sort 19)
       // ==========================================
       {
         title_en: "Zero-Initials & IME Typing Rules ⌨️",

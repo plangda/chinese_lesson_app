@@ -2189,7 +2189,7 @@ function renderPinyinRules(rules) {
     `;
 
     // Robust Title-Based Categorization into Tab containers
-    const isMouthGuide = tEn.includes('Retroflex') || tEn.includes('Palatal') || tEn.includes('Dental') || tEn.includes('Aspirated') || tEn.includes("ü' Vowel Sound");
+    const isMouthGuide = tEn.includes('Retroflex') || tEn.includes('Palatal') || tEn.includes('Dental') || tEn.includes('Aspirated') || tEn.includes("ü' Vowel Sound") || tEn.includes('Nasal');
     const isTypingRule = tEn.includes('Typing') || tEn.includes('Zero-Initials');
 
     if (isMouthGuide && mouthContainer) {
