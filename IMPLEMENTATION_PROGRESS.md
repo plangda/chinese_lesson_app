@@ -8,7 +8,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 - **Completed Tasks**: 19
 - **In-Progress Tasks**: 1
 - **Not Started Tasks**: 7
-- **Overall Project Completion**: **~76%** (Core Web App: **~95%**)
+- **Overall Project Completion**: **~76%** (Core Web App: **~98%**)
 
 ---
 
@@ -28,7 +28,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Stage 2: Grammar & Practice** | Phase 3: Core Learning Engine | `Complete` | 100% | Grammar explanations, example sentences, and interactive word-reordering exercises. |
 | **Stage 3: Dialogue & TTS Playback** | Phase 3: Core Learning Engine | `Complete` | 100% | Bilingual dialogue reader with speaker avatars, translation toggle, and speech synthesis engine. |
 | **Stage 4: Lesson Review Quiz** | Phase 3: Core Learning Engine | `Complete` | 100% | Dynamic 15-question quiz mimicking official HSK 3.0 formats (True/False, Listening, Reading). |
-| **Pinyin Chart (Lesson 0)** | Phase 3: Core Learning Engine | `Complete` | 100% | Interactive CSS grid with hover popups and 1,600+ human-recorded MP3s mapped dynamically from Purple Culture. Replaces computer 'v' with proper 'ü'. |
+| **Pinyin Chart & 20-Rule Suite (Lesson 0)** | Phase 3: Core Learning Engine | `Complete` | 100% | Reorganized into 5-tab visual suite with 20 rules covering 100% ISO 7098 & Jiewfudao standards across Mouth, Tone/Phonetics, Pairs, and Typing tabs. |
 | **Streak & Time-Spent Tracking** | Phase 4: Consistency & Retention | `Complete` | 100% | Tracks study streak and total hours; streaks reset dynamically if a day is skipped. |
 | **Daily Study Reminder System** | Phase 4: Consistency & Retention | `Complete` | 100% | Periodic interval checks on user-set reminder times and integrated UI status notifications. |
 | **User Progress Synchronization** | Phase 4: Consistency & Retention | `Complete` | 100% | Multi-storage model syncing local state (`localStorage`), Express SQLite backend, and IDE `student_progress.json` file. |
@@ -73,6 +73,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Visual 5-Tab Pinyin Suite & Pedagogical Redesign** | Maintenance & Bug Fixes | `Complete` | 100% | Aug 5: Refactored Pinyin suite into 5 categorized tabs (`📊 Syllable Matrix`, `👄 Mouth & Airflow Guide`, `🎵 Tone & General Rules`, `🎧 Tone Pairs Practice`, `⌨️ Pinyin Typing Game`). Added Language Purity Guardrail in `insert_pinyin_rules.js` (0% EN-TH mixing), implemented 0ms memory caching in `app.js` (`state.pinyinLessonData`) for instant TH-EN toggles, and redesigned Pinyin Typing Simulator game loop (prompt -> type pinyin -> IME candidate pick -> Hanzi reveal + TTS). |
 | **HSK1 Thai Translation Rollout (26/26 LLM Locked)** | Maintenance & Bug Fixes | `Complete` | 100% | Aug 6: Added regex cleanup for LLM JSON keys, resolving "translation _ th" failures. Successfully patched final lesson (hsk1_day24) bringing HSK 1 to 100% completion. |
 | **Pinyin Audio Error Web Speech TTS Fallback** | Maintenance & Bug Fixes | `Complete` | 100% | Aug 4: Added `audio.onerror` & `.catch()` fallback in `app.js` `playTone()` routing to Web Speech API SpeechSynthesis (`zh-CN`), fixing missing/broken audio for rare Pinyin syllables (e.g. `tei`) across the entire Pinyin chart. |
+| **20-Rule Pinyin Orthography Suite & Dynamic Categorization** | Maintenance & Bug Fixes | `Complete` | 100% | Aug 7: Expanded Lesson 0 from 4 to 20 rules based on ISO 7098 standards & Jiewfudao pedagogy. Added 'ü' pronunciation, nasal airflow (-n vs -ng), Half 3rd Sandhi, e/a sound mutations, vowel contractions, apostrophes, and capitalization rules. Replaced fragile index-based card sorting in app.js with title-keyword matching. Seeded Turso DB and pushed to main. |
 | **Kid-Unfriendly Grammar Explanation Tone** | Maintenance & Bug Fixes | `Not Started` | 0% | Aug 2: User flagged `hsk1_day5`'s grammar explanation (and likely many others) as reading like a linguistics reference (formal grammar-slot notation) rather than something an 8-15 year old would find approachable, in both English and Thai. Explicitly deferred as a separate, larger effort (likely a generation-prompt rewrite + batch re-translation pass, quota-limited like everything else here) rather than folded into the same-day fixes. |
 ----
 

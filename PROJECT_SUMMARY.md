@@ -1,5 +1,5 @@
 # HanPath Project Summary
-**Date:** August 5, 2026 (Last Updated)
+**Date:** August 7, 2026 (Last Updated)
 
 ## 1. Business Requirements
 
@@ -10,10 +10,10 @@ HanPath is a structured, daily Chinese learning application tailored to make lan
 - **Curriculum & Pacing:** Content is mapped to standard HSK proficiency levels (HSK 1, 2, and 3). The curriculum is delivered in daily, digestible 1-hour sessions to prevent burnout and encourage habit-building.
 - **Visual 5-Tab Pinyin Suite (Lesson 0 Foundation):**
   - *Tab 1 (📊 Syllable Matrix):* Interactive 1,600+ audio grid mapping initials, finals, and four tones.
-  - *Tab 2 (👄 Mouth & Airflow Guide):* Anatomical cut-away SVG profile diagrams explaining Retroflex (`zh, ch, sh, r`), Palatal (`j, q, x`), Dental (`z, c, s`), and the Tissue Paper Test 💨 (Aspirated vs. Unaspirated consonants).
-  - *Tab 3 (🎵 Tone & General Rules):* Interactive rule cards explaining the Four Tones, 3rd Tone Sandhi (`3+3 ➔ 2+3`), Tone Changes for 'Yi' and 'Bu', and the 'ü' dot removal rule.
+  - *Tab 2 (👄 Mouth & Airflow Guide):* 6 anatomical cut-away SVG profile diagrams and physical guides covering Retroflex (`zh, ch, sh, r`), Palatal (`j, q, x`), Dental (`z, c, s`), Tissue Paper Test 💨 (Aspirated vs. Unaspirated), 'ü' Vowel Sound & Mouth Position, and Front Nasal (`-n`) vs Back Nasal (`-ng`) Airflow resonance contrast.
+  - *Tab 3 (🎵 Tone & Phonetic Rules):* 13 interactive rule cards covering Consonants & Basic Vowels, Four Tones & Neutral Tone, 3rd Tone Sandhi (`3+3 ➔ 2+3`), Half 3rd Tone Sandhi (`3+1/2/4 ➔ Low Dip 211`), Tone Changes for 'Yi' and 'Bu', 'ü' Dot Removal Rule (`j, q, x, y`), 'e' Sound Mutation (`ie/üe ➔ eh`), 'a' Sound Mutation (`ian/üan ➔ eh`), Vowel Contractions (`iou➔iu`, `uei➔ui`, `uen➔un`), Tone Mark Placement Priority (`a > o > e > i / u`), Erhua (`-r`), Syllable Separator Apostrophe (`'`), and Capitalization & Word Separation Rules (`正词法`).
   - *Tab 4 (🎧 Tone Pairs Practice):* 20 interactive cards covering 100% of 2-tone combinations (1+1, 1+2, ..., 4+4, 4+0) using real HSK 1 vocabulary (`今天`, `明天`, `你好`, `再见`).
-  - *Tab 5 (⌨️ Pinyin Typing Game & IME Simulator):* Pedagogically sound challenge loop: presents a meaning/audio prompt (target Hanzi hidden `❓ ❓`), learner types Pinyin, IME candidate choices appear, and correct selection reveals the Hanzi + plays native audio.
+  - *Tab 5 (⌨️ Pinyin Typing Game & IME Simulator):* Zero-Initials & IME typing rules + pedagogically sound challenge loop: presents a meaning/audio prompt (target Hanzi hidden `❓ ❓`), learner types Pinyin, IME candidate choices appear, and correct selection reveals the Hanzi + plays native audio.
 - **4-Stage Daily Learning Engine:**
   - *Stage 1 (Vocabulary):* Interactive flashcards, stroke tracing (via HanziWriter), and pronunciation.
   - *Stage 2 (Grammar):* Concept explanations, examples, and sentence-reordering exercises.

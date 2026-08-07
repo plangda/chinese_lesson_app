@@ -95,3 +95,12 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Started HSK 2 Thai LLM translation rollout: successfully upgraded 8 HSK 2 lessons to LLM Thai.
 - Verified graceful batch abortion due to quota limit: hit 429 RESOURCE_EXHAUSTED on hsk2_day12, safely leaving 6 lessons untouched for tomorrow.
 - Overall state: 36 lessons on LLM Thai, 1 fallback, 6 remaining untouched.
+
+2026-08-07:
+- Audited and restructured Pinyin Lesson 0 curriculum into a comprehensive 20-rule orthography system based on ISO 7098 standard and Jiewfudao Thai-Chinese pedagogy.
+- Expanded Tab 2 (Mouth & Airflow Guide) with 'ü' Vowel Sound & Mouth Position (holding "ee" while puckering lips) and Front Nasal (-n) vs Back Nasal (-ng) Airflow resonance contrast.
+- Expanded Tab 3 (Tone & Phonetic Rules) with Half 3rd Tone Sandhi, 'e' Sound Mutation (ie/üe -> eh), 'a' Sound Mutation (ian/üan -> eh), Vowel Contractions (iou->iu, uei->ui, uen->un), Syllable Separator Apostrophe ('), and ISO 7098 Capitalization & Word Grouping rules.
+- Updated app.js renderPinyinRules() categorization logic from hardcoded numerical index thresholds to robust title-keyword matching (isMouthGuide, isTypingRule), eliminating card leakage across tabs.
+- Updated i18n.js to localize Tab 3 label to "Tone & Phonetic Rules" (EN) / "กฎระบบพินอินและวรรณยุกต์" (TH).
+- Enforced pre-commit language purity assertions in insert_pinyin_rules.js, fixed Thai script contamination in English fields, and re-seeded Turso DB with all 20 rules.
+- Committed and pushed changes to main branch on GitHub (commits 1497b12, e779516, 92051b3, 6f32a3d).
