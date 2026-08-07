@@ -93,9 +93,9 @@ async function insertPinyinRules() {
       },
       {
         title_en: "Vowel Contractions & Omitted Spelling Rules 📝",
-        title_th: "กฎการลดรูปและละสระ (Jiewfudao Pedagogy 📝)",
-        explanation_en: "In standard Pinyin spelling (Jiewfudao Pedagogy), three main compound vowels are written in contracted forms when combined with consonants:\n- **iou** is written as **iu** (e.g. `liù` 六, `jiǔ` 九)\n- **uei** is written as **ui** (e.g. `duì` 对, `guǐ` 鬼)\n- **uen** is written as **un** (e.g. `lún` 轮, `chūn` 春)\n\n💡 Remember: Tone marks are placed on the **last vowel** in `iu` and `ui`!",
-        explanation_th: "ตามหลักการเขียนพินอินมาตรฐาน (เทคนิคพี่จิ๋ว Jiewfudao) สระผสม 3 ตัวนี้จะถูกลดรูปเมื่อมีพยัญชนะต้น:\n- **iou** เขียนลดรูปเป็น **iu** (เช่น `liù` 六, `jiǔ` 九)\n- **uei** เขียนลดรูปเป็น **ui** (เช่น `duì` 对, `guǐ` 鬼)\n- **uen** เขียนลดรูปเป็น **un** (เช่น `lún` 轮, `chūn` 春)\n\n💡 จำง่ายๆ: เครื่องหมายวรรณยุกต์จะใส่อยู่บน **สระตัวหลังสุด** เสมอในรูปย่อ `iu` และ `ui`!"
+        title_th: "กฎการลดรูปและละสระ 📝",
+        explanation_en: "In standard Pinyin spelling rules, three main compound vowels are written in contracted forms when combined with consonants:\n- **iou** is written as **iu** (e.g. `liù` 六, `jiǔ` 九)\n- **uei** is written as **ui** (e.g. `duì` 对, `guǐ` 鬼)\n- **uen** is written as **un** (e.g. `lún` 轮, `chūn` 春)\n\n💡 Remember: Tone marks are placed on the **last vowel** in `iu` and `ui`!",
+        explanation_th: "ตามหลักการเขียนพินอินมาตรฐาน สระผสม 3 ตัวนี้จะถูกลดรูปเมื่อมีพยัญชนะต้น:\n- **iou** เขียนลดรูปเป็น **iu** (เช่น `liù` 六, `jiǔ` 九)\n- **uei** เขียนลดรูปเป็น **ui** (เช่น `duì` 对, `guǐ` 鬼)\n- **uen** เขียนลดรูปเป็น **un** (เช่น `lún` 轮, `chūn` 春)\n\n💡 จำง่ายๆ: เครื่องหมายวรรณยุกต์จะใส่อยู่บน **สระตัวหลังสุด** เสมอในรูปย่อ `iu` และ `ui`!"
       },
       {
         title_en: "Tone Mark Placement Rules (a > o > e > i / u)",
