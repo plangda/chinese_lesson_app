@@ -106,13 +106,13 @@ async function insertPinyinRules() {
       {
         title_en: "The 'e' Sound Mutation in 'ie' & 'üe' (e ➔ eh) 🗣️",
         title_th: "การเปลี่ยนเสียงสระ e ใน ie และ üe (e ➔ เอ) 🗣️",
-        explanation_en: "Standalone **'e'** is pronounced **'uh' (เอ๋อ)** (e.g. `gē`). However, when **'e'** follows **'i'** or **'ü'**, it changes to **'eh' (สระเอ)**!\n- **ie** ➔ *i + eh* = **'เอีย'** (e.g. `jiě` 姐, `xiè` 谢)\n- **üe / ue** ➔ *ü + eh* = **'เอวีย'** (e.g. `xué` 学, `yuè` 月)",
+        explanation_en: "Standalone **'e'** is pronounced **'uh'** (like in 'her'). However, when **'e'** follows **'i'** or **'ü'**, it changes to **'eh'** (like in 'bed')!\n- **ie** ➔ *i + eh* = **'ye'** (e.g. `jiě` 姐, `xiè` 谢)\n- **üe / ue** ➔ *ü + eh* = **'yue'** (e.g. `xué` 学, `yuè` 月)",
         explanation_th: "สระ **'e'** เดี่ยวๆ ออกเสียง **'เอ๋อ/ออ'** (เช่น `gē`) แต่เมื่อตามหลัง **'i'** หรือ **'ü'**, เสียงสระ **'e'** จะเปลี่ยนเป็น **'เอ'** ทันที!\n- **ie** ➔ *i + eh* = **สระเอีย** (เช่น `jiě` 姐, `xiè` 谢)\n- **üe / ue** ➔ *ü + eh* = **สระเอวีย** (เช่น `xué` 学, `yuè` 月)"
       },
       {
         title_en: "The 'a' Sound Mutation in 'ian' & 'üan' (a ➔ eh) 🗣️",
         title_th: "การเปลี่ยนเสียงสระ a ใน ian และ üan (a ➔ แอน/เอียน) 🗣️",
-        explanation_en: "Standalone **'a'** is pronounced **'ah' (อา)**. However, in **'ian'** and **'üan'**, the letter **'a'** changes its sound to **'eh' (แอน / เอียน)**!\n- **ian** ➔ pronounced like *ien / เอียน* (e.g. `tiān` 天, `xiān` 先)\n- **üan / uan** (after j,q,x,y) ➔ pronounced like *üen / เอวียน* (e.g. `yuán` 元, `juǎn` 卷)",
+        explanation_en: "Standalone **'a'** is pronounced **'ah'** (like in 'father'). However, in **'ian'** and **'üan'**, the letter **'a'** changes its sound to **'eh'**!\n- **ian** ➔ pronounced like *ien* (e.g. `tiān` 天, `xiān` 先)\n- **üan / uan** (after j,q,x,y) ➔ pronounced like *üen* (e.g. `yuán` 元, `juǎn` 卷)",
         explanation_th: "สระ **'a'** เดี่ยวๆ ออกเสียง **'อา'** แต่เมื่ออยู่ในสระผสม **'ian'** และ **'üan'**, ตัว **'a'** จะเปลี่ยนเสียงเป็น **'แอน / เอียน'**!\n- **ian** ➔ ออกเสียงคล้าย *เอียน* (เช่น `tiān` 天, `xiān` 先)\n- **üan / uan** (หลัง j,q,x,y) ➔ ออกเสียงคล้าย *เอวียน* (เช่น `yuán` 元, `juǎn` 卷)"
       },
       {
