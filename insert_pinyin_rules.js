@@ -24,7 +24,9 @@ async function insertPinyinRules() {
     await db.run('DELETE FROM grammar WHERE lesson_id = ?', [lessonId]);
     
     const grammarRules = [
-      // CATEGORY: Mouth & Airflow Guide (Tab 2) - Sort 0-3
+      // ==========================================
+      // TAB 2: Mouth & Airflow Guide (Sort 0 - 4)
+      // ==========================================
       {
         title_en: "1. Retroflex Group: zh, ch, sh, r",
         title_th: "1. กลุ่มพยัญชนะม้วนลิ้น (Retroflex): zh, ch, sh, r",
@@ -49,13 +51,27 @@ async function insertPinyinRules() {
         explanation_en: "Chinese consonants are grouped into **Unaspirated (No Air)** vs. **Aspirated (Strong Air)** pairs:\n- **b** vs **p (💨)**\n- **d** vs **t (💨)**\n- **g** vs **k (💨)**\n- **j** vs **q (💨)**\n- **zh** vs **ch (💨)**\n- **z** vs **c (💨)**\n\n💡 **The Tissue Paper Test:** Hold a paper tissue in front of your mouth. Aspirated sounds (p, t, k, q, ch, c) will blow the tissue paper forward strongly!",
         explanation_th: "พยัญชนะจีนแบ่งเป็นคู่ **ไม่พ่นลม** กับ **พ่นลมแรง (Aspirated)**:\n- **b (ป)** คู่กับ **p (พ - พ่นลมแรง 💨)**\n- **d (ต)** คู่กับ **t (ท - พ่นลมแรง 💨)**\n- **g (ก)** คู่กับ **k (ค - พ่นลมแรง 💨)**\n- **j (จิ)** คู่กับ **q (ชิ - พ่นลมแรง 💨)**\n- **zh (จ-ม้วนลิ้น)** คู่กับ **ch (ช-ม้วนลิ้น พ่นลมแรง 💨)**\n- **z (จึ)** คู่กับ **c (ชึ - พ่นลมแรง 💨)**\n\n💡 **ทดสอบด้วยทิชชู (Tissue Paper Test):** ถือแผ่นทิชชูไว้หน้าปาก เมื่อออกเสียงกลุ่มพ่นลม (p, t, k, q, ch, c) แผ่นทิชชูจะขยับปลิวอย่างชัดเจน!"
       },
-
-      // CATEGORY: Tone & General Rules (Tab 3) - Sort 4-7
       {
-        title_en: "The Four Tones",
-        title_th: "เสียงวรรณยุกต์ 4 เสียง",
-        explanation_en: "Mandarin Chinese has four main tones plus a neutral tone. The meaning of a word changes depending on the tone!\n- **1st Tone (mā)**: High and flat (—).\n- **2nd Tone (má)**: Rising, like asking a question (/).\n- **3rd Tone (mǎ)**: Dips down low then curves up (\\/).\n- **4th Tone (mà)**: Sharp and falling, like a strong command (\\).\n- **Neutral Tone (ma)**: Short, light, and soft.",
-        explanation_th: "ภาษาจีนกลางมีเสียงวรรณยุกต์หลัก 4 เสียง และเสียงเบา 1 เสียง ความหมายของคำจะเปลี่ยนไปตามระดับเสียงวรรณยุกต์!\n- **เสียงที่ 1 (mā)**: เสียงสูงและราบเรียบ (เทียบเท่าเสียงสามัญ: —)\n- **เสียงที่ 2 (má)**: เสียงชันขึ้น เหมือนถามคำถาม (เทียบเท่าเสียงจัตวา: /)\n- **เสียงที่ 3 (mǎ)**: เสียงต่ำลงแล้วโค้งขึ้น (เทียบเท่าเสียงเอก/กึ่งจัตวา: \\/)\n- **เสียงที่ 4 (mà)**: เสียงหนักและสั้นลงอย่างรวดเร็ว (เทียบเท่าเสียงโท: \\)\n- **เสียงเบา (ma)**: ออกเสียงสั้นและเบากว่าปกติ"
+        title_en: "The 'ü' Vowel Sound & Mouth Position 👄",
+        title_th: "การออกเสียงสระ 'ü' และรูปปาก 👄",
+        explanation_en: "How to pronounce the **'ü'** sound correctly:\n1. Say and hold the **'ee'** sound (like in 'see').\n2. Without moving your tongue, **pucker your lips tightly into a tiny circle** (like blowing a kiss or whistling!).\n3. Keep the 'ee' sound going while your lips are rounded — that's the **'ü'** sound!",
+        explanation_th: "วิธีออกเสียงสระ **'ü'** ให้ถูกต้องตามหลักกายภาพ:\n1. ออกเสียง **'อี'** ค้างไว้\n2. โดยที่ **ลิ้นยังคงอยู่ที่เดิม**, ให้ **ห่อริมฝีปากจู๋แน่นๆ เป็นวงกลมเล็ก** (เหมือนกำลังส่งจูบหรือเป่านกหวีด!)\n3. เปล่งเสียง 'อี' ออกมาขณะห่อปากจู๋ — จะได้เสียง **'ü'** ที่ถูกต้องทันที!"
+      },
+
+      // ==========================================
+      // TAB 3: Tone & Phonetic Rules (Sort 5 - 12)
+      // ==========================================
+      {
+        title_en: "Consonants & Basic Vowels 🅰️",
+        title_th: "พยัญชนะและสระพื้นฐาน 🅰️",
+        explanation_en: "Pinyin has **Initials** (Consonants) and **Finals** (Vowels).\n- **Basic Vowels:** a, o, e, i, u, ü\n- **Consonants:** b, p, m, f, d, t, n, l, g, k, h (and more below!).\nMost syllables start with a consonant and end with a vowel.",
+        explanation_th: "พินอินประกอบด้วย **พยัญชนะต้น (Initials)** และ **สระ (Finals)**\n- **สระเดี่ยวพื้นฐาน:** a, o, e, i, u, ü\n- **พยัญชนะพื้นฐาน:** b, p, m, f, d, t, n, l, g, k, h\nพยางค์ส่วนใหญ่จะขึ้นต้นด้วยพยัญชนะและตามด้วยสระเสมอ!"
+      },
+      {
+        title_en: "The Four Tones & Neutral Tone 🎢",
+        title_th: "เสียงวรรณยุกต์ 4 เสียง และเสียงเบา 🎢",
+        explanation_en: "Mandarin Chinese has four main tones plus a neutral tone. The meaning of a word changes depending on the tone!\n- **1st Tone (mā)**: High and flat (—).\n- **2nd Tone (má)**: Rising, like asking a question (/).\n- **3rd Tone (mǎ)**: Dips down low then curves up (\\/).\n- **4th Tone (mà)**: Sharp and falling, like a strong command (\\).\n- **Neutral Tone (ma)**: Short, light, and has **NO tone mark**!",
+        explanation_th: "ภาษาจีนกลางมีเสียงวรรณยุกต์หลัก 4 เสียง และเสียงเบา ความหมายของคำจะเปลี่ยนไปตามระดับเสียงวรรณยุกต์!\n- **เสียงที่ 1 (mā)**: เสียงสูงและราบเรียบ (เทียบเท่าเสียงสามัญ: —)\n- **เสียงที่ 2 (má)**: เสียงชันขึ้น เหมือนถามคำถาม (เทียบเท่าเสียงจัตวา: /)\n- **เสียงที่ 3 (mǎ)**: เสียงต่ำลงแล้วโค้งขึ้น (เทียบเท่าเสียงเอก/กึ่งจัตวา: \\/)\n- **เสียงที่ 4 (mà)**: เสียงหนักและสั้นลงอย่างรวดเร็ว (เทียบเท่าเสียงโท: \\)\n- **เสียงเบา (ma)**: ออกเสียงสั้น เบา และ **ไม่มีเครื่องหมายวรรณยุกต์**!"
       },
       {
         title_en: "Third Tone Sandhi (3 + 3 ➔ 2 + 3)",
@@ -70,18 +86,38 @@ async function insertPinyinRules() {
         explanation_th: "**Yi (一 - หนึ่ง)** ตามปกติเป็นเสียงที่ 1 แต่เมื่อนำหน้าคำที่เป็น **เสียงที่ 4** จะเปลี่ยนเป็นเสียงที่ 2 (เช่น yí gè) และเมื่อนำหน้าเสียงอื่น (1, 2, 3) จะเปลี่ยนเป็นเสียงที่ 4 (เช่น yì bēi)\n\n**Bu (不 - ไม่)** ตามปกติเป็นเสียงที่ 4 แต่เมื่อนำหน้าคำที่เป็น **เสียงที่ 4** จะเปลี่ยนเป็นเสียงที่ 2 (เช่น bú shì)"
       },
       {
-        title_en: "The 'ü' Rule",
-        title_th: "กฎการตัดจุดของสระ 'ü'",
-        explanation_en: "The 'ü' sound (like 'ee' with rounded lips) loses its two dots when it comes after the initials **j, q, x, and y**. So `ju`, `qu`, `xu`, and `yu` are actually pronounced with the 'ü' sound, NOT the regular 'u' sound!",
-        explanation_th: "สระ 'ü' (ออกเสียง อี ทำปากจู๋) จะ **ละจุดสองจุดข้างบนออก** เมื่อประสมกับพยัญชนะ **j, q, x และ y**\nดังนั้นคำว่า `ju`, `qu`, `xu` และ `yu` จึงออกเสียงด้วยสระ 'ü' ไม่ใช่สระ 'u' (อู) ปกติ!"
+        title_en: "The 'ü' Dot Removal Rule (j, q, x, y) 😲",
+        title_th: "กฎการตัดจุดของสระ 'ü' (j, q, x, y) 😲",
+        explanation_en: "**The Dot Removal Rule:** The two dots on top of **'ü'** are dropped when combined with **j, q, x, and y** (`ju, qu, xu, yu`).\n\n💡 **Note:** When combined with **n** and **l**, the dots are **KEPT** (`nǚ, lǚ`) to avoid confusion with `nu` and `lu`!",
+        explanation_th: "**กฎการละจุดของสระ 'ü':** สระ 'ü' จะ **ละจุดสองจุดข้างบนออก** เมื่อประสมกับพยัญชนะ **j, q, x และ y** (`ju, qu, xu, yu`)\n\n💡 **ข้อควรระวัง:** เมื่อประสมกับ **n** และ **l** จะ **ต้องคงจุดสองจุดไว้** เสมอ (`nǚ, lǚ`) เพื่อไม่ให้สับสนกับสระอูปกติ (`nu, lu`)!"
+      },
+      {
+        title_en: "Vowel Contractions & Omitted Spelling Rules 📝",
+        title_th: "กฎการลดรูปและละสระ (Jiewfudao Pedagogy 📝)",
+        explanation_en: "In standard Pinyin spelling (Jiewfudao Pedagogy), three main compound vowels are written in contracted forms when combined with consonants:\n- **iou** is written as **iu** (e.g. `liù` 六, `jiǔ` 九)\n- **uei** is written as **ui** (e.g. `duì` 对, `guǐ` 鬼)\n- **uen** is written as **un** (e.g. `lún` 轮, `chūn` 春)\n\n💡 Remember: Tone marks are placed on the **last vowel** in `iu` and `ui`!",
+        explanation_th: "ตามหลักการเขียนพินอินมาตรฐาน (เทคนิคพี่จิ๋ว Jiewfudao) สระผสม 3 ตัวนี้จะถูกลดรูปเมื่อมีพยัญชนะต้น:\n- **iou** เขียนลดรูปเป็น **iu** (เช่น `liù` 六, `jiǔ` 九)\n- **uei** เขียนลดรูปเป็น **ui** (เช่น `duì` 对, `guǐ` 鬼)\n- **uen** เขียนลดรูปเป็น **un** (เช่น `lún` 轮, `chūn` 春)\n\n💡 จำง่ายๆ: เครื่องหมายวรรณยุกต์จะใส่อยู่บน **สระตัวหลังสุด** เสมอในรูปย่อ `iu` และ `ui`!"
+      },
+      {
+        title_en: "Tone Mark Placement Rules (a > o > e > i / u)",
+        title_th: "กฎการใส่วรรณยุกต์บนสระ (a > o > e > i / u)",
+        explanation_en: "Always place the tone mark on the main vowel in this order of priority: **a ➔ o ➔ e ➔ i / u**.\n- If **a** is present, mark **a** (e.g. `hǎo`).\n- Otherwise, mark **o** or **e** (e.g. `gōu`, `léi`).\n- If both **i** and **u** appear together (`iu` or `ui`), place the tone mark on the **SECOND (last)** vowel! (e.g. `liú`, `guǐ`).",
+        explanation_th: "วางเครื่องหมายวรรณยุกต์ไว้บนสระหลักตามลำดับความสำคัญเสมอ: **a ➔ o ➔ e ➔ i / u**\n- ถ้ามี **a** ให้ใส่วรรณยุกต์บน **a** เสมอ (เช่น `hǎo`)\n- ถ้าไม่มี a ให้หา **o** หรือ **e** (เช่น `gōu`, `léi`)\n- ถ้าสระ **i** และ **u** อยู่คู่กัน (`iu` หรือ `ui`) ให้ใส่วรรณยุกต์บน **สระตัวหลังสุด** เสมอ! (เช่น `liú`, `guǐ`)"
+      },
+      {
+        title_en: "The Pirate Sound (Erhua -r) 🏴‍☠️",
+        title_th: "เสียงม้วนลิ้นท้ายคำ (Erhua -r) 🏴‍☠️",
+        explanation_en: "Sometimes you'll see an **'r'** added to the end of a word, like `nǎr` (where) or `zhèr` (here). This is called 'Erhua'. Just curl your tongue back at the end of the word, like a pirate going 'Arrr'!",
+        explanation_th: "บางครั้งจะเห็นตัว **'r'** หรือ **'er' (儿)** เติมท้ายคำ เช่น `nǎr` (ที่ไหน) หรือ `zhèr` (ที่นี่) เรียกว่า 'เอ๋อร์ฮว่า'\nวิธีออกเสียงคือให้ออกเสียงคำหน้าตามปกติ แล้วม้วนปลายลิ้นขึ้นในตอนท้าย (คล้ายเสียงโจรสลัด Arrr!)"
       },
 
-      // CATEGORY: Typing Rules (Tab 5) - Sort 8
+      // ==========================================
+      // TAB 5: Pinyin Typing Rules (Sort 13)
+      // ==========================================
       {
-        title_en: "Pinyin Typing Rules & Zero-Initials ⌨️",
+        title_en: "Zero-Initials & IME Typing Rules ⌨️",
         title_th: "กฎการพิมพ์พินอินและอักษรนำศูนย์ (Zero-Initials ⌨️)",
-        explanation_en: "Under standard HSK typing rules, syllables without a consonant initial follow special spelling rules:\n- **Standalone Vowels:** `i` ➔ **yi**, `u` ➔ **wu**, `ü` ➔ **yu**\n- **Leading Vowels:** `ia` ➔ **ya**, `ie` ➔ **ye**, `ua` ➔ **wa**, `uo` ➔ **wo**, `üe` ➔ **yue**\n- **Contractions:** `iou` ➔ **iu** (`liù`), `uei` ➔ **ui** (`duì`), `uen` ➔ **un** (`lún`)\n- **Apostrophe Separator ('):** Used to separate overlapping syllables, e.g. **Xī'ān** (西安) vs **xiān** (先).",
-        explanation_th: "ตามมาตรฐานการพิมพ์ภาษาจีน (IME) พยางค์ที่ไม่มีพยัญชนะต้นจะใช้กฎพิเศษดังนี้:\n- **สระเดี่ยวขึ้นต้น:** `i` ➔ **yi**, `u` ➔ **wu**, `ü` ➔ **yu**\n- **สระผสมขึ้นต้น:** `ia` ➔ **ya**, `ie` ➔ **ye**, `ua` ➔ **wa**, `uo` ➔ **wo**, `üe` ➔ **yue**\n- **รูปย่อสระ:** `iou` ➔ **iu** (เช่น `liù`), `uei` ➔ **ui** (เช่น `duì`), `uen` ➔ **un** (เช่น `lún`)\n- **เครื่องหมายแยกพยางค์ ('):** ใช้คั่นระหว่างสระติดกัน เช่น **Xī'ān** (เมืองซีอาน) เพื่อไม่ให้สับสนกับ **xiān** (ก๋วยเตี๋ยว/ก่อน)"
+        explanation_en: "Under standard typing rules, syllables without a consonant initial follow special spelling rules:\n- **Standalone Vowels:** `i` ➔ **yi**, `u` ➔ **wu**, `ü` ➔ **yu**\n- **Leading Vowels:** `ia` ➔ **ya**, `ie` ➔ **ye**, `ua` ➔ **wa**, `uo` ➔ **wo**, `üe` ➔ **yue**\n- **Apostrophe Separator ('):** Used to separate overlapping syllables, e.g. **Xī'ān** (西安) vs **xiān** (先).",
+        explanation_th: "ตามมาตรฐานการพิมพ์ (IME) พยางค์ที่ไม่มีพยัญชนะต้นจะใช้กฎพิเศษ:\n- **สระเดี่ยวขึ้นต้น:** `i` ➔ **yi**, `u` ➔ **wu**, `ü` ➔ **yu**\n- **สระผสมขึ้นต้น:** `ia` ➔ **ya**, `ie` ➔ **ye**, `ua` ➔ **wa**, `uo` ➔ **wo**, `üe` ➔ **yue**\n- **เครื่องหมายแยกพยางค์ ('):** ใช้คั่นระหว่างสระที่ติดกัน เช่น **Xī'ān** (เมืองซีอาน) เพื่อไม่ให้สับสนกับ **xiān** (ก่อน/ล่วงหน้า)"
       }
     ];
     
@@ -94,14 +130,14 @@ async function insertPinyinRules() {
           throw new Error(`🚨 GUARDRAIL ABORT: English field for rule '${rule.title_en}' contains Thai characters!`);
         }
 
-        console.log(`Inserting grammar: ${rule.title_en}`);
+        console.log(`Inserting grammar [${i}]: ${rule.title_en}`);
         await db.run(
             'INSERT INTO grammar (lesson_id, title_en, title_th, explanation_en, explanation_th, sort_order) VALUES (?, ?, ?, ?, ?, ?)',
             [lessonId, rule.title_en, rule.title_th, rule.explanation_en, rule.explanation_th, i]
         );
     }
     
-    console.log("Successfully inserted comprehensive 9 Pinyin Rules into Turso DB!");
+    console.log(`Successfully inserted comprehensive ${grammarRules.length} Pinyin Rules into Turso DB!`);
   } catch (err) {
     console.error("Error inserting pinyin rules:", err);
   }

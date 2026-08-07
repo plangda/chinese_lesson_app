@@ -2170,6 +2170,16 @@ function renderPinyinRules(rules) {
           <button class="btn btn-sm btn-secondary" onclick="playTone('si1')">🔊 s</button>
         </div>
       `;
+    } else if (tEn.includes("ü' Vowel Sound")) {
+      card.style.borderLeftColor = 'var(--accent-purple, #a29bfe)';
+      svgGraphicHtml = `
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0;">
+          <button class="btn btn-sm btn-secondary" onclick="playTone('v1')">🔊 Tone 1 (ǖ)</button>
+          <button class="btn btn-sm btn-secondary" onclick="playTone('v2')">🔊 Tone 2 (ǘ)</button>
+          <button class="btn btn-sm btn-secondary" onclick="playTone('v3')">🔊 Tone 3 (ǚ)</button>
+          <button class="btn btn-sm btn-secondary" onclick="playTone('v4')">🔊 Tone 4 (ǜ)</button>
+        </div>
+      `;
     }
 
     card.innerHTML = `
@@ -2178,12 +2188,13 @@ function renderPinyinRules(rules) {
       <p style="line-height: 1.6; color: var(--text-primary);">${explanation.replace(/\n/g, '<br>')}</p>
     `;
 
-    // Categorize into Tab containers
-    if (idx < 4 && mouthContainer) {
+    // Robust Title-Based Categorization into Tab containers
+    const isMouthGuide = tEn.includes('Retroflex') || tEn.includes('Palatal') || tEn.includes('Dental') || tEn.includes('Aspirated') || tEn.includes("ü' Vowel Sound");
+    const isTypingRule = tEn.includes('Typing') || tEn.includes('Zero-Initials');
+
+    if (isMouthGuide && mouthContainer) {
       mouthContainer.appendChild(card);
-    } else if (idx >= 4 && idx < 8 && rulesContainer) {
-      rulesContainer.appendChild(card);
-    } else if (idx === 8 && typingContainer) {
+    } else if (isTypingRule && typingContainer) {
       typingContainer.appendChild(card);
     } else if (rulesContainer) {
       rulesContainer.appendChild(card);
