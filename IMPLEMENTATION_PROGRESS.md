@@ -5,10 +5,10 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 ## Overall Implementation Summary
 
 - **Total Tasks**: 27 (excluding Maintenance & Bug Fixes)
-- **Completed Tasks**: 19
-- **In-Progress Tasks**: 1
-- **Not Started Tasks**: 7
-- **Overall Project Completion**: **~76%** (Core Web App: **~98%**)
+- **Completed Tasks**: 21
+- **In-Progress Tasks**: 0
+- **Not Started Tasks**: 6
+- **Overall Project Completion**: **~82%** (Core Web App: **~100%**)
 
 ---
 
@@ -19,7 +19,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **SQLite Database Schema & Setup** | Phase 1: Database & Backend | `Complete` | 100% | Configured in `database.js` with schemas for lessons, vocab, grammar, dialogues, and progress tracking. |
 | **Express API & Server Routes** | Phase 1: Database & Backend | `Complete` | 100% | Implemented in `server.js` with routes for lessons, full curricula, and user progress backup. |
 | **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `Complete` | 100% | Remapped to official 300 words A-Z standard; all 26 dynamic thematic lessons generated and seeded. |
-| **HSK 2 Curriculum Seeding** | Phase 1: Database & Backend | `In Progress` | 85% | Days 1–17 generated and seeded into Turso. Thai translation patch partially completed (8/17 lessons patched to LLM, 1 fallback, 6 untouched awaiting quota reset). |
+| **HSK 2 Curriculum Seeding** | Phase 1: Database & Backend | `Complete` | 100% | Days 1–18 generated and seeded into Turso. Thai translation patch 100% completed (all 44 generated lessons locked on high-quality LLM Thai). |
 | **HSK 3 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Remapped to 500 words; theme mapping completed. Start after HSK2 complete. |
 | **HSK 4, 5, 6 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Advanced content generation and database seeding for higher proficiency levels. |
 | **Level Placement Pre-Test System** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 12-question diagnostic test that maps results to recommended start levels. |
@@ -54,7 +54,8 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **HSK 3.0 (2026 Standard) Remapping & Dynamic Clustering Overhaul** | Maintenance & Bug Fixes | `Complete` | 100% | Remapped all 11,092 terms to 2026 standard levels; clustered dynamically (26 themes HSK 1, 19 themes HSK 2); resolved double day prefix bugs; cleaned delete_hsk1.js; seeded Day 1-8. |
 | **Google Translate → LLM Translation Migration** | Maintenance & Bug Fixes | `Complete` | 100% | Replaced stateless per-field `translate_en_to_th()` Google Translate calls with a single `gemini-3.5-flash` contextual LLM call per lesson. Migrated from deprecated `google-generativeai` to `google.genai` SDK. Added `--no-translate` CLI flag and `patch_thai_translations.py` for targeted Turso UPDATE patching. Confirmed `gemini-3.5-flash` working; `gemini-2.0-flash` quota-exhausted. |
 | **HSK Level Prefix Rendering Fix** | Maintenance & Bug Fixes | `Complete` | 100% | Updated `app.js` lesson ID regex from hardcoded `hsk1_day` to generic `/^hsk\d_day/` so Day numbers render correctly for HSK 2+ levels. |
-| **Thai Translation Patch (HSK1 & HSK2)** | Maintenance & Bug Fixes | `In Progress` | 95% | **Aug 6 update:** HSK 1 rollout complete (26/26). HSK 2 rollout started: 8 lessons upgraded to LLM Thai. hsk2_day9 safely fell back to Google Translate after network drop. Batch securely stopped at hsk2_day12 due to Gemini Free Tier QuotaExceededError. 36/43 total lessons successfully upgraded. 1 fallback and 6 untouched HSK 2 lessons remaining for tomorrow. |
+| **Thai Translation Patch (HSK1 & HSK2)** | Maintenance & Bug Fixes | `Complete` | 100% | **Aug 8 update:** Rollout 100% complete across all 44 lessons in HSK 1 (26/26) and HSK 2 (18/18). All generated lessons locked on high-quality LLM Thai translation (`_th_source = "llm"`). |
+| **Vocab Garden Spaced Repetition System (SRS)** | Phase 4: Consistency & Retention | `Complete` | 100% | Implemented kid-friendly Vocab Garden SRS with 4 plant stages (Seeds ➔ Sprouts ➔ Flowers ➔ Trees), Total Vocab Progress bar, UTC+7 date protection, historical backfilling, Wilting Rescue Box, and full-screen review arena (`#srs-view`). |
 | **Language-Contamination Validation Guardrails** | Maintenance & Bug Fixes | `Complete` | 100% | Added `find_thai_contamination()`, `find_incomplete_practice()`, and `find_chinese_field_contamination()` checks to `generate_hsk_full.py`'s validation block, feeding the existing retry loop so contaminated LLM responses (wrong language, missing example sentences, broken answer arrays) trigger automatic regeneration instead of being saved. |
 | **Field Masking for LLM JSON Structure Protection** | Maintenance & Bug Fixes | `Superseded` | 100% | July 29: Implemented `_mask_untranslatable_fields()`/`_unmask_fields()` to stop the LLM from modifying cn/py/character/pinyin fields, validated only against a hand-written ideal fake response. July 31: a live retry still failed with the same error masking was built to fix. Root cause: `_apply_translated_fields()` never reads these fields back from the LLM response at all, so the round-trip was validating something nothing downstream consumes — and the synthetic `_*_masked` names were arguably *harder* for the LLM to echo back correctly than the original ones. Replaced with `_strip_untranslatable_fields()` (deletes the fields from the payload, never expects them back); `test_field_masking.py` rewritten with an adversarial fixture. Logged as retrospective lesson #19. |
 | **Windows Console Encoding Crash Fix** | Maintenance & Bug Fixes | `Complete` | 100% | July 31: A live retry of hsk1_day4 crashed with `UnicodeEncodeError` when printing a validation error containing Chinese/Thai text, because Windows' default console encoding (`cp1252`) can't represent it — this killed the retry loop after attempt 1 instead of exhausting all 3 retries and falling back gracefully. Fixed by reconfiguring `sys.stdout`/`sys.stderr` to UTF-8 at the top of `generate_hsk_full.py`. |
