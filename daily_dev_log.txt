@@ -104,3 +104,16 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Updated i18n.js to localize Tab 3 label to "Tone & Phonetic Rules" (EN) / "กฎระบบพินอินและวรรณยุกต์" (TH).
 - Enforced pre-commit language purity assertions in insert_pinyin_rules.js, fixed Thai script contamination in English fields, and re-seeded Turso DB with all 20 rules.
 - Committed and pushed changes to main branch on GitHub (commits 1497b12, e779516, 92051b3, 6f32a3d).
+
+2026-08-08:
+- Completed HSK 2 Thai LLM translation rollout via patch_thai_translations.py: upgraded all remaining HSK 2 lessons to LLM Thai state (100% completion across all 44 generated lessons in HSK 1 and HSK 2).
+- Designed and implemented the Vocab Garden Spaced Repetition System (SRS) featuring Plants & Watering theme with 4 visual plant stages (🌱 Seeds, 🌿 Sprouts, 🌻 Flowers, 🌳 Golden Trees).
+- Implemented Total Vocab Progress Bar (unlocked planted words vs total level target, e.g. 45 / 300 words for HSK 1).
+- Designed automatic system evaluation for review games (MISSED -> Reset to Seed; GOT_IT -> Normal growth; PERFECT -> Fast-track growth), eliminating confusing 4-button Anki self-grading menus.
+- Added UTC+7 (Asia/Bangkok) date calculation protection in server.js to prevent timezone rollover bugs.
+- Implemented historical SRS backfilling (syncUserHistoricalSrs) to auto-plant completed lesson words upon user login/profile load.
+- Added Wilting Rescue Box for words forgotten 3+ times (times_forgotten >= 3) requiring targeted tracing care.
+- Added full-screen SRS Review Arena (#srs-view) in index.html with interactive flip cards, audio playback, and score updates.
+- Added database schema user_vocab_srs with idx_user_srs_due index, and exposed REST API endpoints (GET /api/srs/garden, GET /api/srs/due, POST /api/srs/water, POST /api/srs/plant-lesson).
+- Executed comprehensive end-to-end smoke test verifying table creation, auto-planting, aggregation queries, and SM-2 interval updates against production Turso Cloud DB.
+- Committed and pushed changes to main branch on GitHub (commits f06510b, efb98a7).
