@@ -258,6 +258,71 @@
         <!-- Sidebar Controls & Study Planner -->
         <div style="display: flex; flex-direction: column; gap: 2rem;">
           
+          <!-- Vocab Garden SRS Widget -->
+          <div id="vocab-garden-widget" class="glass-panel" style="padding: 1.75rem; border-left: 4px solid var(--success, #2ec4b6);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <h3 style="font-family: var(--font-serif); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                <span>🪴</span> <span data-i18n="vocab_garden_title">Vocab Garden</span>
+              </h3>
+              <span id="srs-total-badge" class="tag" style="background: rgba(46, 196, 182, 0.15); color: var(--success, #2ec4b6); border: none; font-weight: bold; font-size: 0.8rem;">0 / 300</span>
+            </div>
+            
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">
+              <span data-i18n="vocab_garden_desc">Water your thirsty plants today to nourish your memory!</span>
+            </p>
+
+            <!-- Total Vocab Progress Bar -->
+            <div style="margin-bottom: 1.25rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                <span data-i18n="total_vocab_progress">Total Vocab Progress</span>
+                <span id="srs-progress-percent" style="font-weight: bold; color: var(--primary);">0%</span>
+              </div>
+              <div style="width: 100%; height: 10px; background: rgba(255, 255, 255, 0.1); border-radius: 6px; overflow: hidden;">
+                <div id="srs-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent, #ff9f1c), var(--success, #2ec4b6)); transition: width 0.4s ease;"></div>
+              </div>
+            </div>
+
+            <!-- Garden Stages Chips -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1.25rem;">
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.5rem; border-radius: var(--border-radius-sm); text-align: center;">
+                <div style="font-size: 0.75rem; color: var(--text-secondary);"><span data-i18n="stage_seeds">Seeds</span> 🌱</div>
+                <div id="srs-count-seeds" style="font-weight: bold; font-size: 1.1rem; color: var(--text-main);">0</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.5rem; border-radius: var(--border-radius-sm); text-align: center;">
+                <div style="font-size: 0.75rem; color: var(--text-secondary);"><span data-i18n="stage_sprouts">Sprouts</span> 🌿</div>
+                <div id="srs-count-sprouts" style="font-weight: bold; font-size: 1.1rem; color: var(--text-main);">0</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.5rem; border-radius: var(--border-radius-sm); text-align: center;">
+                <div style="font-size: 0.75rem; color: var(--text-secondary);"><span data-i18n="stage_flowers">Flowers</span> 🌻</div>
+                <div id="srs-count-flowers" style="font-weight: bold; font-size: 1.1rem; color: var(--text-main);">0</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.5rem; border-radius: var(--border-radius-sm); text-align: center;">
+                <div style="font-size: 0.75rem; color: var(--text-secondary);"><span data-i18n="stage_trees">Trees</span> 🌳</div>
+                <div id="srs-count-trees" style="font-weight: bold; font-size: 1.1rem; color: var(--text-main);">0</div>
+              </div>
+            </div>
+
+            <!-- Thirsty Banner & Water Button -->
+            <div id="srs-thirsty-banner" style="background: rgba(46, 196, 182, 0.08); border: 1px dashed var(--success, #2ec4b6); padding: 1rem; border-radius: var(--border-radius-sm); text-align: center; margin-bottom: 0.75rem;">
+              <div style="font-size: 0.85rem; font-weight: bold; color: var(--success, #2ec4b6); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                <span>💧</span> <span id="srs-thirsty-text">0 Thirsty Plants Need Water Today</span>
+              </div>
+              <button id="srs-water-btn" class="btn btn-primary" style="width: 100%; font-size: 0.9rem; padding: 0.6rem 1rem;" data-i18n="btn_water_plants">
+                🚿 Water Thirsty Plants (3-Min Review)
+              </button>
+            </div>
+
+            <!-- Rescue Box for Wilting Plants (times_forgotten >= 3) -->
+            <div id="srs-rescue-banner" style="background: rgba(255, 51, 102, 0.08); border: 1px dashed var(--danger, #ff3366); padding: 0.85rem; border-radius: var(--border-radius-sm); text-align: center; display: none;">
+              <div style="font-size: 0.8rem; font-weight: bold; color: var(--danger, #ff3366); margin-bottom: 0.4rem; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
+                <span>🥀</span> <span id="srs-rescue-text" data-i18n="wilting_plants_count">Rescue Words Need Extra Tracing Care</span>
+              </div>
+              <button id="srs-rescue-btn" class="btn btn-secondary btn-sm" style="width: 100%; border-color: var(--danger); color: var(--danger);" data-i18n="btn_rescue_wilting">
+                ✍️ Rescue Wilting Plants
+              </button>
+            </div>
+          </div>
+          
           <!-- Study Plan & Daily reminder Setup -->
           <div class="glass-panel" style="padding: 2rem;">
             <h3 style="margin-bottom: 1rem; font-family: var(--font-serif); display: flex; align-items: center; gap: 0.5rem;">
@@ -671,6 +736,23 @@
         </div>
       </div>
 
+    <!-- 8. VOCAB GARDEN SRS REVIEW VIEW -->
+    <section id="srs-view" class="view-section" style="display: none;">
+      <div class="glass-panel" style="max-width: 700px; margin: 0 auto; padding: 2rem;">
+        <!-- Header Controls -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1rem;">
+          <button id="srs-exit-btn" class="btn btn-secondary btn-sm" data-i18n="btn_back_to_dashboard">← Back to Dashboard</button>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.2rem;">🪴</span>
+            <h3 style="margin: 0; font-family: var(--font-serif);" data-i18n="srs_view_title">Vocab Garden Watering Room</h3>
+          </div>
+          <span id="srs-card-progress" style="font-weight: bold; color: var(--accent); font-size: 0.9rem;">Card 1 of 8</span>
+        </div>
+
+        <div id="srs-arena-container" style="text-align: center; min-height: 350px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          <!-- Card content rendered dynamically -->
+        </div>
+      </div>
     </section>
 
   </main>

@@ -724,6 +724,9 @@ function renderDashboard() {
   document.getElementById('stat-time-spent').textContent = Math.round(state.timeSpentMinutes / 60) + "h";
   document.getElementById('score-val').textContent = state.score;
 
+  // Render Vocab Garden SRS Widget
+  renderVocabGardenWidget();
+
   // Toggle placement test warning banner
   const warningBanner = document.getElementById('placement-warning-banner');
   if (warningBanner) {
@@ -2356,5 +2359,201 @@ function showConfirmModal(i18nKeyTitle, i18nKeyMsg, onConfirm) {
   newOk.addEventListener('click', () => {
     document.getElementById('custom-confirm-modal').style.display = 'none';
     if (onConfirm) onConfirm();
+  });
+}
+
+// ====================================================
+// VOCAB GARDEN SRS CONTROLLER MODULE
+// ====================================================
+
+async function renderVocabGardenWidget() {
+  try {
+    const res = await fetch('/api/srs/garden');
+    if (!res.ok) return;
+    const data = await res.json();
+
+    // Update total badge
+    const totalBadge = document.getElementById('srs-total-badge');
+    if (totalBadge) {
+      totalBadge.textContent = `${data.totalPlanted} / ${data.levelTargetTotal}`;
+    }
+
+    // Update progress bar
+    const percentEl = document.getElementById('srs-progress-percent');
+    const fillEl = document.getElementById('srs-progress-fill');
+    if (percentEl && fillEl) {
+      percentEl.textContent = `${data.progressPercentage}%`;
+      fillEl.style.width = `${data.progressPercentage}%`;
+    }
+
+    // Update stage counts
+    if (document.getElementById('srs-count-seeds')) {
+      document.getElementById('srs-count-seeds').textContent = data.stages.seeds || 0;
+      document.getElementById('srs-count-sprouts').textContent = data.stages.sprouts || 0;
+      document.getElementById('srs-count-flowers').textContent = data.stages.flowers || 0;
+      document.getElementById('srs-count-trees').textContent = data.stages.trees || 0;
+    }
+
+    // Update thirsty banner text
+    const thirstyText = document.getElementById('srs-thirsty-text');
+    if (thirstyText) {
+      thirstyText.textContent = `${data.thirstyDueCount} Thirsty Plants Need Water Today`;
+    }
+
+    // Update rescue banner
+    const rescueBanner = document.getElementById('srs-rescue-banner');
+    const rescueText = document.getElementById('srs-rescue-text');
+    if (rescueBanner && rescueText) {
+      if (data.wiltingCount > 0) {
+        rescueBanner.style.display = 'block';
+        rescueText.textContent = `${data.wiltingCount} Rescue Words Need Extra Tracing Care`;
+      } else {
+        rescueBanner.style.display = 'none';
+      }
+    }
+  } catch (err) {
+    console.error("Failed to render Vocab Garden widget:", err);
+  }
+}
+
+function setupSrsEventListeners() {
+  const waterBtn = document.getElementById('srs-water-btn');
+  if (waterBtn) {
+    waterBtn.addEventListener('click', () => startSrsSession('normal'));
+  }
+  const rescueBtn = document.getElementById('srs-rescue-btn');
+  if (rescueBtn) {
+    rescueBtn.addEventListener('click', () => startSrsSession('rescue'));
+  }
+  const exitBtn = document.getElementById('srs-exit-btn');
+  if (exitBtn) {
+    exitBtn.addEventListener('click', () => switchView('dashboard-view'));
+  }
+}
+
+async function startSrsSession(mode = 'normal') {
+  try {
+    const res = await fetch(`/api/srs/due?mode=${mode}`);
+    if (!res.ok) return;
+    const cards = await res.json();
+
+    if (!cards || cards.length === 0) {
+      alert(t('srs_empty_due'));
+      return;
+    }
+
+    state.srsCards = cards;
+    state.srsIndex = 0;
+    state.srsSessionMode = mode;
+    state.srsXpEarned = 0;
+
+    switchView('srs-view');
+    renderSrsCard();
+  } catch (err) {
+    console.error("Failed to start SRS session:", err);
+  }
+}
+
+function renderSrsCard() {
+  const container = document.getElementById('srs-arena-container');
+  if (!container) return;
+
+  if (!state.srsCards || state.srsIndex >= state.srsCards.length) {
+    // Session summary
+    container.innerHTML = `
+      <div style="font-size: 3rem; margin-bottom: 1rem;">🪴✨</div>
+      <h2 style="font-family: var(--font-serif); margin-bottom: 0.5rem; color: var(--success);">${t('srs_session_complete', { xp: state.srsXpEarned })}</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">All target plants received proper care and nourishment today!</p>
+      <button class="btn btn-primary" onclick="switchView('dashboard-view')" style="padding: 0.75rem 2rem;">🚀 Return to Dashboard</button>
+    `;
+    document.getElementById('srs-card-progress').textContent = 'Completed!';
+    return;
+  }
+
+  const c = state.srsCards[state.srsIndex];
+  document.getElementById('srs-card-progress').textContent = `Card ${state.srsIndex + 1} of ${state.srsCards.length}`;
+
+  const stageIcons = { 1: '🌱 Seed', 2: '🌿 Sprout', 3: '🌻 Flower', 4: '🌳 Tree' };
+  const stageIcon = stageIcons[c.mastery_stage] || '🌱 Seed';
+  const localizedMeaning = ld(c, 'meaning') || c.meaning;
+
+  container.innerHTML = `
+    <div style="margin-bottom: 1rem;">
+      <span class="tag" style="background: rgba(46, 196, 182, 0.15); color: var(--success); border: none; font-size: 0.85rem;">${stageIcon}</span>
+    </div>
+    
+    <div style="font-size: 4.5rem; font-family: var(--font-serif); color: var(--primary); margin: 0.25rem 0; text-shadow: 0 4px 12px rgba(255, 51, 102, 0.2);">
+      ${c.character}
+    </div>
+    
+    <div style="margin-bottom: 1.25rem;">
+      <button class="btn btn-secondary btn-sm" onclick="playTone('${c.character}')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+        🔊 <span>${c.pinyin}</span>
+      </button>
+    </div>
+
+    <div style="font-size: 1.25rem; font-weight: bold; color: var(--text-main); margin-bottom: 0.5rem;">
+      ${localizedMeaning}
+    </div>
+
+    ${c.exampleCn ? `
+      <div style="font-size: 0.9rem; color: var(--text-secondary); background: rgba(255,255,255,0.03); border-radius: 8px; padding: 0.6rem 1rem; margin-bottom: 1.5rem; max-width: 450px;">
+        <div>${c.exampleCn}</div>
+        <div style="font-size: 0.8rem; color: var(--accent);">${c.examplePy || ''}</div>
+      </div>
+    ` : '<div style="margin-bottom: 1.5rem;"></div>'}
+
+    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">How well did you recall this word?</div>
+
+    <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 500px;">
+      <button class="btn btn-secondary" onclick="submitSrsWatering(${c.vocab_id}, 3, false)" style="flex: 1; border-color: var(--danger); color: var(--danger); font-size: 0.85rem; padding: 0.65rem;">
+        🌧️ Needs Practice
+      </button>
+      <button class="btn btn-secondary" onclick="submitSrsWatering(${c.vocab_id}, 2, false)" style="flex: 1; border-color: var(--accent); color: var(--accent); font-size: 0.85rem; padding: 0.65rem;">
+        🟡 Got It!
+      </button>
+      <button class="btn btn-primary" onclick="submitSrsWatering(${c.vocab_id}, 1, false)" style="flex: 1; font-size: 0.85rem; padding: 0.65rem;">
+        🌟 Super Star!
+      </button>
+    </div>
+  `;
+}
+
+async function submitSrsWatering(vocabId, attemptsCount, hintsUsed) {
+  try {
+    const res = await fetch('/api/srs/water', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vocabId, attemptsCount, hintsUsed })
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    state.srsXpEarned += (data.xpEarned || 10);
+    state.score += (data.xpEarned || 10);
+    saveProgress();
+
+    state.srsIndex++;
+    renderSrsCard();
+  } catch (err) {
+    console.error("Failed to submit SRS watering:", err);
+  }
+}
+
+async function plantLessonSrs(lessonId) {
+  try {
+    await fetch('/api/srs/plant-lesson', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lessonId })
+    });
+  } catch (err) {
+    console.error("Failed to plant lesson SRS:", err);
+  }
+}
+
+// Hook setupSrsEventListeners into initialization
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setupSrsEventListeners();
   });
 }

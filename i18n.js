@@ -272,7 +272,23 @@ const i18nDictionary = {
     "Additional Vocabulary Part 2": "Additional Vocabulary Part 2",
     "Additional Vocabulary Part 3": "Additional Vocabulary Part 3",
     "Additional Vocabulary Part 4": "Additional Vocabulary Part 4",
-    "btn_close": "Close"
+    "btn_close": "Close",
+
+    // Vocab Garden (SRS)
+    "vocab_garden_title": "Vocab Garden",
+    "vocab_garden_desc": "Water your thirsty plants today to nourish your memory!",
+    "total_vocab_progress": "Total Vocab Progress",
+    "stage_seeds": "Seeds",
+    "stage_sprouts": "Sprouts",
+    "stage_flowers": "Flowers",
+    "stage_trees": "Trees",
+    "thirsty_plants_count": "Thirsty Plants Need Water Today",
+    "btn_water_plants": "🚿 Water Thirsty Plants (3-Min Review)",
+    "wilting_plants_count": "Rescue Words Need Extra Tracing Care",
+    "btn_rescue_wilting": "✍️ Rescue Wilting Plants",
+    "srs_view_title": "Vocab Garden Watering Room",
+    "srs_session_complete": "Garden Watered! +{{xp}} XP",
+    "srs_empty_due": "All your plants are well watered today! 🌟"
   },
   
   th: {
@@ -543,7 +559,23 @@ const i18nDictionary = {
     "Additional Vocabulary Part 2": "คำศัพท์เพิ่มเติมตอนที่ 2",
     "Additional Vocabulary Part 3": "คำศัพท์เพิ่มเติมตอนที่ 3",
     "Additional Vocabulary Part 4": "คำศัพท์เพิ่มเติมตอนที่ 4",
-    "btn_close": "ปิด"
+    "btn_close": "ปิด",
+
+    // Vocab Garden (SRS)
+    "vocab_garden_title": "สวนคำศัพท์",
+    "vocab_garden_desc": "รดน้ำต้นไม้คำศัพท์เพื่อฟื้นฟูความจำของคุณ!",
+    "total_vocab_progress": "ความคืบหน้าคำศัพท์ทั้งหมด",
+    "stage_seeds": "เมล็ดพันธุ์",
+    "stage_sprouts": "ต้นกล้า",
+    "stage_flowers": "ดอกไม้",
+    "stage_trees": "ต้นไม้ใหญ่",
+    "thirsty_plants_count": "ต้นไม้ที่ต้องการรดน้ำวันนี้",
+    "btn_water_plants": "🚿 รดน้ำต้นไม้คำศัพท์ (ทบทวน 3 นาที)",
+    "wilting_plants_count": "คำศัพท์เหี่ยวเฉาที่ต้องการการคัดลายมือ",
+    "btn_rescue_wilting": "✍️ คัดลายมือช่วยชีวิตต้นไม้",
+    "srs_view_title": "ห้องรดน้ำต้นไม้คำศัพท์",
+    "srs_session_complete": "รดน้ำต้นไม้เรียบร้อยแล้ว! +{{xp}} XP",
+    "srs_empty_due": "ต้นไม้ทุกต้นของคุณได้รับน้ำเพียงพอแล้ววันนี้! 🌟"
   }
 };
 
