@@ -75,11 +75,16 @@ async function syncUserHistoricalSrs(database, userId, userLevel = 'hsk1', compl
 
 // Ensure DB is initialized before handling any requests (Serverless pattern)
 app.use(async (req, res, next) => {
-  if (!db) {
-    db = await getDb();
-    await initSrsTable(db);
+  try {
+    if (!db) {
+      db = await getDb();
+      await initSrsTable(db);
+    }
+    next();
+  } catch (err) {
+    console.error("Database connection/init failed:", err);
+    res.status(500).json({ error: "Database initialization failed: " + err.message });
   }
-  next();
 });
 
 // API Routes
