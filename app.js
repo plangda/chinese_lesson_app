@@ -735,14 +735,23 @@ function getLevelName(level) {
 }
 
 function renderDashboard() {
-  document.getElementById('dashboard-level-badge').textContent = getLevelName(state.userLevel);
-  document.getElementById('change-level-select').value = state.userLevel;
+  const lvlBadge = document.getElementById('dashboard-level-badge');
+  if (lvlBadge) lvlBadge.textContent = getLevelName(state.userLevel);
   
-  document.getElementById('stat-lessons-completed').textContent = state.completedLessons.length;
-  // Let's also update the daily streak value here!
-  document.getElementById('stat-streak').textContent = state.streakCount;
-  document.getElementById('stat-time-spent').textContent = Math.round(state.timeSpentMinutes / 60) + "h";
-  document.getElementById('score-val').textContent = state.score;
+  const lvlSelect = document.getElementById('change-level-select');
+  if (lvlSelect) lvlSelect.value = state.userLevel;
+  
+  const lessonsCompletedEl = document.getElementById('stat-lessons-completed');
+  if (lessonsCompletedEl) lessonsCompletedEl.textContent = state.completedLessons.length;
+
+  const streakEl = document.getElementById('stat-streak');
+  if (streakEl) streakEl.textContent = state.streakCount;
+
+  const timeSpentEl = document.getElementById('stat-time-spent');
+  if (timeSpentEl) timeSpentEl.textContent = Math.round(state.timeSpentMinutes / 60) + "h";
+
+  const scoreValEl = document.getElementById('score-val');
+  if (scoreValEl) scoreValEl.textContent = state.score;
 
   // Render Vocab Garden SRS Widget
   renderVocabGardenWidget();
@@ -754,6 +763,7 @@ function renderDashboard() {
   }
   
   const container = document.getElementById('dashboard-lessons-container');
+  if (!container) return;
   container.innerHTML = '';
   
   const lessons = (window.CHINESE_LESSONS && window.CHINESE_LESSONS.lessons) ? (window.CHINESE_LESSONS.lessons[state.userLevel] || []) : [];
@@ -764,47 +774,64 @@ function renderDashboard() {
   if (todayPanel) {
     if (activeLesson) {
       todayPanel.classList.remove('hidden');
-      document.getElementById('today-lesson-title').textContent = t('day_prefix', { day: activeLesson.day_number || activeLesson.id.replace(/^hsk\d_day/, '') }) + ld(activeLesson, 'title');
+      const todayTitle = document.getElementById('today-lesson-title');
+      if (todayTitle) todayTitle.textContent = t('day_prefix', { day: activeLesson.day_number || activeLesson.id.replace(/^hsk\d_day/, '') }) + ld(activeLesson, 'title');
       
-      let descId = "todays_lesson_desc";
-      if (state.userLevel === 'hsk2') descId = "todays_lesson_desc_hsk2";
-      if (state.userLevel === 'hsk3') descId = "todays_lesson_desc_hsk3";
-      document.getElementById('today-lesson-desc').textContent = t(descId);
+      const todayDesc = document.getElementById('today-lesson-desc');
+      if (todayDesc) {
+        let descId = "todays_lesson_desc";
+        if (state.userLevel === 'hsk2') descId = "todays_lesson_desc_hsk2";
+        if (state.userLevel === 'hsk3') descId = "todays_lesson_desc_hsk3";
+        todayDesc.textContent = t(descId);
+      }
       
       const todayTag = document.getElementById('today-lesson-tag');
-      todayTag.textContent = t('todays_lesson_with_level', { level: state.userLevel.toUpperCase() });
-      todayTag.className = `tag tag-${state.userLevel}`;
+      if (todayTag) {
+        todayTag.textContent = t('todays_lesson_with_level', { level: state.userLevel.toUpperCase() });
+        todayTag.className = `tag tag-${state.userLevel}`;
+      }
       
       const startBtn = document.getElementById('today-lesson-start-btn');
-      startBtn.textContent = t('btn_start_today');
-      startBtn.onclick = () => routeToLesson(activeLesson.id);
+      if (startBtn) {
+        startBtn.textContent = t('btn_start_today');
+        startBtn.onclick = () => routeToLesson(activeLesson.id);
+      }
     } else {
       if (lessons.length > 0) {
         todayPanel.classList.remove('hidden');
-        document.getElementById('today-lesson-title').textContent = t('level_complete_title');
-        document.getElementById('today-lesson-desc').textContent = t('level_complete_desc', { level: state.userLevel.toUpperCase() });
+        const todayTitle = document.getElementById('today-lesson-title');
+        if (todayTitle) todayTitle.textContent = t('level_complete_title');
+        
+        const todayDesc = document.getElementById('today-lesson-desc');
+        if (todayDesc) todayDesc.textContent = t('level_complete_desc', { level: state.userLevel.toUpperCase() });
         
         const todayTag = document.getElementById('today-lesson-tag');
-        todayTag.textContent = t('lbl_complete_tag');
-        todayTag.className = "tag tag-hsk1";
-        todayTag.style.background = "var(--success)";
+        if (todayTag) {
+          todayTag.textContent = t('lbl_complete_tag');
+          todayTag.className = "tag tag-hsk1";
+          todayTag.style.background = "var(--success)";
+        }
         
         const startBtn = document.getElementById('today-lesson-start-btn');
-        startBtn.textContent = t('btn_explore_next');
-        startBtn.onclick = () => {
-          if (state.userLevel === 'hsk1') {
-            state.userLevel = 'hsk2';
-          } else if (state.userLevel === 'hsk2') {
-            state.userLevel = 'hsk3';
-          } else {
-            document.getElementById('today-lesson-desc').textContent = t('all_levels_complete');
-            document.getElementById('today-lesson-desc').style.color = "var(--success)";
-            startBtn.classList.add('hidden');
-            return;
-          }
-          saveProgress();
-          renderDashboard();
-        };
+        if (startBtn) {
+          startBtn.textContent = t('btn_explore_next');
+          startBtn.onclick = () => {
+            if (state.userLevel === 'hsk1') {
+              state.userLevel = 'hsk2';
+            } else if (state.userLevel === 'hsk2') {
+              state.userLevel = 'hsk3';
+            } else {
+              if (todayDesc) {
+                todayDesc.textContent = t('all_levels_complete');
+                todayDesc.style.color = "var(--success)";
+              }
+              startBtn.classList.add('hidden');
+              return;
+            }
+            saveProgress();
+            renderDashboard();
+          };
+        }
       } else {
         todayPanel.classList.add('hidden');
       }
@@ -2393,62 +2420,100 @@ async function renderVocabGardenWidget() {
     const data = await res.json();
 
     // Update total badge
-    const totalBadge = document.getElementById('srs-total-badge');
+    const totalBadge = document.getElementById('garden-total-badge');
     if (totalBadge) {
-      totalBadge.textContent = `${data.totalPlanted} / ${data.levelTargetTotal}`;
+      totalBadge.textContent = `${data.totalPlanted} / ${data.levelTargetTotal} Words`;
     }
 
-    // Update progress bar
-    const percentEl = document.getElementById('srs-progress-percent');
-    const fillEl = document.getElementById('srs-progress-fill');
-    if (percentEl && fillEl) {
-      percentEl.textContent = `${data.progressPercentage}%`;
-      fillEl.style.width = `${data.progressPercentage}%`;
-    }
-
-    // Update stage counts
-    if (document.getElementById('srs-count-seeds')) {
-      document.getElementById('srs-count-seeds').textContent = data.stages.seeds || 0;
-      document.getElementById('srs-count-sprouts').textContent = data.stages.sprouts || 0;
-      document.getElementById('srs-count-flowers').textContent = data.stages.flowers || 0;
-      document.getElementById('srs-count-trees').textContent = data.stages.trees || 0;
-    }
-
-    // Update thirsty banner text
-    const thirstyText = document.getElementById('srs-thirsty-text');
-    if (thirstyText) {
-      thirstyText.textContent = `${data.thirstyDueCount} Thirsty Plants Need Water Today`;
-    }
-
-    // Update rescue banner
-    const rescueBanner = document.getElementById('srs-rescue-banner');
-    const rescueText = document.getElementById('srs-rescue-text');
-    if (rescueBanner && rescueText) {
-      if (data.wiltingCount > 0) {
-        rescueBanner.classList.remove('hidden');
-        rescueText.textContent = `${data.wiltingCount} Rescue Words Need Extra Tracing Care`;
+    // Update habit banner title & description
+    const habitTitle = document.getElementById('habit-banner-title');
+    const habitDesc = document.getElementById('habit-banner-desc');
+    const mainWaterBtn = document.getElementById('main-water-all-btn');
+    
+    if (habitTitle && habitDesc) {
+      if (data.totalPlanted === 0) {
+        habitTitle.textContent = "Welcome to HanPath!";
+        habitDesc.textContent = "Your garden is empty. Start a lesson or take a pre-test to plant your first words!";
+        if (mainWaterBtn) {
+          mainWaterBtn.textContent = "💧 Water All Due Words";
+          mainWaterBtn.disabled = true;
+          mainWaterBtn.style.opacity = '0.5';
+        }
       } else {
-        rescueBanner.classList.add('hidden');
+        habitTitle.textContent = "Today's Memory Habit";
+        habitDesc.textContent = `${data.thirstyDueCount} plants need watering & ${data.wiltingCount} plants are wilting.`;
+        if (mainWaterBtn) {
+          if (data.thirstyDueCount > 0) {
+            mainWaterBtn.textContent = `💧 Water ${data.thirstyDueCount} Thirsty Words (~${Math.ceil(data.thirstyDueCount * 0.5)} mins)`;
+            mainWaterBtn.disabled = false;
+            mainWaterBtn.style.opacity = '1';
+          } else {
+            mainWaterBtn.textContent = "✨ Garden Fully Nourished!";
+            mainWaterBtn.disabled = true;
+            mainWaterBtn.style.opacity = '0.7';
+          }
+        }
       }
     }
+
+    // Render the visual garden canvas
+    gardenRenderer.render('main-garden-canvas-slot', data.plants);
+
+    // Surface Confusion Pairs Alert
+    const confusionAlert = document.getElementById('confusion-pairs-alert');
+    const confusionList = document.getElementById('confusion-pairs-list');
+    if (confusionAlert && confusionList) {
+      const activePairs = [];
+      const userChars = data.plants.map(p => p.character);
+      
+      const pairsMap = {
+        hsk1: [['买', '卖'], ['本', '木'], ['人', '入']],
+        hsk2: [['喝', '渴'], ['右', '左'], ['谁', '准']],
+        hsk3: [['洗', '选'], ['干', '千'], ['同', '司']]
+      };
+
+      const levelPairs = pairsMap[state.userLevel] || pairsMap.hsk1;
+      levelPairs.forEach(pair => {
+        if (userChars.includes(pair[0]) && userChars.includes(pair[1])) {
+          activePairs.push(pair);
+        }
+      });
+
+      if (activePairs.length > 0) {
+        confusionAlert.classList.remove('hidden');
+        let text = "You have confusable character pairs planted: ";
+        activePairs.forEach(pair => {
+          text += `<strong>${pair[0]}</strong> vs <strong>${pair[1]}</strong> | `;
+        });
+        confusionList.innerHTML = text.slice(0, -3) + ". Pay special attention to their tone and structural details!";
+      } else {
+        confusionAlert.classList.add('hidden');
+      }
+    }
+
   } catch (err) {
     console.error("Failed to render Vocab Garden widget:", err);
   }
 }
 
 function setupSrsEventListeners() {
-  const waterBtn = document.getElementById('srs-water-btn');
-  if (waterBtn) {
-    waterBtn.addEventListener('click', () => startSrsSession('normal'));
-  }
-  const rescueBtn = document.getElementById('srs-rescue-btn');
-  if (rescueBtn) {
-    rescueBtn.addEventListener('click', () => startSrsSession('rescue'));
-  }
   const exitBtn = document.getElementById('srs-exit-btn');
   if (exitBtn) {
     exitBtn.addEventListener('click', () => switchView('dashboard-view'));
   }
+
+  // Bind clicked plant events to start a single SRS session for that plant
+  eventBus.on('garden:plant-clicked', (plant) => {
+    // Play audio feedback
+    playTone(plant.character);
+    
+    // Start session
+    srsEngine.initSession([plant], 1);
+    state.srsSessionMode = 'single';
+    state.srsXpEarned = 0;
+    switchView('srs-view');
+    renderSrsCard();
+  });
 }
 
 // Keep track of active challenge state

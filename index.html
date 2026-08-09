@@ -181,192 +181,125 @@
 
     <!-- 2. STUDENT DASHBOARD VIEW -->
     <section id="dashboard-view" class="view-section">
-      <div class="dashboard-grid">
-        
-        <!-- Main Stats and Curriculum -->
-        <div style="display: flex; flex-direction: column; gap: 2rem;">
-          
-          <!-- Placement Pre-test Warning Banner -->
-          <div id="placement-warning-banner" class="glass-panel hidden"  style="display: flex; padding: 1.25rem 2rem; border-color: var(--warning); background: rgba(255, 183, 3, 0.05);  align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; border-radius: var(--border-radius-md);">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-              <span style="font-size: 2rem;">⚠️</span>
-              <div>
-                <h4 style="color: var(--warning); margin-bottom: 0.25rem;" data-i18n="warn_pretest_title"><span data-i18n="warn_pretest_title">Placement Pre-Test Recommended</span></h4>
-                <p style="font-size: 0.85rem; color: var(--text-secondary);"><span data-i18n="warn_pretest_desc">You haven\'t completed the placement pre-test. Take it now to make sure lessons fit your level.</span></p>
-              </div>
-            </div>
-            <button id="banner-pretest-btn" class="btn btn-secondary btn-sm" style="border-color: var(--warning); color: var(--warning); padding: 0.4rem 1rem; font-size: 0.85rem;" data-i18n="btn_take_pretest_short"><span data-i18n="btn_take_pretest_short">Take Pre-Test</span></button>
-          </div>
-
-          <div class="glass-panel student-card">
-            <div class="student-welcome">
-              <span id="dashboard-level-badge" class="student-level-tag">HSK 1 (Beginner)</span>
-              <h1 data-i18n="welcome_back">Welcome Back, Scholar!</h1>
-              <p style="color: var(--text-secondary);"><span data-i18n="study_program_desc">Your study program consists of structured daily lessons of 1 hour each.</span></p>
-            </div>
-            
-            <div class="stats-row">
-              <div class="stat-item">
-                <div id="stat-streak" class="stat-val highlight">0</div>
-                <div class="stat-lbl" data-i18n="daily_streak">Daily Streak</div>
-              </div>
-              <div class="stat-item">
-                <div id="stat-lessons-completed" class="stat-val">0</div>
-                <div class="stat-lbl" data-i18n="lessons_done">Lessons Done</div>
-              </div>
-              <div class="stat-item">
-                <div id="stat-time-spent" class="stat-val">0h</div>
-                <div class="stat-lbl" data-i18n="study_time">Study Time</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Pinyin Chart Banner -->
-          <div class="glass-panel" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent); cursor: pointer;" id="pinyin-chart-btn">
-            <div>
-              <h3 style="margin-bottom: 0.25rem;" data-i18n="lesson0_title">Lesson 0: Interactive Pinyin Chart</h3>
-              <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;"><span data-i18n="lesson0_desc">Master the 4 tones and pronunciation rules before starting Day 1.</span></p>
-            </div>
-            <span style="font-size: 1.5rem;">🗣️</span>
-          </div>
-          
-          <!-- Today's Lesson Panel -->
-          <div id="today-lesson-panel" class="glass-panel" style="padding: 2rem; border-color: var(--primary); background: linear-gradient(135deg, rgba(255, 51, 102, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-              <span class="tag tag-hsk1" id="today-lesson-tag" style="background: var(--primary); color: white; border: none; font-size: 0.8rem;" data-i18n="todays_lesson_tag">TODAY\'S LESSON</span>
-              <span id="today-lesson-duration" style="font-size: 0.85rem; color: var(--accent); font-weight: bold; display: flex; align-items: center; gap: 0.25rem;" data-i18n="minute_block_tag">⏳ 60-Minute Block</span>
-            </div>
-            <h2 id="today-lesson-title" style="font-family: var(--font-serif); margin-bottom: 0.5rem;">Day 1: Greetings & Basics</h2>
-            <p id="today-lesson-desc" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;">
-              <span data-i18n="todays_lesson_desc">Learn essential vocabulary, build core sentences, participate in interactive dialogue, and complete the review quiz.</span>
-            </p>
-            <button id="today-lesson-start-btn" class="btn btn-primary" style="width: 100%; max-width: 300px; font-size: 1.05rem;">
-              🚀 Start Today's 1-Hour Lesson
-            </button>
-          </div>
-          
-          <div class="glass-panel" style="padding: 2rem;">
-            <h2 style="margin-bottom: 0.5rem; font-family: var(--font-serif);" data-i18n="your_curriculum">Your Curriculum</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;"><span data-i18n="curriculum_desc">Complete these daily lessons in order. Each lesson requires 1 hour of study.</span></p>
-            
-            <div id="dashboard-lessons-container" class="lessons-list">
-              <!-- Lesson rows will be dynamically populated here -->
-            </div>
+      <!-- 1. Daily Memory Habit Banner (Top Area) -->
+      <div id="daily-memory-habit-banner" class="glass-panel" style="padding: 1.5rem 2rem; margin-bottom: 2rem; border-left: 5px solid var(--success); display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; background: linear-gradient(90deg, rgba(46, 196, 182, 0.08) 0%, rgba(255,255,255,0.02) 100%); border-radius: var(--border-radius-md);">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <span style="font-size: 2.5rem; animation: pulse 2s infinite;">🌱</span>
+          <div>
+            <h3 style="margin: 0 0 0.25rem 0; font-family: var(--font-serif);" id="habit-banner-title">Today's Memory Habit</h3>
+            <p id="habit-banner-desc" style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">Loading your memory garden status...</p>
           </div>
         </div>
+        <button id="main-water-all-btn" class="btn btn-primary" style="padding: 0.75rem 2rem; font-weight: bold; border-radius: 30px; box-shadow: 0 4px 15px rgba(0, 245, 212, 0.25);" onclick="window.startSrsSession('normal')">
+          💧 Water All Due Words (~5 mins)
+        </button>
+      </div>
+
+      <!-- 2. Main Dashboard Layout (Grid columns: 2.2fr left, 1fr right) -->
+      <div class="dashboard-grid" style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 2rem; align-items: start;">
         
-        <!-- Sidebar Controls & Study Planner -->
+        <!-- Left Area: Garden Canvas -->
         <div style="display: flex; flex-direction: column; gap: 2rem;">
           
-          <!-- Vocab Garden SRS Widget -->
-          <div id="vocab-garden-widget" class="glass-panel" style="padding: 1.75rem; border-left: 4px solid var(--success, #2ec4b6);">
+          <!-- Visual Garden Canvas Card -->
+          <div class="glass-panel" style="padding: 2rem; min-height: 400px; display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1rem;">
+              <h2 style="margin: 0; font-family: var(--font-serif); display: flex; align-items: center; gap: 0.5rem;">
+                <span>🪴</span> <span data-i18n="visual_garden_title">Your Memory Garden</span>
+              </h2>
+              <!-- Garden Progress stats -->
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <span id="garden-total-badge" class="tag" style="background: rgba(0, 245, 212, 0.15); color: var(--success); border: none; font-weight: bold; font-size: 0.85rem; padding: 4px 12px; border-radius: 20px;">0 / 300 Words</span>
+              </div>
+            </div>
+            
+            <!-- Garden Canvas Slot (Renders the plant grid or onboarding Empty State) -->
+            <div id="main-garden-canvas-slot" style="min-height: 300px; display: flex; align-items: center; justify-content: center; width: 100%;">
+              <!-- Renders modules/garden.js Grid -->
+            </div>
+          </div>
+
+          <!-- Confusion Pair Alert Panel -->
+          <div id="confusion-pairs-alert" class="glass-panel hidden" style="padding: 1.5rem; border-left: 4px solid var(--accent); background: rgba(255, 159, 28, 0.05); border-radius: var(--border-radius-md);">
+            <div style="display: flex; gap: 1rem; align-items: flex-start;">
+              <span style="font-size: 1.75rem;">⚠️</span>
+              <div>
+                <h4 style="margin: 0 0 0.35rem 0; color: var(--accent);" data-i18n="confusion_alert_title">Confusion Pair Alert</h4>
+                <p id="confusion-pairs-list" style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.4;">
+                  You recently mixed up characters: <strong>喝</strong> (drink) and <strong>渴</strong> (thirsty). Let's review them together!
+                </p>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+
+        <!-- Right Area: Lessons & Quests Sidebar -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+          
+          <!-- Today's Lesson Panel (Compact Sidebar form) -->
+          <div id="today-lesson-panel" class="glass-panel" style="padding: 1.5rem; border-color: var(--primary); background: linear-gradient(135deg, rgba(255, 51, 102, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-              <h3 style="font-family: var(--font-serif); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
-                <span>🪴</span> <span data-i18n="vocab_garden_title">Vocab Garden</span>
-              </h3>
-              <span id="srs-total-badge" class="tag" style="background: rgba(46, 196, 182, 0.15); color: var(--success, #2ec4b6); border: none; font-weight: bold; font-size: 0.8rem;">0 / 300</span>
+              <span class="tag" style="background: var(--primary); color: white; border: none; font-size: 0.7rem; font-weight: bold; padding: 2px 8px; border-radius: 4px;">CURRENT LESSON</span>
+              <span id="today-lesson-duration" style="font-size: 0.75rem; color: var(--accent); font-weight: bold;">⏳ 60 Min</span>
             </div>
-            
-            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">
-              <span data-i18n="vocab_garden_desc">Water your thirsty plants today to nourish your memory!</span>
-            </p>
-
-            <!-- Total Vocab Progress Bar -->
-            <div style="margin-bottom: 1.25rem;">
-              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
-                <span data-i18n="total_vocab_progress">Total Vocab Progress</span>
-                <span id="srs-progress-percent" style="font-weight: bold; color: var(--primary);">0%</span>
-              </div>
-              <div style="width: 100%; height: 10px; background: rgba(255, 255, 255, 0.1); border-radius: 6px; overflow: hidden;">
-                <div id="srs-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent, #ff9f1c), var(--success, #2ec4b6)); transition: width 0.4s ease;"></div>
-              </div>
-            </div>
-
-            <!-- Garden Stages Chips -->
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1.25rem;">
-              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.5rem; border-radius: var(--border-radius-sm); text-align: center;">
-                <div style="font-size: 0.75rem; color: var(--text-secondary);"><span data-i18n="stage_seeds">Seeds</span> 🌱</div>
-                <div id="srs-count-seeds" style="font-weight: bold; font-size: 1.1rem; color: var(--text-main);">0</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.5rem; border-radius: var(--border-radius-sm); text-align: center;">
-                <div style="font-size: 0.75rem; color: var(--text-secondary);"><span data-i18n="stage_sprouts">Sprouts</span> 🌿</div>
-                <div id="srs-count-sprouts" style="font-weight: bold; font-size: 1.1rem; color: var(--text-main);">0</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.5rem; border-radius: var(--border-radius-sm); text-align: center;">
-                <div style="font-size: 0.75rem; color: var(--text-secondary);"><span data-i18n="stage_flowers">Flowers</span> 🌻</div>
-                <div id="srs-count-flowers" style="font-weight: bold; font-size: 1.1rem; color: var(--text-main);">0</div>
-              </div>
-              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.5rem; border-radius: var(--border-radius-sm); text-align: center;">
-                <div style="font-size: 0.75rem; color: var(--text-secondary);"><span data-i18n="stage_trees">Trees</span> 🌳</div>
-                <div id="srs-count-trees" style="font-weight: bold; font-size: 1.1rem; color: var(--text-main);">0</div>
-              </div>
-            </div>
-
-            <!-- Thirsty Banner & Water Button -->
-            <div id="srs-thirsty-banner" style="background: rgba(46, 196, 182, 0.08); border: 1px dashed var(--success, #2ec4b6); padding: 1rem; border-radius: var(--border-radius-sm); text-align: center; margin-bottom: 0.75rem;">
-              <div style="font-size: 0.85rem; font-weight: bold; color: var(--success, #2ec4b6); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
-                <span>💧</span> <span id="srs-thirsty-text">0 Thirsty Plants Need Water Today</span>
-              </div>
-              <button id="srs-water-btn" class="btn btn-primary" style="width: 100%; font-size: 0.9rem; padding: 0.6rem 1rem;" data-i18n="btn_water_plants">
-                🚿 Water Thirsty Plants (3-Min Review)
-              </button>
-            </div>
-
-            <!-- Rescue Box for Wilting Plants (times_forgotten >= 3) -->
-            <div id="srs-rescue-banner" class="hidden" style="background: rgba(255, 51, 102, 0.08); border: 1px dashed var(--danger, #ff3366); padding: 0.85rem; border-radius: var(--border-radius-sm); text-align: center;">
-              <div style="font-size: 0.8rem; font-weight: bold; color: var(--danger, #ff3366); margin-bottom: 0.4rem; display: flex; align-items: center; justify-content: center; gap: 0.3rem;">
-                <span>🥀</span> <span id="srs-rescue-text" data-i18n="wilting_plants_count">Rescue Words Need Extra Tracing Care</span>
-              </div>
-              <button id="srs-rescue-btn" class="btn btn-secondary btn-sm" style="width: 100%; border-color: var(--danger); color: var(--danger);" data-i18n="btn_rescue_wilting">
-                ✍️ Rescue Wilting Plants
-              </button>
-            </div>
-          </div>
-          
-          <!-- Study Plan & Daily reminder Setup -->
-          <div class="glass-panel" style="padding: 2rem;">
-            <h3 style="margin-bottom: 1rem; font-family: var(--font-serif); display: flex; align-items: center; gap: 0.5rem;">
-              <span>⏰</span data-i18n="study_reminder_title"> Study Reminder</h3>
-            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">
-              <span data-i18n="study_reminder_desc">Consistent daily practice makes perfect. Set a daily study reminder.</span>
-            </p>
-            
-            <div class="config-item" style="margin-bottom: 1.25rem;">
-              <label for="reminder-time-input" data-i18n="daily_reminder_time">Daily Reminder Time</label>
-              <input type="time" id="reminder-time-input" value="09:00">
-            </div>
-            
-            <button id="set-reminder-btn" class="btn btn-primary" style="width: 100%;" data-i18n="btn_activate_reminder">
-              <span data-i18n="btn_activate_reminder">🔔 Activate Daily Reminder</span>
+            <h3 id="today-lesson-title" style="font-family: var(--font-serif); margin: 0 0 0.5rem 0; font-size: 1.15rem;">Day 1: Greetings</h3>
+            <button id="today-lesson-start-btn" class="btn btn-primary btn-sm" style="width: 100%; font-weight: bold; font-size: 0.85rem; padding: 0.5rem;">
+              🚀 Start Lesson
             </button>
-            <div id="reminder-status-msg" class="hidden" style="margin-top: 0.75rem; font-size: 0.85rem; text-align: center; color: var(--success);">
-              <span data-i18n="reminder_success">Reminder set successfully!</span>
+          </div>
+
+          <!-- Completed Lessons Drawer / Collapsible List -->
+          <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="margin: 0 0 0.75rem 0; font-family: var(--font-serif); font-size: 1.1rem; display: flex; align-items: center; gap: 0.4rem;">
+              <span>📖</span> Unlocked Lessons
+            </h3>
+            <div id="dashboard-lessons-container" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; padding-right: 0.25rem;">
+              <!-- Completed and unlocked lessons loaded dynamically -->
             </div>
           </div>
-          
-          <!-- Options / Level Configurator -->
-          <div class="glass-panel" style="padding: 2rem;">
-            <h3 style="margin-bottom: 1rem; font-family: var(--font-serif);" data-i18n="account_settings">Account & Settings</h3>
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
-              <div class="config-item">
-                <label for="change-level-select" data-i18n="change_hsk_level">Change HSK Level</label>
-                <select id="change-level-select">
-                  <option value="hsk1" data-i18n="hsk1_level_name">HSK 1 (Beginner)</option>
-                  <option value="hsk2" data-i18n="hsk2_level_name">HSK 2 (Elementary)</option>
-                  <option value="hsk3" data-i18n="hsk3_level_name">HSK 3 (Intermediate)</option>
-                </select>
-              </div>
-              <div style="display: flex; gap: 1rem; align-items: center; width: 100%;">
-                <button id="reset-progress-btn" class="btn btn-secondary" style="flex: 1; border-color: var(--danger); color: var(--danger);" data-i18n="btn_hard_reset">
-                  ⚠️ Hard Reset
-                </button>
-                <button id="logout-btn" class="btn btn-secondary" style="flex: 1; border-color: var(--accent); color: var(--accent);" data-i18n="btn_logout">
-                  🚪 Logout
-                </button>
-              </div>
+
+          <!-- Mini-Games and Labs Panel -->
+          <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="margin: 0 0 1rem 0; font-family: var(--font-serif); font-size: 1.1rem; display: flex; align-items: center; gap: 0.4rem;">
+              <span>🧪</span> Learning Labs
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <button class="btn btn-secondary btn-sm" style="width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 1rem;" onclick="window.switchView('seed-fusion-lab-view')">
+                <span>🧪 Seed Fusion Lab</span>
+                <span>➡️</span>
+              </button>
+              <button class="btn btn-secondary btn-sm" style="width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 1rem;" onclick="window.switchView('sentence-quest-view')">
+                <span>🏹 Sentence Quest Game</span>
+                <span>➡️</span>
+              </button>
             </div>
           </div>
-          
+
+          <!-- Stats & settings -->
+          <div class="glass-panel" style="padding: 1.5rem; font-size: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+              <span style="color: var(--text-secondary);">Daily Streak:</span>
+              <span id="stat-streak" style="font-weight: bold; color: var(--accent);">0 Days</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;">
+              <span style="color: var(--text-secondary);">Vocabulary Planted:</span>
+              <span id="stat-lessons-completed" style="font-weight: bold; color: var(--success);">0 Words</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+              <span style="color: var(--text-secondary);">Study Time:</span>
+              <span id="stat-time-spent" style="font-weight: bold;">0h</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <select id="change-level-select" style="flex: 1; padding: 0.35rem; font-size: 0.75rem; border-radius: 6px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.1);">
+                <option value="hsk1">HSK 1 (Beginner)</option>
+                <option value="hsk2">HSK 2 (Elementary)</option>
+                <option value="hsk3">HSK 3 (Intermediate)</option>
+              </select>
+              <button id="logout-btn" class="btn btn-secondary btn-sm" style="border-color: rgba(255,255,255,0.2); padding: 0.35rem 0.75rem; font-size: 0.75rem;">🚪 Logout</button>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -752,6 +685,80 @@
 
         <div id="srs-arena-container" style="text-align: center; min-height: 350px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
           <!-- Card content rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. SEED FUSION LAB VIEW -->
+    <section id="seed-fusion-lab-view" class="view-section">
+      <div class="glass-panel" style="max-width: 800px; margin: 0 auto; padding: 2rem; text-align: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1rem;">
+          <button class="btn btn-secondary btn-sm" onclick="window.switchView('dashboard-view')">← Back to Garden</button>
+          <h2 style="margin: 0; font-family: var(--font-serif);">🧪 Seed Fusion Lab</h2>
+          <div style="width: 80px;"></div>
+        </div>
+        
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+          Fuse two single-character seed cards to unlock a compound HSK word!
+        </p>
+
+        <!-- Fusion Slots -->
+        <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; margin-bottom: 3rem;">
+          <div id="fusion-slot-1" class="glass-panel fusion-dropzone" style="width: 120px; height: 120px; border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; cursor: pointer;" onclick="window.clearFusionSlot(1)">
+            ➕
+          </div>
+          <div style="font-size: 2rem; color: var(--accent);">+</div>
+          <div id="fusion-slot-2" class="glass-panel fusion-dropzone" style="width: 120px; height: 120px; border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; cursor: pointer;" onclick="window.clearFusionSlot(2)">
+            ➕
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="trigger-fusion-btn" style="padding: 0.75rem 3rem; font-weight: bold; font-size: 1.1rem; border-radius: 30px;" onclick="window.triggerSeedFusion()">
+          ⚡ FUSE SEEDS ⚡
+        </button>
+
+        <div id="fusion-result-area" style="margin-top: 2rem; min-height: 100px; display: flex; align-items: center; justify-content: center;">
+        </div>
+
+        <!-- Available Single Character Seeds -->
+        <h3 style="margin-top: 3rem; margin-bottom: 1rem; text-align: left; font-family: var(--font-serif);">Select Seeds to Fuse</h3>
+        <div id="fusion-seed-pool" style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: flex-start; padding: 1rem; background: rgba(0,0,0,0.1); border-radius: 12px; min-height: 100px;">
+          <!-- Loaded dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. SENTENCE QUEST VIEW -->
+    <section id="sentence-quest-view" class="view-section">
+      <div class="glass-panel" style="max-width: 800px; margin: 0 auto; padding: 2rem; text-align: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1rem;">
+          <button class="btn btn-secondary btn-sm" onclick="window.switchView('dashboard-view')">← Back to Garden</button>
+          <h2 style="margin: 0; font-family: var(--font-serif);">🏹 Sentence Quest Game</h2>
+          <div style="width: 80px;"></div>
+        </div>
+
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+          Arrange the cards below to build the correct Chinese sentence!
+        </p>
+
+        <div id="sentence-quest-prompt-area" style="font-size: 1.25rem; font-weight: bold; color: var(--primary); margin-bottom: 1.5rem;">
+          English translation prompt will load here...
+        </div>
+
+        <!-- Drag & Drop target area / Slot tray -->
+        <div id="sentence-quest-target-slots" style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; align-items: center; min-height: 80px; padding: 1rem; border: 2px dashed rgba(255,255,255,0.1); border-radius: 16px; margin-bottom: 2rem; background: rgba(255,255,255,0.01);">
+          <!-- Drop words here -->
+        </div>
+
+        <div id="sentence-quest-words-pool" style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-bottom: 2rem; padding: 1rem; background: rgba(0,0,0,0.15); border-radius: 12px; min-height: 80px;">
+          <!-- Drag-source words -->
+        </div>
+
+        <div id="sentence-quest-feedback" style="min-height: 40px; font-weight: bold; margin-bottom: 1.5rem;"></div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+          <button class="btn btn-secondary" onclick="window.resetSentenceQuest()">Reset Tray</button>
+          <button class="btn btn-primary" onclick="window.checkSentenceQuest()">Submit Answer</button>
         </div>
       </div>
     </section>
