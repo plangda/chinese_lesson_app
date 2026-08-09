@@ -1312,3 +1312,6 @@ main {
  . t e x t - c e n t e r   {   t e x t - a l i g n :   c e n t e r ;   } 
   
  
+.hidden {
+  display: none !important;
+}

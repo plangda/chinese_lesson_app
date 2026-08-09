@@ -353,7 +353,7 @@ function setupEventListeners() {
           loadPretestQuestion();
         } else if (state.currentView === 'lesson-pretest-view') {
           // Re-render only if actively taking the test (not on result screen)
-          if (document.getElementById("lesson-pretest-quiz-screen").style.display !== "none") {
+          if (!document.getElementById("lesson-pretest-quiz-screen").classList.contains("hidden")) {
             loadLessonPretestQuestion();
           }
         } else if (state.currentView === 'lesson-view') {
@@ -384,8 +384,8 @@ function setupEventListeners() {
       document.getElementById("auth-toggle-text").setAttribute("data-i18n", isLogin ? "auth_no_account" : "auth_have_account");
       translateUI();
       toggleLink.textContent = isLogin ? "Sign Up" : "Login";
-      document.getElementById("auth-name").style.display = isLogin ? "none" : "block";
-      document.getElementById("auth-error").style.display = "none";
+      isLogin ? document.getElementById("auth-name").classList.add('hidden') : document.getElementById("auth-name").classList.remove('hidden');
+      document.getElementById("auth-error").classList.add('hidden');
     });
   }
 
@@ -412,11 +412,11 @@ function setupEventListeners() {
           loadProgress();
         } else {
         errorDiv.textContent = data.error || t('error_network');
-          errorDiv.style.display = "block";
+          errorDiv.classList.remove('hidden');
         }
       } catch (err) {
         errorDiv.textContent = t('error_network');
-        errorDiv.style.display = "block";
+        errorDiv.classList.remove('hidden');
       }
     });
   }
@@ -428,8 +428,8 @@ function setupEventListeners() {
   });
   
   document.getElementById("begin-test-now-btn").addEventListener("click", () => {
-    document.getElementById("pretest-intro-screen").style.display = "none";
-    document.getElementById("pretest-quiz-screen").style.display = "block";
+    document.getElementById("pretest-intro-screen").classList.add('hidden');
+    document.getElementById("pretest-quiz-screen").classList.remove('hidden');
     loadPretestQuestion();
   });
 
@@ -472,8 +472,8 @@ function setupEventListeners() {
 
   // Lesson pretest triggers
   document.getElementById("begin-lesson-test-btn").addEventListener("click", () => {
-    document.getElementById("lesson-pretest-intro-screen").style.display = "none";
-    document.getElementById("lesson-pretest-quiz-screen").style.display = "block";
+    document.getElementById("lesson-pretest-intro-screen").classList.add('hidden');
+    document.getElementById("lesson-pretest-quiz-screen").classList.remove('hidden');
     startLessonPretestQuiz();
   });
 
@@ -620,19 +620,19 @@ function setupEventListeners() {
   document.getElementById('mode-animate-btn').addEventListener('click', (e) => {
     document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
     e.target.classList.add('active');
-    document.getElementById('free-write-canvas').style.display = 'none';
+    document.getElementById('free-write-canvas').classList.add('hidden');
     if(writer) { writer.cancelQuiz(); writer.animateCharacter(); }
   });
   document.getElementById('mode-trace-btn').addEventListener('click', (e) => {
     document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
     e.target.classList.add('active');
-    document.getElementById('free-write-canvas').style.display = 'none';
+    document.getElementById('free-write-canvas').classList.add('hidden');
     if(writer) writer.quiz({showHintAfterMisses: 1});
   });
   document.getElementById('mode-freewrite-btn').addEventListener('click', (e) => {
     document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
     e.target.classList.add('active');
-    document.getElementById('free-write-canvas').style.display = 'block';
+    document.getElementById('free-write-canvas').classList.remove('hidden');
     if(writer) writer.cancelQuiz();
     initFreeWriteCanvas();
   });
@@ -660,7 +660,7 @@ function setupEventListeners() {
          ctx.clearRect(0, 0, canvas.width, canvas.height);
       });
     }
-    document.getElementById('btn-writing-clear').style.display = 'inline-block';
+    document.getElementById('btn-writing-clear').classList.remove('hidden');
   }
   
   function handleTouch(e) {
@@ -696,7 +696,7 @@ function setupEventListeners() {
   document.getElementById('pinyin-visibility-toggle').addEventListener('click', () => {
     const pyElements = document.querySelectorAll('.dialogue-py');
     pyElements.forEach(el => {
-      el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+      el.classList.toggle('hidden');
     });
   });
 
@@ -730,7 +730,7 @@ function renderDashboard() {
   // Toggle placement test warning banner
   const warningBanner = document.getElementById('placement-warning-banner');
   if (warningBanner) {
-    warningBanner.style.display = state.hasTakenPlacementTest ? 'none' : 'flex';
+    state.hasTakenPlacementTest ? warningBanner.classList.add('hidden') : warningBanner.classList.remove('hidden');
   }
   
   const container = document.getElementById('dashboard-lessons-container');
@@ -743,7 +743,7 @@ function renderDashboard() {
   const todayPanel = document.getElementById('today-lesson-panel');
   if (todayPanel) {
     if (activeLesson) {
-      todayPanel.style.display = 'block';
+      todayPanel.classList.remove('hidden');
       document.getElementById('today-lesson-title').textContent = t('day_prefix', { day: activeLesson.day_number || activeLesson.id.replace(/^hsk\d_day/, '') }) + ld(activeLesson, 'title');
       
       let descId = "todays_lesson_desc";
@@ -760,7 +760,7 @@ function renderDashboard() {
       startBtn.onclick = () => routeToLesson(activeLesson.id);
     } else {
       if (lessons.length > 0) {
-        todayPanel.style.display = 'block';
+        todayPanel.classList.remove('hidden');
         document.getElementById('today-lesson-title').textContent = t('level_complete_title');
         document.getElementById('today-lesson-desc').textContent = t('level_complete_desc', { level: state.userLevel.toUpperCase() });
         
@@ -779,14 +779,14 @@ function renderDashboard() {
           } else {
             document.getElementById('today-lesson-desc').textContent = t('all_levels_complete');
             document.getElementById('today-lesson-desc').style.color = "var(--success)";
-            startBtn.style.display = "none";
+            startBtn.classList.add('hidden');
             return;
           }
           saveProgress();
           renderDashboard();
         };
       } else {
-        todayPanel.style.display = 'none';
+        todayPanel.classList.add('hidden');
       }
     }
   }
@@ -869,8 +869,8 @@ function startLesson(id) {
 
 function switchPane(paneId) {
   state.currentPane = paneId;
-  document.querySelectorAll('.lesson-pane-content').forEach(el => el.style.display = 'none');
-  document.getElementById(paneId).style.display = 'block';
+  document.querySelectorAll('.lesson-pane-content').forEach(el => el.classList.add('hidden'));
+  document.getElementById(paneId).classList.remove('hidden');
   
   document.querySelectorAll('.timeline-step').forEach(el => el.classList.remove('active'));
   const stepEl = document.querySelector(`.timeline-step[data-pane="${paneId}"]`);
@@ -878,7 +878,7 @@ function switchPane(paneId) {
   
   const idx = timelineStages.indexOf(paneId);
   document.getElementById('pane-back-btn').style.visibility = idx === 0 ? 'hidden' : 'visible';
-  document.getElementById('pane-next-btn').style.display = idx === timelineStages.length - 1 ? 'none' : 'block';
+  idx === timelineStages.length - 1 ? document.getElementById('pane-next-btn').classList.add('hidden') : document.getElementById('pane-next-btn').classList.remove('hidden');
   
   if (paneId === "vocab-pane") renderVocabPane();
   if (paneId === "grammar-pane") renderGrammarPane();
@@ -915,7 +915,7 @@ function renderVocabPane() {
       if (!tabsContainer) {
          tabsContainer = document.createElement('div');
          tabsContainer.id = 'hanzi-tabs-container';
-         tabsContainer.style.display = 'flex';
+         tabsContainer.classList.remove('hidden');
          tabsContainer.style.gap = '0.5rem';
          tabsContainer.style.justifyContent = 'center';
          tabsContainer.style.marginTop = '1rem';
@@ -1344,8 +1344,8 @@ function renderQuizQuestion() {
   
   const opts = document.getElementById('lesson-quiz-options');
   opts.innerHTML = '';
-  document.getElementById('lesson-quiz-explanation-box').style.display = 'none';
-  document.getElementById('lesson-quiz-next-btn').style.display = 'none';
+  document.getElementById('lesson-quiz-explanation-box').classList.add('hidden');
+  document.getElementById('lesson-quiz-next-btn').classList.add('hidden');
   
   // Progress bar
   const pct = (state.quizIndex / state.currentLesson.quiz.length) * 100;
@@ -1387,10 +1387,10 @@ function handleQuizAnswer(selectedOpt, btnEl) {
   }
   
   document.getElementById('lesson-quiz-explanation-text').textContent = ld(q, 'explanation');
-  document.getElementById('lesson-quiz-explanation-box').style.display = 'block';
+  document.getElementById('lesson-quiz-explanation-box').classList.remove('hidden');
   
   const nextBtn = document.getElementById('lesson-quiz-next-btn');
-  nextBtn.style.display = 'inline-block';
+  nextBtn.classList.remove('hidden');
   if (state.quizIndex === state.currentLesson.quiz.length - 1) {
     nextBtn.textContent = t('btn_finish_lesson');
   } else {
@@ -1440,9 +1440,9 @@ function initPretest() {
   state.pretestScore = 0;
   state.pretestAnswers = [];
   
-  document.getElementById("pretest-intro-screen").style.display = "block";
-  document.getElementById("pretest-quiz-screen").style.display = "none";
-  document.getElementById("pretest-result-screen").style.display = "none";
+  document.getElementById("pretest-intro-screen").classList.remove('hidden');
+  document.getElementById("pretest-quiz-screen").classList.add('hidden');
+  document.getElementById("pretest-result-screen").classList.add('hidden');
 
   // Apply translations after showing the pretest view
   translateUI();
@@ -1461,8 +1461,8 @@ function loadPretestQuestion() {
   const qText = document.getElementById('pretest-question-text');
   qText.textContent = ld(question, 'question');
   
-  document.getElementById("pretest-explanation-box").style.display = "none";
-  document.getElementById("pretest-next-btn").style.display = "none";
+  document.getElementById("pretest-explanation-box").classList.add('hidden');
+  document.getElementById("pretest-next-btn").classList.add('hidden');
   
   const optionsBox = document.getElementById("pretest-options-container");
   optionsBox.innerHTML = "";
@@ -1507,12 +1507,12 @@ function selectPretestAnswer(button, selectedVal, selectedIdx) {
   const expText = document.getElementById("pretest-explanation-text");
   
   expText.textContent = ld(question, 'explanation');
-  expBox.style.display = "block";
+  expBox.classList.remove('hidden');
   expBox.style.borderColor = isCorrect ? "var(--success)" : "var(--error)";
   expBox.querySelector("strong").style.color = isCorrect ? "var(--success)" : "var(--error)";
   expBox.querySelector("strong").textContent = isCorrect ? t('msg_correct') : t('msg_incorrect');
   
-  document.getElementById("pretest-next-btn").style.display = "inline-block";
+  document.getElementById("pretest-next-btn").classList.remove('hidden');
 }
 
 function nextPretestQuestion() {
@@ -1528,8 +1528,8 @@ function nextPretestQuestion() {
 
 function finishPretest() {
   const totalCount = window.CHINESE_LESSONS.preTestQuestions.length;
-  document.getElementById("pretest-quiz-screen").style.display = "none";
-  document.getElementById("pretest-result-screen").style.display = "block";
+  document.getElementById("pretest-quiz-screen").classList.add('hidden');
+  document.getElementById("pretest-result-screen").classList.remove('hidden');
   
   document.getElementById("pretest-score-display").textContent = `${state.pretestScore} / ${totalCount}`;
   
@@ -1649,7 +1649,7 @@ function routeToLesson(id) {
     const newCancel = cancelBtn.cloneNode(true);
     cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
     newCancel.addEventListener('click', () => {
-      document.getElementById('custom-confirm-modal').style.display = 'none';
+      document.getElementById('custom-confirm-modal').classList.add('hidden');
       startLessonPretest(id);
     });
   } else {
@@ -1671,9 +1671,9 @@ function routeToLesson(id) {
         return;
       }
 
-      document.getElementById("lesson-pretest-intro-screen").style.display = "block";
-      document.getElementById("lesson-pretest-quiz-screen").style.display = "none";
-      document.getElementById("lesson-pretest-result-screen").style.display = "none";
+      document.getElementById("lesson-pretest-intro-screen").classList.remove('hidden');
+      document.getElementById("lesson-pretest-quiz-screen").classList.add('hidden');
+      document.getElementById("lesson-pretest-result-screen").classList.add('hidden');
 
       document.getElementById("lesson-pretest-intro-title").textContent = t('lesson_pretest_intro_title') + ": " + state.pretestLesson.title;
 
@@ -1831,8 +1831,8 @@ function loadLessonPretestQuestion() {
   const container = document.getElementById("lesson-pretest-options-container");
   container.innerHTML = "";
 
-  document.getElementById("lesson-pretest-explanation-box").style.display = "none";
-  document.getElementById("lesson-pretest-next-btn").style.display = "none";
+  document.getElementById("lesson-pretest-explanation-box").classList.add('hidden');
+  document.getElementById("lesson-pretest-next-btn").classList.add('hidden');
 
   const currentOptions = ld(q, 'options');
   currentOptions.forEach((opt, idx) => {
@@ -1871,13 +1871,13 @@ function selectLessonPretestAnswer(button, selectedVal, selectedIdx) {
   const expBox = document.getElementById("lesson-pretest-explanation-box");
   const expText = document.getElementById("lesson-pretest-explanation-text");
   expText.textContent = ld(q, 'explanation');
-  expBox.style.display = "block";
+  expBox.classList.remove('hidden');
   expBox.style.borderColor = isCorrect ? "var(--success)" : "var(--error)";
   expBox.querySelector("strong").style.color = isCorrect ? "var(--success)" : "var(--error)";
   expBox.querySelector("strong").textContent = isCorrect ? t('msg_correct') : t('msg_incorrect');
 
   const nextBtn = document.getElementById("lesson-pretest-next-btn");
-  nextBtn.style.display = "inline-block";
+  nextBtn.classList.remove('hidden');
   if (state.lessonPretestIndex === state.lessonPretestQuestions.length - 1) {
     nextBtn.textContent = t('btn_next_question');
   } else {
@@ -1895,8 +1895,8 @@ function nextLessonPretestQuestion() {
 }
 
 function finishLessonPretest() {
-  document.getElementById("lesson-pretest-quiz-screen").style.display = "none";
-  document.getElementById("lesson-pretest-result-screen").style.display = "block";
+  document.getElementById("lesson-pretest-quiz-screen").classList.add('hidden');
+  document.getElementById("lesson-pretest-result-screen").classList.remove('hidden');
 
   const score = state.lessonPretestScore;
   const total = state.lessonPretestQuestions.length;
@@ -1911,12 +1911,12 @@ function finishLessonPretest() {
     recTitle.textContent = t('pretest_result_perfect');
     recTitle.style.color = "var(--success)";
     recDesc.textContent = t('pretest_result_perfect_desc');
-    skipBtn.style.display = "inline-block";
+    skipBtn.classList.remove('hidden');
   } else {
     recTitle.textContent = t('pretest_result_ready');
     recTitle.style.color = "var(--primary)";
     recDesc.textContent = t('pretest_result_ready_desc', { score: score, total: total });
-    skipBtn.style.display = "none";
+    skipBtn.classList.add('hidden');
   }
 }
 
@@ -1955,10 +1955,10 @@ window.switchPinyinTab = function(tabName) {
     const content = document.getElementById(`pinyin-tab-${t}-content`);
     const btn = document.getElementById(`pinyin-tab-${t}-btn`);
     if (t === tabName) {
-      if (content) content.style.display = 'block';
+      if (content) content.classList.remove('hidden');
       if (btn) { btn.classList.add('btn-primary', 'active'); btn.classList.remove('btn-secondary'); }
     } else {
-      if (content) content.style.display = 'none';
+      if (content) content.classList.add('hidden');
       if (btn) { btn.classList.add('btn-secondary'); btn.classList.remove('btn-primary', 'active'); }
     }
   });
@@ -2340,7 +2340,7 @@ function showConfirmModal(i18nKeyTitle, i18nKeyMsg, onConfirm) {
   document.getElementById('custom-confirm-title').textContent = dict[i18nKeyTitle] || dict['title_confirm'] || "Confirm";
   document.getElementById('custom-confirm-message').textContent = dict[i18nKeyMsg] || i18nKeyMsg;
   
-  document.getElementById('custom-confirm-modal').style.display = 'flex';
+  document.getElementById('custom-confirm-modal').classList.remove('hidden');
   
   const cancelBtn = document.getElementById('custom-confirm-cancel');
   const okBtn = document.getElementById('custom-confirm-ok');
@@ -2353,11 +2353,11 @@ function showConfirmModal(i18nKeyTitle, i18nKeyMsg, onConfirm) {
   okBtn.parentNode.replaceChild(newOk, okBtn);
   
   newCancel.addEventListener('click', () => {
-    document.getElementById('custom-confirm-modal').style.display = 'none';
+    document.getElementById('custom-confirm-modal').classList.add('hidden');
   });
   
   newOk.addEventListener('click', () => {
-    document.getElementById('custom-confirm-modal').style.display = 'none';
+    document.getElementById('custom-confirm-modal').classList.add('hidden');
     if (onConfirm) onConfirm();
   });
 }
@@ -2405,10 +2405,10 @@ async function renderVocabGardenWidget() {
     const rescueText = document.getElementById('srs-rescue-text');
     if (rescueBanner && rescueText) {
       if (data.wiltingCount > 0) {
-        rescueBanner.style.display = 'block';
+        rescueBanner.classList.remove('hidden');
         rescueText.textContent = `${data.wiltingCount} Rescue Words Need Extra Tracing Care`;
       } else {
-        rescueBanner.style.display = 'none';
+        rescueBanner.classList.add('hidden');
       }
     }
   } catch (err) {
