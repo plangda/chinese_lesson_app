@@ -503,6 +503,24 @@ app.get('/api/srs/garden', async (req, res) => {
     const totalPlanted = stats ? (stats.total_planted || 0) : 0;
     const progressPercentage = Math.min(100, Math.round((totalPlanted / levelTargetTotal) * 100));
 
+    // 4. Fetch the actual plants in the garden (join with vocab to get pinyin & meaning)
+    const plants = await db.all(`
+      SELECT 
+        u.vocab_id, 
+        u.character, 
+        v.pinyin, 
+        u.mastery_stage, 
+        u.interval_days, 
+        u.next_review_date, 
+        u.times_forgotten,
+        v.meaning_en as meaning,
+        v.meaning_th
+      FROM user_vocab_srs u
+      JOIN vocab v ON u.vocab_id = v.id
+      WHERE u.user_id = ?
+      ORDER BY u.next_review_date ASC, u.id ASC
+    `, [userId]);
+
     res.json({
       totalPlanted,
       levelTargetTotal,
@@ -514,7 +532,8 @@ app.get('/api/srs/garden', async (req, res) => {
         trees: stats ? (stats.trees_count || 0) : 0
       },
       thirstyDueCount: stats ? (stats.thirsty_due_count || 0) : 0,
-      wiltingCount: stats ? (stats.wilting_count || 0) : 0
+      wiltingCount: stats ? (stats.wilting_count || 0) : 0,
+      plants
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
