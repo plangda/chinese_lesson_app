@@ -129,5 +129,14 @@ As the HanPath team progresses through the development phases, this document ser
 **The Cause:** The language toggle button re-executed asynchronous HTTP fetch requests (`fetch('/api/lessons/hsk1_day0')`) on every button click to retrieve localized lesson records from the cloud database.
 **Prevention:** Cache reference curriculum payloads in application memory (`state.pinyinLessonData`) on initial page load. Subsequent language toggles re-render the UI synchronously from memory in **0 milliseconds**, providing an instantaneous UI transition.
 
-
-
+## 25. The Ripple Effect of Broad Refactoring & Flawed UAT
+**The Error:** A broad architectural refactor to standardise visibility (replacing inline `style="display: none;"` with a CSS `.hidden` class) caused a cascading series of UI breakages (invisible SRS quiz, missing tabs, permanently visible popup modals) that went back and forth in a debugging loop.
+**The Cause:** 
+1. **Hidden Tech Debt Exposed:** Removing the "band-aid" inline styles exposed a malformed HTML structure (a missing `</section>` tag) that accidentally nested views inside each other.
+2. **Incomplete Migration:** The JavaScript was updated to remove `.hidden` classes, but the HTML components were left with hardcoded `style="display: none;"`, causing the components to remain permanently hidden.
+3. **Flawed UAT (False Positives):** Automated tests (Puppeteer) checked if the target element had `display: block` via `getComputedStyle`, but failed to verify if its *parent container* was hidden. This generated a false positive pass.
+4. **Encoding Corruption (Mojibake):** An automated script appended `.hidden { display: none !important; }` to a UTF-16 encoded `style.css` file using UTF-8/ANSI formatting. The browser parsed the mixed encoding as garbage characters at the end of the file, silently ignoring the CSS rule and leaving modals permanently visible.
+**Prevention:**
+1. **Holistic Visual Testing:** UAT scripts must test for true screen visibility (e.g., checking if `offsetParent !== null` or `getBoundingClientRect().width > 0`) rather than just reading isolated CSS properties.
+2. **Encoding Awareness:** Always explicitly declare file encoding (e.g., UTF-8) when programmatically reading or appending to files, especially text-based CSS/HTML assets, to prevent silent parsing failures (Mojibake).
+3. **Refactor in Isolation:** When standardising an architecture, ensure the migration is 100% complete across both logic (JavaScript) and templates (HTML) before declaring success, and visually verify edge cases.
