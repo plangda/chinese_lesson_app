@@ -687,6 +687,53 @@ app.post('/api/srs/plant-lesson', async (req, res) => {
   }
 });
 
+// POST /api/srs/fuse - Attempt to fuse two single characters into a compound HSK word
+app.post('/api/srs/fuse', async (req, res) => {
+  try {
+    const userId = req.body.userId || (req.user ? req.user.id : 1);
+    const { char1, char2 } = req.body;
+
+    if (!char1 || !char2) {
+      return res.status(400).json({ error: 'char1 and char2 are required' });
+    }
+
+    const comb1 = char1 + char2;
+    const comb2 = char2 + char1;
+
+    // Find the compound word in vocabulary database
+    let word = await db.get('SELECT * FROM vocab WHERE character = ? OR character = ?', [comb1, comb2]);
+    
+    if (!word) {
+      return res.json({ success: false, message: `No HSK compound word found for '${comb1}' or '${comb2}'.` });
+    }
+
+    // Auto-plant the fused word into SRS table if not already present
+    const existing = await db.get('SELECT id FROM user_vocab_srs WHERE user_id = ? AND vocab_id = ?', [userId, word.id]);
+    if (!existing) {
+      const tomorrowStr = getBkkDateString(1);
+      await db.run(`
+        INSERT INTO user_vocab_srs (user_id, vocab_id, lesson_id, character, mastery_stage, interval_days, next_review_date)
+        VALUES (?, ?, ?, ?, 1, 1, ?)
+      `, [userId, word.id, word.lesson_id, word.character, tomorrowStr]);
+    }
+
+    res.json({
+      success: true,
+      word: {
+        id: word.id,
+        character: word.character,
+        pinyin: word.pinyin,
+        meaning: word.meaning_en || word.meaning,
+        meaning_th: word.meaning_th,
+        deconstruct: word.deconstruct_en || word.deconstruct || 'No deconstruction details available.',
+        deconstruct_th: word.deconstruct_th
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Start server locally (Vercel will ignore this and use module.exports)
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
