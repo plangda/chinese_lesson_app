@@ -78,12 +78,11 @@ app.use(async (req, res, next) => {
   try {
     if (!db) {
       db = await getDb();
-      await initSrsTable(db);
     }
     next();
   } catch (err) {
-    console.error("Database connection/init failed:", err);
-    res.status(500).json({ error: "Database initialization failed: " + err.message });
+    console.error("Database connection failed:", err);
+    res.status(500).json({ error: "Database connection failed: " + err.message });
   }
 });
 
