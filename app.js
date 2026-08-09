@@ -2,6 +2,11 @@
  * HanPath - Core Application Engine (4-Stage Layout)
  */
 
+import { eventBus } from './modules/event-bus.js';
+import { srsEngine } from './modules/srs-engine.js';
+import { challengeSelector } from './modules/challenge-selector.js';
+import { gardenRenderer } from './modules/garden.js';
+
 const state = {
   userLevel: null,
   completedLessons: [],
@@ -203,6 +208,21 @@ function fetchCurriculumAndRender(level) {
         ];
       }
       window.CHINESE_LESSONS.lessons[level] = data;
+      
+      // Update vocabulary pool for active challenge selection
+      const pool = [];
+      Object.keys(window.CHINESE_LESSONS.lessons).forEach(lvl => {
+        const lessonsArray = window.CHINESE_LESSONS.lessons[lvl];
+        if (Array.isArray(lessonsArray)) {
+          lessonsArray.forEach(lesson => {
+            if (Array.isArray(lesson.vocab)) {
+              pool.push(...lesson.vocab);
+            }
+          });
+        }
+      });
+      challengeSelector.setVocabularyPool(pool);
+      
       renderDashboard();
     })
     .catch(err => {
@@ -2431,6 +2451,11 @@ function setupSrsEventListeners() {
   }
 }
 
+// Keep track of active challenge state
+let currentChallenge = null;
+let challengeAttempts = 0;
+let challengeHintsUsed = false;
+
 async function startSrsSession(mode = 'normal') {
   try {
     const res = await fetch(`/api/srs/due?mode=${mode}`);
@@ -2442,8 +2467,8 @@ async function startSrsSession(mode = 'normal') {
       return;
     }
 
-    state.srsCards = cards;
-    state.srsIndex = 0;
+    // Initialize the interleaved round-robin engine
+    srsEngine.initSession(cards, 5);
     state.srsSessionMode = mode;
     state.srsXpEarned = 0;
 
@@ -2453,91 +2478,225 @@ async function startSrsSession(mode = 'normal') {
     console.error("Failed to start SRS session:", err);
   }
 }
+window.startSrsSession = startSrsSession;
 
 function renderSrsCard() {
   const container = document.getElementById('srs-arena-container');
   if (!container) return;
 
-  if (!state.srsCards || state.srsIndex >= state.srsCards.length) {
+  const activeCard = srsEngine.getActiveCard();
+  if (!activeCard) {
     // Session summary
     container.innerHTML = `
-      <div style="font-size: 3rem; margin-bottom: 1rem;">🪴✨</div>
+      <div style="font-size: 3.5rem; margin-bottom: 1.25rem; animation: bounce 2s infinite;">🪴✨</div>
       <h2 style="font-family: var(--font-serif); margin-bottom: 0.5rem; color: var(--success);">${t('srs_session_complete', { xp: state.srsXpEarned })}</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">All target plants received proper care and nourishment today!</p>
-      <button class="btn btn-primary" onclick="switchView('dashboard-view')" style="padding: 0.75rem 2rem;">🚀 Return to Dashboard</button>
+      <p style="color: var(--text-secondary); margin-bottom: 2rem;">All target plants received proper care and active cognitive watering today!</p>
+      <button class="btn btn-primary" onclick="switchView('dashboard-view')" style="padding: 0.75rem 2.5rem; font-weight: bold; border-radius: 30px; box-shadow: 0 4px 15px rgba(0, 245, 212, 0.3);">
+        🚀 Return to Dashboard
+      </button>
     `;
     document.getElementById('srs-card-progress').textContent = 'Completed!';
+    // Refresh the garden widgets
+    renderVocabGardenWidget();
     return;
   }
 
-  const c = state.srsCards[state.srsIndex];
-  document.getElementById('srs-card-progress').textContent = `Card ${state.srsIndex + 1} of ${state.srsCards.length}`;
+  // Update batch progress text
+  document.getElementById('srs-card-progress').textContent = `Progress: ${srsEngine.getSessionProgressString()}`;
 
-  const stageIcons = { 1: '🌱 Seed', 2: '🌿 Sprout', 3: '🌻 Flower', 4: '🌳 Tree' };
-  const stageIcon = stageIcons[c.mastery_stage] || '🌱 Seed';
-  const localizedMeaning = ld(c, 'meaning') || c.meaning;
+  // Generate a challenge based on current mastery stage
+  currentChallenge = challengeSelector.generateChallenge(activeCard, state.currentLanguage);
+  challengeAttempts = 0;
+  challengeHintsUsed = false;
+
+  // Build the challenge HTML
+  const stageIcons = { 1: '🌱 Seed (Recognition)', 2: '🌿 Sprout (Phonology)', 3: '🌻 Flower (Meaning)', 4: '🌳 Harvest (Context)' };
+  const stageIcon = stageIcons[activeCard.mastery_stage] || '🌱 Seed';
+
+  let questionDisplay = '';
+  let interactionArea = '';
+
+  if (currentChallenge.type === 'PINYIN_INPUT') {
+    questionDisplay = `
+      <div class="active-challenge-question" style="font-size: 4rem; font-family: var(--font-serif); color: var(--primary); margin: 0.5rem 0;">
+        ${currentChallenge.question}
+      </div>
+    `;
+    interactionArea = `
+      <div style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 0.75rem;">
+        <input type="text" id="srs-pinyin-input" class="glass-panel" 
+               style="width: 100%; padding: 0.75rem 1rem; border-radius: 12px; text-align: center; font-size: 1.25rem; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15);" 
+               placeholder="Type pinyin without tones..." autocomplete="off" />
+        <button class="btn btn-primary" onclick="window.submitPinyinChallengeAnswer()" style="padding: 0.75rem;">Submit Answer</button>
+      </div>
+    `;
+  } else {
+    // Multiple Choice Challenge (RECOGNITION, TONE_ID, TRANSLATION, CONTEXT)
+    const isContext = currentChallenge.type === 'CONTEXT';
+    const isTone = currentChallenge.type === 'TONE_ID';
+    
+    questionDisplay = `
+      <div class="active-challenge-question" style="font-size: ${isContext ? '1.5rem' : '4.25rem'}; font-family: ${isContext ? 'inherit' : 'var(--font-serif)'}; color: var(--primary); margin: 0.5rem 0; font-weight: ${isContext ? 'bold' : 'normal'}; line-height: 1.4;">
+        ${currentChallenge.question}
+      </div>
+    `;
+
+    let buttonHtml = `<div class="active-challenge-options" style="display: grid; grid-template-columns: ${isTone ? 'repeat(5, 1fr)' : 'repeat(2, 1fr)'}; gap: 0.75rem; width: 100%; max-width: 500px; margin-top: 1rem;">`;
+    
+    currentChallenge.options.forEach(opt => {
+      const optVal = typeof opt === 'object' ? opt.value : opt;
+      const optLabel = typeof opt === 'object' ? opt.label : opt;
+      buttonHtml += `
+        <button class="btn btn-secondary challenge-opt-btn" 
+                onclick="window.checkChallengeAnswer('${optVal}')" 
+                style="padding: 1rem 0.5rem; text-align: center; border-radius: 12px; font-weight: bold; border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); min-height: 50px;">
+          ${optLabel}
+        </button>
+      `;
+    });
+    buttonHtml += `</div>`;
+    interactionArea = buttonHtml;
+  }
 
   container.innerHTML = `
-    <div style="margin-bottom: 1rem;">
-      <span class="tag" style="background: rgba(46, 196, 182, 0.15); color: var(--success); border: none; font-size: 0.85rem;">${stageIcon}</span>
+    <div style="margin-bottom: 0.5rem;">
+      <span class="tag" style="background: rgba(46, 196, 182, 0.15); color: var(--success); border: none; font-size: 0.85rem; font-weight: bold;">
+        ${stageIcon}
+      </span>
     </div>
     
-    <div style="font-size: 4.5rem; font-family: var(--font-serif); color: var(--primary); margin: 0.25rem 0; text-shadow: 0 4px 12px rgba(255, 51, 102, 0.2);">
-      ${c.character}
+    <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem; font-weight: 500;">
+      ${currentChallenge.prompt}
     </div>
     
-    <div style="margin-bottom: 1.25rem;">
-      <button class="btn btn-secondary btn-sm" onclick="playTone('${c.character}')" style="display: inline-flex; align-items: center; gap: 0.4rem;">
-        🔊 <span>${c.pinyin}</span>
-      </button>
+    ${questionDisplay}
+    
+    ${interactionArea}
+
+    <div id="challenge-feedback-area" style="min-height: 40px; margin-top: 1.25rem; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
     </div>
 
-    <div style="font-size: 1.25rem; font-weight: bold; color: var(--text-main); margin-bottom: 0.5rem;">
-      ${localizedMeaning}
-    </div>
-
-    ${c.exampleCn ? `
-      <div style="font-size: 0.9rem; color: var(--text-secondary); background: rgba(255,255,255,0.03); border-radius: 8px; padding: 0.6rem 1rem; margin-bottom: 1.5rem; max-width: 450px;">
-        <div>${c.exampleCn}</div>
-        <div style="font-size: 0.8rem; color: var(--accent);">${c.examplePy || ''}</div>
-      </div>
-    ` : '<div style="margin-bottom: 1.5rem;"></div>'}
-
-    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">How well did you recall this word?</div>
-
-    <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 500px;">
-      <button class="btn btn-secondary" onclick="submitSrsWatering(${c.vocab_id}, 3, false)" style="flex: 1; border-color: var(--danger); color: var(--danger); font-size: 0.85rem; padding: 0.65rem;">
-        🌧️ Needs Practice
-      </button>
-      <button class="btn btn-secondary" onclick="submitSrsWatering(${c.vocab_id}, 2, false)" style="flex: 1; border-color: var(--accent); color: var(--accent); font-size: 0.85rem; padding: 0.65rem;">
-        🟡 Got It!
-      </button>
-      <button class="btn btn-primary" onclick="submitSrsWatering(${c.vocab_id}, 1, false)" style="flex: 1; font-size: 0.85rem; padding: 0.65rem;">
-        🌟 Super Star!
+    <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: center;">
+      <button class="btn btn-secondary btn-sm" onclick="window.showChallengeHint()" style="padding: 0.5rem 1.25rem; font-size: 0.8rem; border-radius: 20px;">
+        💡 Hint
       </button>
     </div>
   `;
+
+  // Focus input if pinyin input challenge
+  if (currentChallenge.type === 'PINYIN_INPUT') {
+    const input = document.getElementById('srs-pinyin-input');
+    if (input) {
+      input.focus();
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          window.submitPinyinChallengeAnswer();
+        }
+      });
+    }
+  }
 }
+window.renderSrsCard = renderSrsCard;
 
-async function submitSrsWatering(vocabId, attemptsCount, hintsUsed) {
-  try {
-    const res = await fetch('/api/srs/water', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ vocabId, attemptsCount, hintsUsed })
+window.submitPinyinChallengeAnswer = function() {
+  const input = document.getElementById('srs-pinyin-input');
+  if (input) {
+    window.checkChallengeAnswer(input.value);
+  }
+};
+
+window.showChallengeHint = function() {
+  challengeHintsUsed = true;
+  const feedback = document.getElementById('challenge-feedback-area');
+  if (feedback && currentChallenge) {
+    feedback.innerHTML = `<span style="color: var(--accent); font-weight: normal; font-size: 0.9rem;">${currentChallenge.hint}</span>`;
+  }
+};
+
+window.checkChallengeAnswer = async function(userAnswer) {
+  if (!currentChallenge) return;
+
+  const activeCard = srsEngine.getActiveCard();
+  if (!activeCard) return;
+
+  const cleanUserAnswer = userAnswer.trim().toLowerCase();
+  const cleanCorrectAnswer = currentChallenge.answer.trim().toLowerCase();
+  
+  const isCorrect = cleanUserAnswer === cleanCorrectAnswer;
+  const feedback = document.getElementById('challenge-feedback-area');
+
+  // Disable interaction options during feedback
+  const buttons = document.querySelectorAll('.challenge-opt-btn');
+  buttons.forEach(b => b.disabled = true);
+  const input = document.getElementById('srs-pinyin-input');
+  if (input) input.disabled = true;
+
+  if (isCorrect) {
+    feedback.innerHTML = `<span style="color: var(--success);">✅ Correct! Excellent job.</span>`;
+    
+    // Highlight correct button
+    buttons.forEach(b => {
+      const onclickAttr = b.getAttribute('onclick');
+      if (onclickAttr && onclickAttr.includes(`'${userAnswer}'`)) {
+        b.style.backgroundColor = 'rgba(46, 196, 182, 0.25)';
+        b.style.borderColor = 'var(--success)';
+      }
     });
-    if (!res.ok) return;
-    const data = await res.json();
-    state.srsXpEarned += (data.xpEarned || 10);
-    state.score += (data.xpEarned || 10);
-    saveProgress();
 
-    state.srsIndex++;
-    renderSrsCard();
+    // Audio reinforcement
+    playTone(activeCard.character);
+
+    await submitSrsWatering(activeCard.vocab_id, challengeAttempts + 1, challengeHintsUsed, true);
+  } else {
+    feedback.innerHTML = `<span style="color: var(--danger);">❌ Try again! Correct answer was: ${currentChallenge.answer}</span>`;
+    
+    // Highlight incorrect button
+    buttons.forEach(b => {
+      const onclickAttr = b.getAttribute('onclick');
+      if (onclickAttr && onclickAttr.includes(`'${userAnswer}'`)) {
+        b.style.backgroundColor = 'rgba(255, 51, 102, 0.25)';
+        b.style.borderColor = 'var(--danger)';
+      }
+    });
+
+    await submitSrsWatering(activeCard.vocab_id, challengeAttempts + 1, challengeHintsUsed, false);
+  }
+};
+
+async function submitSrsWatering(vocabId, attemptsCount, hintsUsed, isCorrect) {
+  try {
+    const engineResult = srsEngine.recordResult(isCorrect, hintsUsed);
+    
+    if (isCorrect) {
+      const activeCard = srsEngine.currentQueue.find(c => c.vocab_id === vocabId);
+      const calculated = srsEngine.calculateSM2(activeCard, engineResult.systemGrade);
+
+      const res = await fetch('/api/srs/water', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          vocabId, 
+          attemptsCount, 
+          hintsUsed,
+          grade: engineResult.systemGrade 
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        state.srsXpEarned += (data.xpEarned || calculated.xpEarned);
+        state.score += (data.xpEarned || calculated.xpEarned);
+        saveProgress();
+      }
+    }
+    
+    setTimeout(() => {
+      renderSrsCard();
+    }, 1500);
   } catch (err) {
     console.error("Failed to submit SRS watering:", err);
   }
 }
+window.submitSrsWatering = submitSrsWatering;
 
 async function plantLessonSrs(lessonId) {
   try {
@@ -2550,6 +2709,20 @@ async function plantLessonSrs(lessonId) {
     console.error("Failed to plant lesson SRS:", err);
   }
 }
+window.plantLessonSrs = plantLessonSrs;
+
+// Global exports of other functions accessed via HTML to ensure ESM backward compatibility
+window.playTone = playTone;
+window.speakText = speakText;
+window.switchView = switchView;
+window.switchPane = switchPane;
+window.selectWord = selectWord;
+window.startLesson = startLesson;
+window.prevWord = prevWord;
+window.nextWord = nextWord;
+window.checkQuizAnswer = checkQuizAnswer;
+window.checkPretestAnswer = checkPretestAnswer;
+window.renderVocabGardenWidget = renderVocabGardenWidget;
 
 // Hook setupSrsEventListeners into initialization
 if (typeof document !== 'undefined') {
