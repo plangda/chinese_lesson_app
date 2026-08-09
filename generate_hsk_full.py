@@ -859,8 +859,8 @@ if __name__ == "__main__":
             print("Batch generation limit reached for this run.")
             exit(0)
     
-    # HSK 3 (973 words) -> Chunk size 25 -> ~39 lessons
+    # HSK 3 (973 words) -> Chunk size 15 -> ~65 lessons
     print("\n--- HSK 3 ---")
-    hsk3_gen = run_generation(level=3, chunk_size=25, limit=global_budget, existing_ids=existing_ids)
+    hsk3_gen = run_generation(level=3, chunk_size=15, limit=global_budget, existing_ids=existing_ids)
     
     print("\nFull pipeline complete!")

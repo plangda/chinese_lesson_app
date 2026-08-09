@@ -7,8 +7,7 @@ const crypto = require('crypto');
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-  console.error("FATAL ERROR: JWT_SECRET environment variable is missing.");
-  process.exit(1);
+  console.warn("WARNING: JWT_SECRET environment variable is missing. Authentication features will be disabled/fail.");
 }
 
 // Register User
@@ -42,6 +41,9 @@ router.post('/register', async (req, res) => {
     await db.run('INSERT INTO user_progress (user_id) VALUES (?)', [userId]);
     
     // Generate token
+    if (!JWT_SECRET) {
+      return res.status(500).json({ error: 'Authentication is not configured on this server (missing JWT_SECRET).' });
+    }
     const token = jwt.sign({ id: userId, email }, JWT_SECRET, { expiresIn: '30d' });
     
     res.status(201).json({ success: true, token, user: { id: userId, email, name: name || 'Student' } });
@@ -72,6 +74,9 @@ router.post('/login', async (req, res) => {
     }
     
     // Generate token
+    if (!JWT_SECRET) {
+      return res.status(500).json({ error: 'Authentication is not configured on this server (missing JWT_SECRET).' });
+    }
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '30d' });
     
     res.json({ success: true, token, user: { id: user.id, email: user.email, name: user.name } });
@@ -83,6 +88,9 @@ router.post('/login', async (req, res) => {
 
 // Auth Middleware
 const requireAuth = (req, res, next) => {
+  if (!JWT_SECRET) {
+    return res.status(500).json({ error: 'Authentication is not configured on this server (missing JWT_SECRET).' });
+  }
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized, no token' });
