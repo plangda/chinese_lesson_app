@@ -457,6 +457,8 @@ app.post('/api/progress', requireAuth, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
 // ==========================================
 // VOCAB GARDEN (SRS) API ENDPOINTS
 // ==========================================
