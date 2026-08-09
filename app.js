@@ -352,6 +352,12 @@ function switchView(viewId) {
       renderDashboard();
     }
   }
+  if (viewId === "seed-fusion-lab-view") {
+    window.initSeedFusionLab();
+  }
+  if (viewId === "sentence-quest-view") {
+    window.initSentenceQuest();
+  }
   translateUI();
 }
 
@@ -2775,6 +2781,298 @@ async function plantLessonSrs(lessonId) {
   }
 }
 window.plantLessonSrs = plantLessonSrs;
+
+// ==========================================
+// 🧪 SEED FUSION LAB GAME LOGIC
+// ==========================================
+let fusionSlot1 = null;
+let fusionSlot2 = null;
+
+window.initSeedFusionLab = async function() {
+  try {
+    const res = await fetch('/api/srs/garden');
+    if (!res.ok) return;
+    const data = await res.json();
+    
+    // Filter single character seeds
+    const singleSeeds = (data.plants || []).filter(p => p.character && p.character.length === 1);
+    
+    // Clear slots
+    fusionSlot1 = null;
+    fusionSlot2 = null;
+    window.updateFusionSlotsUI();
+    
+    const poolContainer = document.getElementById('fusion-seed-pool');
+    if (!poolContainer) return;
+    
+    if (singleSeeds.length === 0) {
+      poolContainer.innerHTML = `<div style="color: var(--text-secondary); width: 100%; text-align: center; padding: 1.5rem;">No single-character seeds planted yet. Plant words from Day 1+ lessons first!</div>`;
+      return;
+    }
+    
+    let html = '';
+    singleSeeds.forEach(seed => {
+      html += `
+        <button class="btn btn-secondary seed-pool-card" 
+                onclick="window.selectFusionSeed('${seed.character}')" 
+                style="font-size: 1.5rem; width: 60px; height: 60px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);">
+          ${seed.character}
+        </button>
+      `;
+    });
+    poolContainer.innerHTML = html;
+    document.getElementById('fusion-result-area').innerHTML = '';
+  } catch (err) {
+    console.error("Failed to initialize Seed Fusion Lab:", err);
+  }
+};
+
+window.selectFusionSeed = function(char) {
+  if (!fusionSlot1) {
+    fusionSlot1 = char;
+  } else if (!fusionSlot2) {
+    fusionSlot2 = char;
+  } else {
+    // Both full - shift slot 2 to slot 1 and insert in slot 2
+    fusionSlot1 = fusionSlot2;
+    fusionSlot2 = char;
+  }
+  window.updateFusionSlotsUI();
+};
+
+window.clearFusionSlot = function(slotNum) {
+  if (slotNum === 1) fusionSlot1 = null;
+  if (slotNum === 2) fusionSlot2 = null;
+  window.updateFusionSlotsUI();
+};
+
+window.updateFusionSlotsUI = function() {
+  const s1 = document.getElementById('fusion-slot-1');
+  const s2 = document.getElementById('fusion-slot-2');
+  if (s1) {
+    s1.innerHTML = fusionSlot1 ? `<span style="font-weight: bold; color: #fff;">${fusionSlot1}</span>` : '➕';
+    s1.style.borderColor = fusionSlot1 ? 'var(--primary)' : 'rgba(255,255,255,0.15)';
+  }
+  if (s2) {
+    s2.innerHTML = fusionSlot2 ? `<span style="font-weight: bold; color: #fff;">${fusionSlot2}</span>` : '➕';
+    s2.style.borderColor = fusionSlot2 ? 'var(--primary)' : 'rgba(255,255,255,0.15)';
+  }
+};
+
+window.triggerSeedFusion = async function() {
+  const resultArea = document.getElementById('fusion-result-area');
+  if (!resultArea) return;
+  
+  if (!fusionSlot1 || !fusionSlot2) {
+    resultArea.innerHTML = `<span style="color: var(--danger);">⚠️ Select two seeds to fuse!</span>`;
+    return;
+  }
+  
+  resultArea.innerHTML = `<span style="color: var(--accent); animation: pulse 1s infinite;">⚡ Fusing ${fusionSlot1} + ${fusionSlot2}... ⚡</span>`;
+  
+  try {
+    const res = await fetch('/api/srs/fuse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ char1: fusionSlot1, char2: fusionSlot2 })
+    });
+    if (!res.ok) {
+      resultArea.innerHTML = `<span style="color: var(--danger);">Server connection error. Try again.</span>`;
+      return;
+    }
+    const data = await res.json();
+    if (data.success) {
+      // Play audio reinforcement for the newly fused compound word!
+      playTone(data.word.character);
+      
+      const localizedMeaning = state.currentLanguage === 'th' ? (data.word.meaning_th || data.word.meaning) : data.word.meaning;
+      const localizedDeconstruct = state.currentLanguage === 'th' ? (data.word.deconstruct_th || data.word.deconstruct) : data.word.deconstruct;
+      
+      resultArea.innerHTML = `
+        <div class="glass-panel" style="padding: 1.5rem; max-width: 500px; border-color: var(--success); background: rgba(46, 196, 182, 0.08); border-radius: 16px; margin: 0 auto; text-align: center; animation: congratsScale 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+          <div style="font-size: 1.5rem; color: var(--success); font-weight: bold; margin-bottom: 0.5rem;">🎉 FUSION SUCCESSFUL!</div>
+          <div style="font-size: 3.5rem; font-family: var(--font-serif); color: var(--primary); margin: 0.25rem 0;">
+            ${data.word.character}
+          </div>
+          <div style="font-size: 1.25rem; font-weight: bold; color: #fff; margin-bottom: 0.5rem;">
+            🔊 ${data.word.pinyin}
+          </div>
+          <div style="font-size: 1.05rem; color: var(--text-main); margin-bottom: 0.75rem; font-weight: bold;">
+            ${localizedMeaning}
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary); background: rgba(255,255,255,0.03); border-radius: 8px; padding: 0.75rem; line-height: 1.4;">
+            <strong>Structure:</strong> ${localizedDeconstruct}
+          </div>
+        </div>
+      `;
+      // Clear slots
+      fusionSlot1 = null;
+      fusionSlot2 = null;
+      window.updateFusionSlotsUI();
+    } else {
+      resultArea.innerHTML = `<span style="color: var(--danger);">${data.message}</span>`;
+    }
+  } catch (err) {
+    console.error("Fusion call failed:", err);
+    resultArea.innerHTML = `<span style="color: var(--danger);">Fusion error occurred.</span>`;
+  }
+};
+
+// ==========================================
+// 🏹 SENTENCE QUEST GAME LOGIC
+// ==========================================
+let activeQuestSentence = '';
+let correctQuestSequence = [];
+let selectedQuestSequence = [];
+
+window.initSentenceQuest = async function() {
+  const promptArea = document.getElementById('sentence-quest-prompt-area');
+  const targetArea = document.getElementById('sentence-quest-target-slots');
+  const poolArea = document.getElementById('sentence-quest-words-pool');
+  const feedback = document.getElementById('sentence-quest-feedback');
+  
+  if (!promptArea || !targetArea || !poolArea || !feedback) return;
+  
+  feedback.innerHTML = '';
+  targetArea.innerHTML = '';
+  selectedQuestSequence = [];
+  
+  try {
+    const res = await fetch('/api/srs/garden');
+    if (!res.ok) return;
+    const data = await res.json();
+    
+    // Basket are plants with stage 4 (mastered)
+    const basket = (data.plants || []).filter(p => p.mastery_stage === 4);
+    
+    if (basket.length < 3) {
+      promptArea.textContent = '';
+      poolArea.innerHTML = `
+        <div style="color: var(--text-secondary); width: 100%; text-align: center; padding: 2rem;">
+          🧺 Your Harvest Basket needs at least 3 Mastered words to trigger a Sentence Quest!<br/>
+          You currently have <strong>${basket.length} / 3</strong> Mastered words. Keep watering due words to harvest them!
+        </div>
+      `;
+      return;
+    }
+    
+    // Find a card with an example sentence to use for the quest
+    const cardWithSentence = basket.find(c => c.exampleCn || c.example_sentence);
+    if (!cardWithSentence) {
+      promptArea.textContent = '';
+      poolArea.innerHTML = `<div style="color: var(--text-secondary); width: 100%; text-align: center; padding: 2rem;">Mastered words do not contain example sentences to generate a quest. Complete HSK lesson dialogues first!</div>`;
+      return;
+    }
+    
+    // Clean target sentence
+    const cnSentence = (cardWithSentence.exampleCn || cardWithSentence.example_sentence).replace(/[。，！？、,!?]/g, '');
+    activeQuestSentence = cnSentence;
+    correctQuestSequence = Array.from(cnSentence);
+    
+    // Prompt translation
+    promptArea.innerHTML = `Translate this sentence:<br/><span style="color: #fff; font-size: 1.35rem; font-family: var(--font-serif);">${cardWithSentence.exampleEn || 'Example sentence'}</span>`;
+    
+    // Shuffle correct cards and add distractors
+    const cardChars = [...correctQuestSequence];
+    const distractorChars = ['是', '不', '我', '他', '的', '了', '好', '呢'].filter(c => !cardChars.includes(c));
+    
+    // Select 3 random distractors
+    const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
+    shuffleArray(distractorChars);
+    const pool = cardChars.concat(distractorChars.slice(0, 3));
+    shuffleArray(pool);
+    
+    let poolHtml = '';
+    pool.forEach((char, idx) => {
+      poolHtml += `
+        <button class="btn btn-secondary quest-word-card" 
+                id="quest-word-${idx}" 
+                onclick="window.selectQuestWord('${char}', 'quest-word-${idx}')" 
+                style="font-size: 1.5rem; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); cursor: pointer;">
+          ${char}
+        </button>
+      `;
+    });
+    poolArea.innerHTML = poolHtml;
+    
+  } catch (err) {
+    console.error("Failed to load Sentence Quest:", err);
+  }
+};
+
+window.selectQuestWord = function(char, cardId) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  
+  // Disable it in the pool
+  card.style.display = 'none';
+  
+  selectedQuestSequence.push({ char, cardId });
+  window.updateSentenceQuestTargetUI();
+};
+
+window.removeQuestWord = function(index) {
+  const item = selectedQuestSequence[index];
+  if (!item) return;
+  
+  // Re-enable in the pool
+  const card = document.getElementById(item.cardId);
+  if (card) card.style.display = 'inline-block';
+  
+  selectedQuestSequence.splice(index, 1);
+  window.updateSentenceQuestTargetUI();
+};
+
+window.updateSentenceQuestTargetUI = function() {
+  const targetArea = document.getElementById('sentence-quest-target-slots');
+  if (!targetArea) return;
+  
+  if (selectedQuestSequence.length === 0) {
+    targetArea.innerHTML = `<span style="color: var(--text-secondary); font-size: 0.9rem;">Click cards from the pool below to form your sentence</span>`;
+    return;
+  }
+  
+  let html = '';
+  selectedQuestSequence.forEach((item, idx) => {
+    html += `
+      <button class="btn btn-primary" 
+              onclick="window.removeQuestWord(${idx})" 
+              style="font-size: 1.5rem; padding: 0.5rem 1rem; border-radius: 8px; font-weight: bold; cursor: pointer; animation: scaleUp 0.2s ease;">
+        ${item.char}
+      </button>
+    `;
+  });
+  targetArea.innerHTML = html;
+};
+
+window.resetSentenceQuest = function() {
+  selectedQuestSequence.forEach(item => {
+    const card = document.getElementById(item.cardId);
+    if (card) card.style.display = 'inline-block';
+  });
+  selectedQuestSequence = [];
+  window.updateSentenceQuestTargetUI();
+  const feedback = document.getElementById('sentence-quest-feedback');
+  if (feedback) feedback.innerHTML = '';
+};
+
+window.checkSentenceQuest = function() {
+  const feedback = document.getElementById('sentence-quest-feedback');
+  if (!feedback) return;
+  
+  const userSentence = selectedQuestSequence.map(item => item.char).join('');
+  
+  if (userSentence === activeQuestSentence) {
+    feedback.innerHTML = `<span style="color: var(--success); font-size: 1.25rem;">🎉 100% CORRECT! +50 XP Reward</span>`;
+    state.score += 50;
+    saveProgress();
+    
+    // Play correct pronunciation of target character sentence if possible
+    speakText(activeQuestSentence);
+  } else {
+    feedback.innerHTML = `<span style="color: var(--danger);">❌ Mismatched structure. Correct sequence: ${activeQuestSentence}</span>`;
+  }
+};
 
 // Global exports of other functions accessed via HTML to ensure ESM backward compatibility
 window.playTone = playTone;
