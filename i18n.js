@@ -288,7 +288,24 @@ const i18nDictionary = {
     "btn_rescue_wilting": "✍️ Rescue Wilting Plants",
     "srs_view_title": "Vocab Garden Watering Room",
     "srs_session_complete": "Garden Watered! +{{xp}} XP",
-    "srs_empty_due": "All your plants are well watered today! 🌟"
+    "srs_empty_due": "All your plants are well watered today! 🌟",
+
+    // Pinyin Daily Practice Banner
+    "pinyin_daily_title": "Daily Pinyin Practice",
+    "pinyin_daily_desc": "Tones & pronunciation — practice every day before your lesson.",
+    "btn_open_pinyin_chart": "🔉 Open Pinyin Chart",
+
+    // Garden Dashboard — new keys (added 2026-08-10)
+    "visual_garden_title": "Your Memory Garden",
+    "confusion_alert_title": "Confusion Pair Alert",
+    "garden_empty_title": "Your Garden is Empty",
+    "garden_empty_desc": "You haven't planted any vocabulary seeds yet! Complete a lesson to populate your garden.",
+    "btn_full_review": "⚔️ Full Garden Review",
+    "btn_start_day1": "▶️ Start Day 1 Lesson",
+
+    // Early Exit (added 2026-08-10)
+    "early_exit_title": "Finish Session Early?",
+    "early_exit_msg": "Do you want to end your review session now and claim your earned XP? Your progress on completed words is already saved."
   },
   
   th: {
@@ -575,7 +592,24 @@ const i18nDictionary = {
     "btn_rescue_wilting": "✍️ คัดลายมือช่วยชีวิตต้นไม้",
     "srs_view_title": "ห้องรดน้ำต้นไม้คำศัพท์",
     "srs_session_complete": "รดน้ำต้นไม้เรียบร้อยแล้ว! +{{xp}} XP",
-    "srs_empty_due": "ต้นไม้ทุกต้นของคุณได้รับน้ำเพียงพอแล้ววันนี้! 🌟"
+    "srs_empty_due": "ต้นไม้ทุกต้นของคุณได้รับน้ำเพียงพอแล้ววันนี้! 🌟",
+
+    // Pinyin Daily Practice Banner
+    "pinyin_daily_title": "ฝึกพินอินประจำวัน",
+    "pinyin_daily_desc": "วรรณยุกต์และการออกเสียง — ฝึกทุกวันก่อนเริ่มบทเรียน",
+    "btn_open_pinyin_chart": "🔉 เปิดตารางพินอิน",
+
+    // Garden Dashboard TH (added 2026-08-10)
+    "visual_garden_title": "สวนคำศัพท์ของฉัน",
+    "confusion_alert_title": "แจ้งเตือนคำที่สับสน",
+    "garden_empty_title": "สวนของคุณว่างเปล่า",
+    "garden_empty_desc": "คุณยังไม่ได้ปลูกคำศัพท์ใดเลย! เริ่มบทเรียนเพื่อเพิ่มคำศัพท์ในสวนของคุณ",
+    "btn_full_review": "⚔️ ทบทวนสวนทั้งหมด",
+    "btn_start_day1": "▶️ เริ่มบทเรียนวันที่ 1",
+
+    // Early Exit TH (added 2026-08-10)
+    "early_exit_title": "จบการฝึกก่อนเวลา?",
+    "early_exit_msg": "คุณต้องการจบการทบทวนตอนนี้และรับ XP หรือไม่? ความคืบหน้าของคำศัพท์ที่ทบทวนเสร็จแล้วจะถูกบันทึกไว้"
   }
 };
 

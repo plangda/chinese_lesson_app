@@ -5,10 +5,10 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 ## Overall Implementation Summary
 
 - **Total Tasks**: 29 (excluding Maintenance & Bug Fixes)
-- **Completed Tasks**: 22
-- **In-Progress Tasks**: 0
-- **Not Started Tasks**: 7
-- **Overall Project Completion**: **~76%** (Core Web App: **~100%**)
+- **Completed Tasks**: 23
+- **In-Progress Tasks**: 1
+- **Not Started Tasks**: 5
+- **Overall Project Completion**: **~79%** (Core Web App: **~100%**)
 
 ---
 
@@ -20,7 +20,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Express API & Server Routes** | Phase 1: Database & Backend | `Complete` | 100% | Implemented in `server.js` with routes for lessons, full curricula, and user progress backup. |
 | **Full HSK 1 Curriculum Seeding** | Phase 1: Database & Backend | `Complete` | 100% | Remapped to official 300 words A-Z standard; all 26 dynamic thematic lessons generated and seeded. |
 | **HSK 2 Curriculum Seeding** | Phase 1: Database & Backend | `Complete` | 100% | Days 1–18 generated and seeded into Turso. Thai translation patch 100% completed (all 44 generated lessons locked on high-quality LLM Thai). |
-| **HSK 3 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Remapped to 500 words; theme mapping completed. Start after HSK2 complete. |
+| **HSK 3 Curriculum Seeding** | Phase 1: Database & Backend | `In Progress` | 53% | Remapped to 500 words; Days 1–18 generated and seeded into Turso. |
 | **HSK 4, 5, 6 Curriculum Seeding** | Phase 1: Database & Backend | `Not Started` | 0% | Advanced content generation and database seeding for higher proficiency levels. |
 | **Level Placement Pre-Test System** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 12-question diagnostic test that maps results to recommended start levels. |
 | **Lesson Pre-test (Gating)** | Phase 2: Diagnostic & Assessment | `Complete` | 100% | 3-question diagnostic pre-test for each lesson with an option to skip if scored 100%. |
@@ -32,10 +32,10 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Streak & Time-Spent Tracking** | Phase 4: Consistency & Retention | `Complete` | 100% | Tracks study streak and total hours; streaks reset dynamically if a day is skipped. |
 | **Daily Study Reminder System** | Phase 4: Consistency & Retention | `Complete` | 100% | Periodic interval checks on user-set reminder times and integrated UI status notifications. |
 | **User Progress Synchronization** | Phase 4: Consistency & Retention | `Complete` | 100% | Multi-storage model syncing local state (`localStorage`), Express SQLite backend, and IDE `student_progress.json` file. |
-| **Vocab Garden SRS: Engine Refactor** | Phase 4: Consistency & Retention | `Complete` | 100% | Decoupled monolithic app.js into clean, isolated modules: `event-bus.js`, `srs-engine.js`, `challenge-selector.js`, and `garden.js`. |
-| **Vocab Garden SRS: Dashboard Revamp** | Phase 4: Consistency & Retention | `Complete` | 100% | Revamped layout with Visual Garden canvas at center stage, habit-based notification banner, and compact lesson/quest sidebar. |
-| **Vocab Garden SRS: Active Challenges & Games** | Phase 4: Consistency & Retention | `Complete` | 100% | Implemented stage-based retrieval challenges (Hanzi MCQ, tone ID/input, translation MCQ), interleaved practice, Seed Fusion Lab, and Sentence Quests. |
-| **Vocab Garden SRS: API Integration** | Phase 4: Consistency & Retention | `Complete` | 100% | Integrated backend `/api/srs/garden` to return live plant lists and `/api/srs/fuse` to process and save compound fusions. |
+| **Vocab Garden SRS: Engine Refactor** | Phase 4: Consistency & Retention | `Complete` | 100% | Decoupled monolithic app.js into clean, isolated modules: `event-bus.js`, `srs-engine.js`, `challenge-selector.js`, and `garden.js`. *(Note: Not yet tested by user)* |
+| **Vocab Garden SRS: Dashboard Revamp** | Phase 4: Consistency & Retention | `Complete` | 100% | Revamped layout with Visual Garden canvas at center stage, habit-based notification banner, and compact lesson/quest sidebar. *(Note: Not yet tested by user)* |
+| **Vocab Garden SRS: Active Challenges & Games** | Phase 4: Consistency & Retention | `Complete` | 100% | Implemented stage-based retrieval challenges (Hanzi MCQ, tone ID/input, translation MCQ), interleaved practice, Seed Fusion Lab, and Sentence Quests. *(Note: Not yet tested by user)* |
+| **Vocab Garden SRS: API Integration** | Phase 4: Consistency & Retention | `Complete` | 100% | Integrated backend `/api/srs/garden` to return live plant lists and `/api/srs/fuse` to process and save compound fusions. *(Note: Not yet tested by user)* |
 | **Settings & Account Management** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Dropdown selectors to change HSK level and database-wide user progress reset button. |
 | **Kid-friendly styling & animations** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Tailored kid-friendly theme with smooth bouncy spring-like physics and transitions; mobile layout refined. |
 | **Thai Localization Expansion** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Integrated a structural language-selection modal with full Turso DB translations for Thai (Vocab, Grammar, Dialogues). |
@@ -109,8 +109,8 @@ gantt
 ### Phase Progress Breakdown
 
 1. **Phase 1: Database & Backend** (SQLite, REST API, Seeding)
-   - **Progress**: 85%
-   - *Next Action:* Seeding for HSK 3 and higher levels. HSK 1 and HSK 2 translation rollouts are 100% complete and locked on LLM Thai.
+   - **Progress**: 90%
+   - *Next Action:* Seeding HSK 3 (53% complete, Days 1–18 seeded) and higher levels. HSK 1 and HSK 2 translation rollouts are 100% complete and locked on LLM Thai.
 2. **Phase 2: Diagnostic & Assessment** (Placement & Gating)
    - **Progress**: 100%
    - *Next Action*: Complete.

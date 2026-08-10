@@ -23,24 +23,28 @@ export class ChallengeSelector {
    * @returns {Object} { type: string, question: string, options: Array, answer: string, hint: string }
    */
   generateChallenge(card, lang = 'en') {
-    const stage = card.mastery_stage || 1;
-    const meaning = lang === 'th' ? (card.meaning_th || card.meaning) : (card.meaning || card.meaning_en);
-    const example = lang === 'th' ? (card.exampleTh || card.exampleEn) : (card.exampleEn || card.example_en);
+    if (!card) return null;
+    // Dynamically localize using HanPath's central helper
+    const localCard = window.localizeLessonObject ? window.localizeLessonObject(card, lang) : card;
+    if (!localCard) return null;
+
+    const stage = localCard.mastery_stage || 1;
+    const meaning = localCard.meaning;
+    const example = localCard.exampleEn;
 
     switch (stage) {
       case 1:
-        return this.createRecognitionChallenge(card, meaning);
+        return this.createRecognitionChallenge(localCard, meaning, lang);
       case 2:
-        // Randomly split between Tone Identification and Pinyin typing
         return Math.random() > 0.5 
-          ? this.createToneChallenge(card)
-          : this.createPinyinChallenge(card);
+          ? this.createToneChallenge(localCard, lang)
+          : this.createPinyinChallenge(localCard, lang);
       case 3:
-        return this.createTranslationChallenge(card, meaning);
+        return this.createTranslationChallenge(localCard, meaning, lang);
       case 4:
-        return this.createContextChallenge(card, example);
+        return this.createContextChallenge(localCard, example, lang);
       default:
-        return this.createRecognitionChallenge(card, meaning);
+        return this.createRecognitionChallenge(localCard, meaning, lang);
     }
   }
 
@@ -58,8 +62,17 @@ export class ChallengeSelector {
    * @param {number} count 
    */
   getDistractors(excludeCard, fieldName, count = 3) {
-    const distractors = this.vocabPool
-      .filter(item => item.character !== excludeCard.character && item[fieldName])
+    if (!excludeCard || !excludeCard.character) return [];
+    if (!Array.isArray(this.vocabPool)) return [];
+
+    // Determine language to localize distractors
+    const lang = window.state ? window.state.currentLanguage : 'en';
+    const localizedPool = this.vocabPool.map(item => 
+      window.localizeLessonObject ? window.localizeLessonObject(item, lang) : item
+    );
+
+    const distractors = localizedPool
+      .filter(item => item && item.character !== excludeCard.character && item[fieldName])
       .map(item => item[fieldName]);
     
     // De-duplicate
@@ -72,7 +85,7 @@ export class ChallengeSelector {
   /**
    * STAGE 1: Recognition -> Meaning is shown, pick correct Hanzi
    */
-  createRecognitionChallenge(card, meaning) {
+  createRecognitionChallenge(card, meaning, lang = 'en') {
     const correctOption = card.character;
     const distractors = this.getDistractors(card, 'character', 3);
     
@@ -85,21 +98,26 @@ export class ChallengeSelector {
 
     return {
       type: 'RECOGNITION',
-      prompt: `Select the correct Chinese character for:`,
+      prompt: lang === 'th' ? 'เลือกตัวอักษรจีนที่ถูกต้องสำหรับ:' : 'Select the correct Chinese character for:',
       question: meaning,
       options,
       answer: correctOption,
-      hint: `Pinyin: ${card.pinyin}`
+      hint: lang === 'th' ? `พินอิน: ${card.pinyin}` : `Pinyin: ${card.pinyin}`
     };
   }
 
   /**
    * STAGE 2 (Phonology A): Tone Identification
    */
-  createToneChallenge(card) {
-    // Extract tone (1-4) from pinyin
+  createToneChallenge(card, lang = 'en') {
     const toneNum = this.extractToneNumber(card.pinyin);
-    const toneLabels = {
+    const toneLabels = lang === 'th' ? {
+      '1': 'เสียงที่ 1 (สูง, ระดับ - ā)',
+      '2': 'เสียงที่ 2 (จัตวา/ระดับกลางขึ้น - á)',
+      '3': 'เสียงที่ 3 (เอก/ระดับต่ำ - ǎ)',
+      '4': 'เสียงที่ 4 (โท/ระดับสูงลง - à)',
+      '5': 'เสียงเบา (สั้น, เบา - a)'
+    } : {
       '1': '1st Tone (High, Level - ā)',
       '2': '2nd Tone (Rising - á)',
       '3': '3rd Tone (Low, Dipping - ǎ)',
@@ -114,61 +132,63 @@ export class ChallengeSelector {
 
     return {
       type: 'TONE_ID',
-      prompt: `Identify the correct tone for this character:`,
+      prompt: lang === 'th' ? 'ระบุเสียงวรรณยุกต์ที่ถูกต้องสำหรับตัวอักษรนี้:' : 'Identify the correct tone for this character:',
       question: card.character,
       options,
       answer: String(toneNum),
-      hint: `Meaning: ${card.meaning}`
+      hint: lang === 'th' ? `ความหมาย: ${card.meaning}` : `Meaning: ${card.meaning}`
     };
   }
 
   /**
    * STAGE 2 (Phonology B): Pinyin Input challenge
    */
-  createPinyinChallenge(card) {
-    // Correct pinyin without tone markers (e.g. nǐ -> ni)
+  createPinyinChallenge(card, lang = 'en') {
     const cleanPinyin = this.stripToneMarkers(card.pinyin).toLowerCase().replace(/\s/g, '');
 
     return {
       type: 'PINYIN_INPUT',
-      prompt: `Type the correct Pinyin (no tone markers or spaces):`,
+      prompt: lang === 'th' ? 'พิมพ์พินอินที่ถูกต้อง (ไม่มีเครื่องหมายวรรณยุกต์หรือเว้นวรรค):' : 'Type the correct Pinyin (no tone markers or spaces):',
       question: card.character,
       answer: cleanPinyin,
-      hint: `Tonal Hint: ${card.pinyin} | Meaning: ${card.meaning}`
+      hint: lang === 'th' 
+        ? `คำใบ้วรรณยุกต์: ${card.pinyin} | ความหมาย: ${card.meaning}`
+        : `Tonal Hint: ${card.pinyin} | Meaning: ${card.meaning}`
     };
   }
 
   /**
    * STAGE 3: Meaning -> Hanzi is shown, pick correct translation
    */
-  createTranslationChallenge(card, meaning) {
+  createTranslationChallenge(card, meaning, lang = 'en') {
     const correctOption = meaning;
     const distractors = this.getDistractors(card, 'meaning', 3);
 
     // Fallbacks
     while (distractors.length < 3) {
-      distractors.push('to learn; study', 'hello; greetings', 'water; river', 'goodbye; see again');
+      const fallbacks = lang === 'th'
+        ? ['เรียน; ศึกษา', 'สวัสดี; ทักทาย', 'น้ำ; แม่น้ำ', 'ลาก่อน; พบกันใหม่']
+        : ['to learn; study', 'hello; greetings', 'water; river', 'goodbye; see again'];
+      distractors.push(fallbacks[distractors.length % fallbacks.length]);
     }
 
     const options = this.shuffle(distractors.slice(0, 3).concat([correctOption]));
 
     return {
       type: 'TRANSLATION',
-      prompt: `Choose the correct meaning of this word:`,
+      prompt: lang === 'th' ? 'เลือกความหมายที่ถูกต้องของคำนี้:' : 'Choose the correct meaning of this word:',
       question: card.character,
       options,
       answer: correctOption,
-      hint: `Pinyin: ${card.pinyin}`
+      hint: lang === 'th' ? `พินอิน: ${card.pinyin}` : `Pinyin: ${card.pinyin}`
     };
   }
 
   /**
    * STAGE 4: Context -> Fill-in-the-blank sentence completion
    */
-  createContextChallenge(card, exampleTranslation) {
+  createContextChallenge(card, exampleTranslation, lang = 'en') {
     const sentence = card.exampleCn || card.example_sentence || '我今天很___。';
-    
-    // Mask target word in sentence
     const masked = sentence.replace(new RegExp(card.character, 'g'), ' ____ ');
 
     const correctOption = card.character;
@@ -182,11 +202,11 @@ export class ChallengeSelector {
 
     return {
       type: 'CONTEXT',
-      prompt: `Complete the sentence with the correct word:`,
+      prompt: lang === 'th' ? 'เติมคำในประโยคให้ถูกต้อง:' : 'Complete the sentence with the correct word:',
       question: masked,
       options,
       answer: correctOption,
-      hint: `Translation: ${exampleTranslation}`
+      hint: lang === 'th' ? `คำแปล: ${exampleTranslation}` : `Translation: ${exampleTranslation}`
     };
   }
 

@@ -1508,3 +1508,18 @@ main {
 .hidden {
   display: none !important;
 }
+
+/* ================================================
+   Dashboard Sticky Sidebar (added 2026-08-10)
+   ================================================ */
+@media (min-width: 1024px) {
+  .dashboard-sidebar {
+    position: sticky;
+    /* Use CSS var for header height so it works even if banner wraps to 2 lines */
+    top: calc(var(--header-height, 80px) + 1.5rem);
+    max-height: calc(100vh - var(--header-height, 80px) - 3rem);
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+  }
+}

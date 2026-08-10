@@ -248,36 +248,37 @@ def find_translation_corruption(original, translated):
     return errors[0] if errors else None
 
 def _strip_untranslatable_fields(data):
-    """Create a deep copy with cn/py/character/pinyin removed entirely.
-    Also injects empty _th fields so the LLM strictly follows the structure."""
-    stripped = copy.deepcopy(data)
-
-    stripped["title_th"] = ""
-    for v in stripped.get("vocab", []):
-        v.pop("character", None)
-        v.pop("pinyin", None)
-        v["translation_th"] = ""
-        v["deconstruct_th"] = ""
-        v["example_translation_th"] = ""
-
-    for g in stripped.get("grammar", []):
-        g["title_th"] = ""
-        g["explanation_th"] = ""
-        for ex in g.get("examples", []):
-            ex.pop("cn", None)
-            ex.pop("py", None)
-            ex["th"] = ""
-        if g.get("practice"):
-            g["practice"]["prompt_th"] = ""
-
-    dial = stripped.get("dialogue")
+    """Keep ONLY the English text fields that need translation.
+    Remove all Chinese characters, pinyin, and structural elements that don't need translation.
+    This reduces input size and allows the LLM to output only target translation fields."""
+    stripped = {}
+    stripped["title"] = data.get("title", "")
+    
+    stripped["vocab"] = []
+    for v in data.get("vocab", []):
+        stripped["vocab"].append({
+            "meaning": v.get("meaning", ""),
+            "deconstruct": v.get("deconstruct", ""),
+            "example_translation_en": v.get("example_translation_en", "")
+        })
+        
+    stripped["grammar"] = []
+    for g in data.get("grammar", []):
+        g_item = {
+            "title": g.get("title", ""),
+            "explanation": g.get("explanation", ""),
+            "examples": [{"en": ex.get("en", "")} for ex in g.get("examples", [])]
+        }
+        if g.get("practice") is not None:
+            g_item["practice"] = {"prompt": g["practice"].get("prompt", "")}
+        stripped["grammar"].append(g_item)
+        
+    dial = data.get("dialogue")
     if dial:
-        dial["title_th"] = ""
-        for line in dial.get("lines", []):
-            line.pop("cn", None)
-            line.pop("py", None)
-            line["th"] = ""
-
+        stripped["dialogue"] = {
+            "title": dial.get("title", ""),
+            "lines": [{"en": line.get("en", "")} for line in dial.get("lines", [])]
+        }
     return stripped
 
 def _apply_translated_fields(lesson_data, translated):
@@ -327,11 +328,20 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
     You are a professional Chinese-to-Thai pedagogical translator for children
     aged 8-15 learning Chinese as a foreign language.
 
-    Below is a full lesson JSON for a Chinese class. Translate every English
-    field into natural, idiomatic, kid-friendly Thai and populate the matching
-    "_th" field for each one (e.g. "meaning" -> "translation_th", "deconstruct"
-    -> "deconstruct_th", "explanation" -> "explanation_th", "prompt" ->
-    "prompt_th", "en" -> "th", "title" -> "title_th").
+    Below is a simplified lesson JSON for a Chinese class. Translate every English
+    field into natural, idiomatic, kid-friendly Thai.
+
+    Your response must contain ONLY the translated Thai fields in a matching JSON structure, 
+    with the target keys mapped as follows:
+    - "title" -> "title_th"
+    - "vocab" items: "meaning" -> "translation_th", "deconstruct" -> "deconstruct_th", "example_translation_en" -> "example_translation_th"
+    - "grammar" items: "title" -> "title_th", "explanation" -> "explanation_th"
+    - "grammar[].examples" items: "en" -> "th"
+    - "grammar[].practice": "prompt" -> "prompt_th"
+    - "dialogue": "title" -> "title_th"
+    - "dialogue.lines" items: "en" -> "th"
+
+    Do NOT return any of the original English fields ("title", "meaning", "deconstruct", "example_translation_en", "explanation", "en", "prompt") in your output.
 
     STRICT RULES:
     - Do NOT translate word-for-byte; use natural spoken Thai grammar.
@@ -342,12 +352,10 @@ def add_thai_translations_to_lesson_llm(lesson_data, max_retries=3):
       For example, if the source says "The word __CIT_0__ , grain) means...", 
       translate it as "คำว่า __CIT_0__ , เมล็ดข้าว) แปลว่า...". Notice how the English word "grain" gets translated, but the placeholder remains.
     - IMPORTANT: Do NOT add spaces around underscores in JSON keys. For example, use "translation_th" exactly, NOT "translation _ th".
-    - Return the EXACT SAME JSON structure and field names as the input, with
-      every "_th"/"th" field now filled in. Do NOT add, remove, or reorder any
-      array items.
+    - Return a JSON object with ONLY the "_th"/"th" keys. Do NOT add, remove, or reorder any array items.
     - Output valid JSON only. No markdown code fences, no extra commentary.
 
-    Lesson JSON:
+    Input JSON:
     {placeholder_lesson_str}
     """
 

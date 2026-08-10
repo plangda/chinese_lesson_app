@@ -390,6 +390,8 @@ function setupEventListeners() {
           if (state.currentPane === "quiz-pane") renderQuizQuestion();
         } else if (state.currentView === 'pinyin-chart-view') {
           initPinyinChart();
+        } else if (state.currentView === 'srs-view') {
+          renderSrsCard();
         } else if (state.currentView === 'welcome-view') {
           // static, translateUI is enough
         }
@@ -844,7 +846,13 @@ function renderDashboard() {
     }
   }
 
-  lessons.forEach(l => {
+  // Inject Lesson 0 at the top of the list manually so it's always accessible
+  const displayLessons = [
+    { id: 'hsk1_day0', day_number: 0, title: 'Pinyin Chart', title_th: 'ตารางพินอิน' },
+    ...lessons
+  ];
+
+  displayLessons.forEach(l => {
     const isCompleted = state.completedLessons.includes(l.id);
     const div = document.createElement('div');
     div.className = `lesson-row glass-panel ${isCompleted ? 'completed' : ''}`;
@@ -2421,7 +2429,10 @@ function showConfirmModal(i18nKeyTitle, i18nKeyMsg, onConfirm) {
 
 async function renderVocabGardenWidget() {
   try {
-    const res = await fetch('/api/srs/garden');
+    const token = localStorage.getItem("hanpath_token");
+    const res = await fetch('/api/srs/garden', {
+      headers: { "Authorization": "Bearer " + token }
+    });
     if (!res.ok) return;
     const data = await res.json();
 
@@ -2505,7 +2516,16 @@ async function renderVocabGardenWidget() {
 function setupSrsEventListeners() {
   const exitBtn = document.getElementById('srs-exit-btn');
   if (exitBtn) {
-    exitBtn.addEventListener('click', () => switchView('dashboard-view'));
+    exitBtn.addEventListener('click', () => {
+      if (state.srsXpEarned > 0) {
+        showConfirmModal('early_exit_title', 'early_exit_msg', () => {
+          srsEngine.currentBatch = [];
+          renderSrsCard();
+        });
+      } else {
+        switchView('dashboard-view');
+      }
+    });
   }
 
   // Bind clicked plant events to start a single SRS session for that plant
@@ -2529,9 +2549,43 @@ let challengeHintsUsed = false;
 
 async function startSrsSession(mode = 'normal') {
   try {
-    const res = await fetch(`/api/srs/due?mode=${mode}`);
-    if (!res.ok) return;
-    const cards = await res.json();
+    let cards;
+
+    const token = localStorage.getItem("hanpath_token");
+    if (mode === 'full') {
+      // Full review: fetch ALL planted words from the garden (not just due ones)
+      const res = await fetch('/api/srs/garden', {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (!res.ok) return;
+      const gardenData = await res.json();
+      // The garden endpoint returns { plants: [...] } — reshape each plant into the card format
+      // that the SRS engine expects (same fields as /api/srs/due cards)
+      cards = (gardenData.plants || []).map(p => ({
+        srs_id: p.vocab_id,
+        vocab_id: p.vocab_id,
+        character: p.character,
+        pinyin: p.pinyin,
+        meaning: p.meaning,
+        meaning_th: p.meaning_th,
+        mastery_stage: p.mastery_stage,
+        interval_days: p.interval_days,
+        times_forgotten: p.times_forgotten,
+        deconstruct: p.deconstruct,
+        deconstruct_th: p.deconstruct_th,
+        exampleCn: p.exampleCn,
+        examplePy: p.examplePy,
+        exampleEn: p.exampleEn,
+        exampleTh: p.exampleTh
+      }));
+    } else {
+      // Normal or rescue mode: fetch only due cards
+      const res = await fetch(`/api/srs/due?mode=${mode}`, {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (!res.ok) return;
+      cards = await res.json();
+    }
 
     if (!cards || cards.length === 0) {
       alert(t('srs_empty_due'));
@@ -2577,6 +2631,10 @@ function renderSrsCard() {
 
   // Generate a challenge based on current mastery stage
   currentChallenge = challengeSelector.generateChallenge(activeCard, state.currentLanguage);
+  if (!currentChallenge) {
+    container.innerHTML = `<div class="error" style="color: var(--danger); text-align: center; padding: 2rem;">Error: Failed to generate challenge for this card. Please try returning to the dashboard.</div>`;
+    return;
+  }
   challengeAttempts = 0;
   challengeHintsUsed = false;
 
@@ -2742,9 +2800,13 @@ async function submitSrsWatering(vocabId, attemptsCount, hintsUsed, isCorrect) {
       const activeCard = srsEngine.currentQueue.find(c => c.vocab_id === vocabId);
       const calculated = srsEngine.calculateSM2(activeCard, engineResult.systemGrade);
 
+      const token = localStorage.getItem("hanpath_token");
       const res = await fetch('/api/srs/water', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
         body: JSON.stringify({ 
           vocabId, 
           attemptsCount, 
@@ -2771,9 +2833,13 @@ window.submitSrsWatering = submitSrsWatering;
 
 async function plantLessonSrs(lessonId) {
   try {
+    const token = localStorage.getItem("hanpath_token");
     await fetch('/api/srs/plant-lesson', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
       body: JSON.stringify({ lessonId })
     });
   } catch (err) {
@@ -2790,13 +2856,14 @@ let fusionSlot2 = null;
 
 window.initSeedFusionLab = async function() {
   try {
-    const res = await fetch('/api/srs/garden');
-    if (!res.ok) return;
-    const data = await res.json();
-    
-    // Filter single character seeds
-    const singleSeeds = (data.plants || []).filter(p => p.character && p.character.length === 1);
-    
+    const token = localStorage.getItem("hanpath_token");
+    const poolRes = await fetch('/api/srs/fusion-pool', {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!poolRes.ok) return;
+    const poolData = await poolRes.json();
+    const fuseableChars = poolData.chars || [];
+
     // Clear slots
     fusionSlot1 = null;
     fusionSlot2 = null;
@@ -2805,18 +2872,20 @@ window.initSeedFusionLab = async function() {
     const poolContainer = document.getElementById('fusion-seed-pool');
     if (!poolContainer) return;
     
-    if (singleSeeds.length === 0) {
-      poolContainer.innerHTML = `<div style="color: var(--text-secondary); width: 100%; text-align: center; padding: 1.5rem;">No single-character seeds planted yet. Plant words from Day 1+ lessons first!</div>`;
+    if (fuseableChars.length === 0) {
+      poolContainer.innerHTML = `<div style="color: var(--text-secondary); width: 100%; text-align: center; padding: 1.5rem;">No fuseable characters found in the database.</div>`;
       return;
     }
     
+    // Limit to 40 tiles for readability
+    const displayChars = fuseableChars.slice(0, 40);
     let html = '';
-    singleSeeds.forEach(seed => {
+    displayChars.forEach(char => {
       html += `
         <button class="btn btn-secondary seed-pool-card" 
-                onclick="window.selectFusionSeed('${seed.character}')" 
+                onclick="window.selectFusionSeed('${char}')" 
                 style="font-size: 1.5rem; width: 60px; height: 60px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);">
-          ${seed.character}
+          ${char}
         </button>
       `;
     });
@@ -2871,9 +2940,13 @@ window.triggerSeedFusion = async function() {
   resultArea.innerHTML = `<span style="color: var(--accent); animation: pulse 1s infinite;">⚡ Fusing ${fusionSlot1} + ${fusionSlot2}... ⚡</span>`;
   
   try {
+    const token = localStorage.getItem("hanpath_token");
     const res = await fetch('/api/srs/fuse', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
       body: JSON.stringify({ char1: fusionSlot1, char2: fusionSlot2 })
     });
     if (!res.ok) {
@@ -2910,7 +2983,12 @@ window.triggerSeedFusion = async function() {
       fusionSlot2 = null;
       window.updateFusionSlotsUI();
     } else {
-      resultArea.innerHTML = `<span style="color: var(--danger);">${data.message}</span>`;
+      resultArea.innerHTML = `
+        <span style="color: var(--danger);">${data.message}</span>
+        <br/><small style="color:var(--text-secondary); margin-top: 0.5rem; display: block;">
+          💡 Try combining: 你+好, 学+生, 老+师, 中+国, 日+本
+        </small>
+      `;
     }
   } catch (err) {
     console.error("Fusion call failed:", err);
@@ -2938,26 +3016,29 @@ window.initSentenceQuest = async function() {
   selectedQuestSequence = [];
   
   try {
-    const res = await fetch('/api/srs/garden');
+    const token = localStorage.getItem("hanpath_token");
+    const res = await fetch('/api/srs/garden', {
+      headers: { "Authorization": "Bearer " + token }
+    });
     if (!res.ok) return;
     const data = await res.json();
     
-    // Basket are plants with stage 4 (mastered)
-    const basket = (data.plants || []).filter(p => p.mastery_stage === 4);
+    // Basket are plants with stage 3+ (blooming or mastered)
+    const basket = (data.plants || []).filter(p => p.mastery_stage >= 3);
     
     if (basket.length < 3) {
       promptArea.textContent = '';
       poolArea.innerHTML = `
         <div style="color: var(--text-secondary); width: 100%; text-align: center; padding: 2rem;">
-          🧺 Your Harvest Basket needs at least 3 Mastered words to trigger a Sentence Quest!<br/>
-          You currently have <strong>${basket.length} / 3</strong> Mastered words. Keep watering due words to harvest them!
+          🧺 Your Harvest Basket needs at least 3 Blooming (🌻) or Mastered words to trigger a Sentence Quest!<br/>
+          You currently have <strong>${basket.length} / 3</strong> qualifying words. Keep watering due words to level them up!
         </div>
       `;
       return;
     }
     
     // Find a card with an example sentence to use for the quest
-    const cardWithSentence = basket.find(c => c.exampleCn || c.example_sentence);
+    const cardWithSentence = basket.find(c => c.example_sentence);
     if (!cardWithSentence) {
       promptArea.textContent = '';
       poolArea.innerHTML = `<div style="color: var(--text-secondary); width: 100%; text-align: center; padding: 2rem;">Mastered words do not contain example sentences to generate a quest. Complete HSK lesson dialogues first!</div>`;
@@ -2965,16 +3046,20 @@ window.initSentenceQuest = async function() {
     }
     
     // Clean target sentence
-    const cnSentence = (cardWithSentence.exampleCn || cardWithSentence.example_sentence).replace(/[。，！？、,!?]/g, '');
+    const cnSentence = cardWithSentence.example_sentence.replace(/[。，！？、,!?]/g, '');
     activeQuestSentence = cnSentence;
     correctQuestSequence = Array.from(cnSentence);
     
     // Prompt translation
-    promptArea.innerHTML = `Translate this sentence:<br/><span style="color: #fff; font-size: 1.35rem; font-family: var(--font-serif);">${cardWithSentence.exampleEn || 'Example sentence'}</span>`;
+    const exampleEn = cardWithSentence.meaning_en || 'Example sentence';
+    promptArea.innerHTML = `Translate into Chinese:<br/><span style="color: #fff; font-size: 1.35rem; font-family: var(--font-serif);">${exampleEn}</span>`;
     
     // Shuffle correct cards and add distractors
     const cardChars = [...correctQuestSequence];
-    const distractorChars = ['是', '不', '我', '他', '的', '了', '好', '呢'].filter(c => !cardChars.includes(c));
+    const distractorChars = (data.plants || [])
+      .filter(p => p.character && p.character.length === 1 && !cardChars.includes(p.character))
+      .map(p => p.character)
+      .slice(0, 8);
     
     // Select 3 random distractors
     const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
@@ -3086,6 +3171,7 @@ window.nextWord = nextWord;
 window.checkQuizAnswer = checkQuizAnswer;
 window.checkPretestAnswer = checkPretestAnswer;
 window.renderVocabGardenWidget = renderVocabGardenWidget;
+window.localizeLessonObject = localizeLessonObject;
 
 // Hook setupSrsEventListeners into initialization
 if (typeof document !== 'undefined') {

@@ -464,7 +464,7 @@ app.post('/api/progress', requireAuth, async (req, res) => {
 // ==========================================
 
 // GET /api/srs/garden - Fetch garden summary stats & progress bar
-app.get('/api/srs/garden', async (req, res) => {
+app.get('/api/srs/garden', requireAuth, async (req, res) => {
   try {
     const userId = req.query.userId || (req.user ? req.user.id : 1);
     
@@ -514,7 +514,13 @@ app.get('/api/srs/garden', async (req, res) => {
         u.next_review_date, 
         u.times_forgotten,
         v.meaning_en as meaning,
-        v.meaning_th
+        v.meaning_th,
+        v.deconstruct_en as deconstruct,
+        v.deconstruct_th,
+        v.example_cn as exampleCn,
+        v.example_py as examplePy,
+        v.example_en as exampleEn,
+        v.example_th as exampleTh
       FROM user_vocab_srs u
       JOIN vocab v ON u.vocab_id = v.id
       WHERE u.user_id = ?
@@ -540,33 +546,70 @@ app.get('/api/srs/garden', async (req, res) => {
   }
 });
 
-// GET /api/srs/due - Fetch up to 20 due cards for watering session (or rescue mode)
-app.get('/api/srs/due', async (req, res) => {
+// GET /api/srs/due - Fetch up to 15 due cards for watering session (or rescue mode), with fallback refresher
+app.get('/api/srs/due', requireAuth, async (req, res) => {
   try {
     const userId = req.query.userId || (req.user ? req.user.id : 1);
     const mode = req.query.mode || 'normal';
     const todayStr = getBkkDateString(0);
 
-    let query = `
-      SELECT 
-        s.id as srs_id, s.vocab_id, s.mastery_stage, s.interval_days, s.ease_factor, s.repetitions, s.times_forgotten,
-        v.character, v.pinyin, v.meaning_en as meaning, v.meaning_th, v.deconstruct_en as deconstruct, v.deconstruct_th,
-        v.example_cn as exampleCn, v.example_py as examplePy, v.example_en as exampleEn, v.example_th as exampleTh
-      FROM user_vocab_srs s
-      JOIN vocab v ON s.vocab_id = v.id
-      WHERE s.user_id = ?
-    `;
-
-    let params = [userId];
-
+    let cards = [];
     if (mode === 'rescue') {
-      query += ` AND s.times_forgotten >= 3 ORDER BY s.times_forgotten DESC LIMIT 20`;
+      // Rescue mode: fetch up to 10 wilting cards (forgotten >= 3 and overdue)
+      cards = await db.all(`
+        SELECT 
+          s.id as srs_id, s.vocab_id, s.mastery_stage, s.interval_days, s.ease_factor, s.repetitions, s.times_forgotten,
+          v.character, v.pinyin, v.meaning_en as meaning, v.meaning_th, v.deconstruct_en as deconstruct, v.deconstruct_th,
+          v.example_cn as exampleCn, v.example_py as examplePy, v.example_en as exampleEn, v.example_th as exampleTh
+        FROM user_vocab_srs s
+        JOIN vocab v ON s.vocab_id = v.id
+        WHERE s.user_id = ? AND s.times_forgotten >= 3 AND s.next_review_date <= ?
+        ORDER BY s.next_review_date ASC, s.id ASC
+        LIMIT 10
+      `, [userId, todayStr]);
     } else {
-      query += ` AND s.next_review_date <= ? ORDER BY s.next_review_date ASC, s.mastery_stage ASC LIMIT 20`;
-      params.push(todayStr);
+      // Normal mode: fetch up to 15 due cards sorted by overdue ratio and lowest accuracy
+      cards = await db.all(`
+        SELECT 
+          s.id as srs_id, s.vocab_id, s.mastery_stage, s.interval_days, s.ease_factor, s.repetitions, s.times_forgotten,
+          v.character, v.pinyin, v.meaning_en as meaning, v.meaning_th, v.deconstruct_en as deconstruct, v.deconstruct_th,
+          v.example_cn as exampleCn, v.example_py as examplePy, v.example_en as exampleEn, v.example_th as exampleTh
+        FROM user_vocab_srs s
+        JOIN vocab v ON s.vocab_id = v.id
+        WHERE s.user_id = ? AND s.next_review_date <= ?
+        ORDER BY 
+          ((julianday('now') - julianday(COALESCE(s.last_reviewed_at, s.created_at))) / s.interval_days) DESC,
+          (CASE WHEN s.total_reviews = 0 THEN 1.0 ELSE CAST(s.total_reviews - s.times_forgotten AS REAL) / s.total_reviews END) ASC
+        LIMIT 15
+      `, [userId, todayStr]);
+
+      // Fallback Mode: If 0 cards are due, fetch 15 words from user's most recently completed lesson sorted by lowest accuracy
+      if (cards.length === 0) {
+        const progress = await db.get('SELECT completed_lessons, hsk_level FROM user_progress WHERE user_id = ?', [userId]);
+        let completed = [];
+        let currentHsk = 'hsk1';
+        if (progress) {
+          try {
+            completed = JSON.parse(progress.completed_lessons || '[]');
+            currentHsk = progress.hsk_level || 'hsk1';
+          } catch (e) {}
+        }
+        const lastLessonId = completed.length > 0 ? completed[completed.length - 1] : `${currentHsk}_day1`;
+
+        cards = await db.all(`
+          SELECT 
+            s.id as srs_id, s.vocab_id, s.mastery_stage, s.interval_days, s.ease_factor, s.repetitions, s.times_forgotten,
+            v.character, v.pinyin, v.meaning_en as meaning, v.meaning_th, v.deconstruct_en as deconstruct, v.deconstruct_th,
+            v.example_cn as exampleCn, v.example_py as examplePy, v.example_en as exampleEn, v.example_th as exampleTh
+          FROM user_vocab_srs s
+          JOIN vocab v ON s.vocab_id = v.id
+          WHERE s.user_id = ? AND s.lesson_id = ?
+          ORDER BY (CASE WHEN s.total_reviews = 0 THEN 1.0 ELSE CAST(s.total_reviews - s.times_forgotten AS REAL) / s.total_reviews END) ASC
+          LIMIT 15
+        `, [userId, lastLessonId]);
+      }
     }
 
-    const cards = await db.all(query, params);
     res.json(cards);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -574,7 +617,7 @@ app.get('/api/srs/due', async (req, res) => {
 });
 
 // POST /api/srs/water - Process student review game result & update SM-2 parameters
-app.post('/api/srs/water', async (req, res) => {
+app.post('/api/srs/water', requireAuth, async (req, res) => {
   try {
     const userId = req.body.userId || (req.user ? req.user.id : 1);
     const { vocabId, attemptsCount = 1, hintsUsed = false } = req.body;
@@ -659,7 +702,7 @@ app.post('/api/srs/water', async (req, res) => {
 });
 
 // POST /api/srs/plant-lesson - Auto-plant all words from a completed daily lesson
-app.post('/api/srs/plant-lesson', async (req, res) => {
+app.post('/api/srs/plant-lesson', requireAuth, async (req, res) => {
   try {
     const userId = req.body.userId || (req.user ? req.user.id : 1);
     const { lessonId } = req.body;
@@ -687,8 +730,29 @@ app.post('/api/srs/plant-lesson', async (req, res) => {
   }
 });
 
+// GET /api/srs/fusion-pool — Returns all single characters that can form valid 2-char compounds in the vocab DB
+app.get('/api/srs/fusion-pool', requireAuth, async (req, res) => {
+  try {
+    // Find every 2-character word in the vocab table
+    const compounds = await db.all(
+      `SELECT character FROM vocab WHERE LENGTH(character) = 2 LIMIT 300`
+    );
+    // Extract both characters from each compound (e.g. "你好" → ["你", "好"])
+    const charSet = new Set();
+    compounds.forEach(c => {
+      if (c.character && c.character.length === 2) {
+        charSet.add(c.character[0]);
+        charSet.add(c.character[1]);
+      }
+    });
+    res.json({ chars: [...charSet] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/srs/fuse - Attempt to fuse two single characters into a compound HSK word
-app.post('/api/srs/fuse', async (req, res) => {
+app.post('/api/srs/fuse', requireAuth, async (req, res) => {
   try {
     const userId = req.body.userId || (req.user ? req.user.id : 1);
     const { char1, char2 } = req.body;

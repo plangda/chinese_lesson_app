@@ -190,8 +190,19 @@
             <p id="habit-banner-desc" style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">Loading your memory garden status...</p>
           </div>
         </div>
-        <button id="main-water-all-btn" class="btn btn-primary" style="padding: 0.75rem 2rem; font-weight: bold; border-radius: 30px; box-shadow: 0 4px 15px rgba(0, 245, 212, 0.25);" onclick="window.startSrsSession('normal')">
-          💧 Water All Due Words (~5 mins)
+      </div>
+
+      <!-- Pinyin Daily Practice Banner — always-accessible, sits above the main grid -->
+      <div id="pinyin-daily-banner" class="glass-panel" style="padding: 1.25rem 2rem; margin-bottom: 2rem; border-left: 5px solid var(--primary); display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; background: linear-gradient(90deg, rgba(255, 51, 102, 0.07) 0%, rgba(255,255,255,0.01) 100%); border-radius: var(--border-radius-md);">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <span style="font-size: 2rem; line-height: 1;">🔉</span>
+          <div>
+            <h3 style="margin: 0 0 0.2rem 0; font-family: var(--font-serif); font-size: 1rem;" data-i18n="pinyin_daily_title">Daily Pinyin Practice</h3>
+            <p style="color: var(--text-secondary); font-size: 0.82rem; margin: 0;" data-i18n="pinyin_daily_desc">Tones &amp; pronunciation — practice every day before your lesson.</p>
+          </div>
+        </div>
+        <button id="pinyin-chart-btn" class="btn btn-primary" style="padding: 0.6rem 1.5rem; font-weight: bold; border-radius: 24px; font-size: 0.9rem; white-space: nowrap; box-shadow: 0 4px 12px rgba(255,51,102,0.2);" data-i18n="btn_open_pinyin_chart">
+          🔉 Open Pinyin Chart
         </button>
       </div>
 
@@ -235,7 +246,7 @@
         </div>
 
         <!-- Right Area: Lessons & Quests Sidebar -->
-        <div style="display: flex; flex-direction: column; gap: 2rem;">
+        <div class="dashboard-sidebar" style="display: flex; flex-direction: column; gap: 2rem;">
           
           <!-- Today's Lesson Panel (Compact Sidebar form) -->
           <div id="today-lesson-panel" class="glass-panel" style="padding: 1.5rem; border-color: var(--primary); background: linear-gradient(135deg, rgba(255, 51, 102, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);">

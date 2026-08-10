@@ -70,9 +70,9 @@ export class GardenRenderer {
   }
 
   /**
-   * Renders the visual garden plot grid
-   * @param {string} containerId DOM element ID
-   * @param {Array} plants Array of SRS records
+   * Renders the interactive garden summary dashboard
+   * @param {string} containerId DOM element ID of the container
+   * @param {Array} plants Array of SRS plant records from /api/srs/garden
    */
   render(containerId, plants) {
     this.containerId = containerId;
@@ -80,61 +80,96 @@ export class GardenRenderer {
     const container = document.getElementById(containerId);
     if (!container) return;
 
+    // Empty state — user has no planted words yet
     if (!plants || plants.length === 0) {
       container.innerHTML = this.getEmptyGardenStateHTML();
       return;
     }
 
-    let html = `<div class="garden-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 1.25rem; width: 100%; padding: 1rem;">`;
-
-    plants.forEach(plant => {
-      const stateInfo = this.getPlantState(plant);
-      const isDue = plant.next_review_date <= new Date().toISOString().split('T')[0];
-      
-      html += `
-        <div class="garden-plot-card glass-panel plant-state-${stateInfo.status} ${isDue ? 'plant-is-due' : ''}" 
-             data-id="${plant.vocab_id}" 
-             style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.25rem; border-radius: 16px; cursor: pointer; position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255,255,255,0.03);"
-             onmouseover="this.style.transform='scale(1.05) translateY(-5px)'; this.style.borderColor='var(--primary)'; this.style.boxShadow='0 8px 24px rgba(0, 245, 212, 0.15)';"
-             onmouseout="this.style.transform='scale(1) translateY(0)'; this.style.borderColor='rgba(255,255,255,0.08)'; this.style.boxShadow='none';">
-          
-          <!-- State Badge -->
-          <span class="plant-badge ${stateInfo.badgeClass}" style="position: absolute; top: -8px; font-size: 0.65rem; font-weight: bold; padding: 2px 8px; border-radius: 20px; z-index: 2;">
-            ${stateInfo.label}
-          </span>
-          
-          <!-- Visual Plant representation -->
-          <div class="plant-visual-wrapper" style="font-size: 3rem; margin-bottom: 0.5rem; transition: transform 0.3s ease; transform-origin: bottom center;">
-            ${stateInfo.emoji}
-          </div>
-          
-          <!-- Character Display -->
-          <div class="plant-character" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 0.15rem; color: #fff;">
-            ${plant.character}
-          </div>
-          
-          <!-- Pronunciation Hint -->
-          <div class="plant-pinyin" style="font-size: 0.75rem; color: var(--text-secondary);">
-            ${plant.pinyin || ''}
-          </div>
-        </div>
-      `;
+    // Count plants by visual stage
+    const counts = { seed: 0, sprout: 0, flower: 0, tree: 0, thirsty: 0, wilting: 0 };
+    plants.forEach(p => {
+      const s = this.getPlantState(p);
+      if (s.status === 'wilting') counts.wilting++;
+      else if (s.status === 'thirsty') counts.thirsty++;
+      else if (s.status === 'evergreen') counts.tree++;
+      else if (s.status === 'harvest' || s.status === 'flower') counts.flower++;
+      else if (s.status === 'sprout') counts.sprout++;
+      else counts.seed++;
     });
 
-    html += `</div>`;
-    container.innerHTML = html;
+    const dueCount = counts.thirsty + counts.wilting;
+    const plotPlants = plants.slice(0, 30); // cap at 30 tiles to avoid scroll exhaustion
 
-    // Attach click listeners to cards
-    const cards = container.querySelectorAll('.garden-plot-card');
-    cards.forEach(card => {
-      card.addEventListener('click', () => {
-        const vocabId = parseInt(card.getAttribute('data-id'));
-        const plant = this.plants.find(p => p.vocab_id === vocabId);
-        if (plant) {
-          eventBus.emit('garden:plant-clicked', plant);
-        }
-      });
-    });
+    // Build the emoji tile grid (each tile = one planted word, shows emoji by growth stage)
+    const tilesHtml = plotPlants.map(plant => {
+      const s = this.getPlantState(plant);
+      const meaning = plant.meaning || '';
+      return `
+        <div class="garden-tile"
+             title="${plant.character} (${plant.pinyin || ''}) — ${meaning}"
+             style="font-size: 1.9rem; cursor: default; user-select: none; transition: transform 0.2s; line-height: 1;"
+             onmouseover="this.style.transform='scale(1.3)'"
+             onmouseout="this.style.transform='scale(1)'">
+          ${s.emoji}
+        </div>`;
+    }).join('');
+
+    const overflowMsg = plants.length > 30
+      ? `<div style="color:var(--text-secondary);font-size:0.8rem;text-align:center;margin-top:0.5rem;">
+           +${plants.length - 30} more words in your garden
+         </div>`
+      : '';
+
+    // Helper: safely call window.t() — falls back to English if i18n not loaded yet
+    const tx = (key, fallback) => (window.t ? window.t(key) : fallback);
+
+    container.innerHTML = `
+      <!-- Stage count badges row -->
+      <div class="garden-stage-badges" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
+        <span style="background:rgba(0,245,212,0.12);color:var(--success);border:1px solid var(--success);border-radius:20px;padding:4px 12px;font-size:0.8rem;font-weight:bold;">
+          🌱 ${counts.seed} ${tx('stage_seeds','Seeds')}
+        </span>
+        <span style="background:rgba(100,200,100,0.12);color:#6bc96b;border:1px solid #6bc96b;border-radius:20px;padding:4px 12px;font-size:0.8rem;font-weight:bold;">
+          🌿 ${counts.sprout} ${tx('stage_sprouts','Sprouts')}
+        </span>
+        <span style="background:rgba(255,200,0,0.12);color:#ffd700;border:1px solid #ffd700;border-radius:20px;padding:4px 12px;font-size:0.8rem;font-weight:bold;">
+          🌻 ${counts.flower} ${tx('stage_flowers','Flowers')}
+        </span>
+        <span style="background:rgba(46,196,182,0.12);color:var(--accent);border:1px solid var(--accent);border-radius:20px;padding:4px 12px;font-size:0.8rem;font-weight:bold;">
+          🌳 ${counts.tree} ${tx('stage_trees','Trees')}
+        </span>
+      </div>
+
+      <!-- Emoji tile grid -->
+      <div class="garden-tile-grid"
+           style="display:flex;flex-wrap:wrap;gap:0.6rem;min-height:80px;padding:0.75rem;background:rgba(0,0,0,0.08);border-radius:12px;margin-bottom:0.5rem;">
+        ${tilesHtml}
+      </div>
+      ${overflowMsg}
+
+      <!-- Due status label -->
+      <div style="margin:1rem 0 0.5rem;font-size:0.85rem;">
+        ${dueCount > 0
+          ? `<span style="color:var(--accent);font-weight:bold;">💧 ${dueCount} ${tx('thirsty_plants_count','words due for watering')}</span>`
+          : `<span style="color:var(--success);">✅ ${tx('srs_empty_due','All plants watered today!')}</span>`}
+      </div>
+
+      <!-- CTA Buttons -->
+      <div style="display:flex;flex-direction:column;gap:0.6rem;">
+        ${dueCount > 0 ? `
+        <button id="garden-water-due-btn" class="btn btn-primary"
+                style="padding:0.75rem;font-weight:bold;border-radius:24px;box-shadow:0 4px 15px rgba(0,245,212,0.25);"
+                onclick="window.startSrsSession('normal')">
+          💧 ${tx('btn_water_plants','Water Thirsty Plants (3-Min Review)')}
+        </button>` : ''}
+        <button id="garden-full-review-btn" class="btn btn-secondary"
+                style="padding:0.65rem;border-radius:24px;"
+                onclick="window.startSrsSession('full')">
+          ${tx('btn_full_review','⚔️ Full Garden Review')}
+        </button>
+      </div>
+    `;
   }
 
   /**

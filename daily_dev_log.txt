@@ -117,3 +117,12 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Added database schema user_vocab_srs with idx_user_srs_due index, and exposed REST API endpoints (GET /api/srs/garden, GET /api/srs/due, POST /api/srs/water, POST /api/srs/plant-lesson).
 - Executed comprehensive end-to-end smoke test verifying table creation, auto-planting, aggregation queries, and SM-2 interval updates against production Turso Cloud DB.
 - Committed and pushed changes to main branch on GitHub (commits f06510b, efb98a7).
+
+2026-08-10:
+- Refactored monolithic frontend client into ES modules (event-bus.js, srs-engine.js, challenge-selector.js, garden.js) and built Summary Dashboard centering the visual garden canvas, adding progress trackers, and rescue box warnings.
+- Integrated Seed Fusion Lab (drag/drop compound word maker) and Sentence Quest Builder (construct sentences dynamically using mastered Stage 4 words).
+- Capped review sessions to 15 cards max, sorted by overdue ratio and lowest accuracy, and implemented fallback refresher mode to query cards from the last completed HSK lesson if 0 are due.
+- Added safety confirmation modals on early exit with XP, and wired mid-session language toggle to instantly re-translate active cards (prompts, choices, hints, distractors) on language click without resetting progress.
+- Enforced 100% target-language distractor generation on translation cards (querying from meaning_th instead of meaning_en) and added defensive guards preventing UI rendering crashes on missing or empty data states.
+- Optimized generate_hsk_full.py to strip untranslatable CJK and English fields from the output structure, instructing Gemini to return only target Thai keys, saving 47% of generated tokens and eliminating truncation failures.
+- Successfully generated and seeded HSK 3 Days 1–18 into the live Turso database before exhausting daily API quota limits.
