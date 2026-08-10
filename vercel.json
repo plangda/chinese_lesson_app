@@ -13,7 +13,9 @@
           "hanzi-writer.min.js",
           "pinyin_data.json",
           "favicon.svg",
-          "favicon.png"
+          "favicon.png",
+          "modules/*",
+          "public/audio/pinyin/*"
         ]
       }
     }
