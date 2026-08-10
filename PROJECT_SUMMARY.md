@@ -23,7 +23,7 @@ HanPath is a structured, daily Chinese learning application tailored to make lan
   - *Placement Test:* A global diagnostic tool to determine a user's starting HSK level.
   - *Lesson Pre-Test:* A micro-assessment allowing advanced users to "test out" of lessons they already know.
 - **Retention & Gamification:** Daily streak counters, total time tracked, lesson completion scores, and user-configurable daily study reminders.
-- **Vocab Garden (Plants & Watering SRS):** A kid-friendly Spaced Repetition System integrated into the right sidebar. Active vocabulary memory is represented as a living plant garden across 4 visual growth stages: 🌱 **Seeds** (Day 1) ➔ 🌿 **Sprouts** (3 Days) ➔ 🌻 **Flowers** (7 Days) ➔ 🌳 **Golden Trees** (21+ Days). Features a **Total Vocab Progress Bar** (`45 / 300 Words`), **Thirsty Plants Banner (💧)**, **Wilting Rescue Box (🥀)** for words forgotten 3+ times, and a full-screen **Watering Review Arena (`#srs-view`)** with automatic system evaluation (`MISSED`, `GOT_IT`, `PERFECT`).
+- **Vocab Garden (Plants & Watering SRS - Revamped):** Now the central Home Screen and Dashboard of the application. Active vocabulary memory is represented as a living plant garden across 4 visual growth stages: 🌱 **Seeds** (Day 1) ➔ 🌿 **Sprouts** (3 Days) ➔ 🌻 **Flowers** (7 Days) ➔ 🌳 **Golden Trees** (21+ Days). Features a dynamic **Daily Memory Habit Banner** with a single-click Watering CTA, a **Total Vocab Progress Bar**, a **Confusion Pairs Alert Banner** for confusing lookalike characters (e.g., 买 vs 卖, 喝 vs 渴) currently in the garden, a **Compact Lessons & Quests Sidebar** with collapsible completed items, a full-screen **Watering Review Arena (`#srs-view`)** running SM-2 queues, and two new active mini-games: **🧪 Seed Fusion Lab** (to combine single characters into HSK compound words) and **🏹 Sentence Quest Builder** (drag-and-drop sentence ordering for mastered Stage 4 words).
 - **Bilingual Support:** Full UI and content localization in both English and Thai.
 
 ---
@@ -34,7 +34,11 @@ HanPath is a structured, daily Chinese learning application tailored to make lan
 HanPath operates as a Single Page Application (SPA) with a lightweight Node.js backend connected to a remote cloud database.
 
 **Frontend (Client-Side):**
-- **Tech Stack:** Vanilla HTML5, CSS3 (Custom utility classes, CSS Variables, Glassmorphism design), and Vanilla JavaScript (ES6+). No heavy frameworks (like React/Vue) to ensure blazing fast load times and simple hosting.
+- **Tech Stack:** Vanilla HTML5, CSS3 (Custom utility classes, CSS Variables, Glassmorphism design), and Vanilla JavaScript (ES6+). Loaded as native ES Modules.
+- **Modular Architecture (Vocab Garden Upgrade):** Decoupled the monolithic client-side `app.js` into clean, single-responsibility ES modules synchronized via a lightweight Pub/Sub `event-bus.js`:
+  - `modules/srs-engine.js`: Manages SM-2 interval calculations and interleaved card practice in round-robin batches of 5.
+  - `modules/challenge-selector.js`: Dynamically targets four different cognitive challenges based on a word's current Mastery Stage (Stage 1: recognition MCQ, Stage 2: tone ID/input, Stage 3: translation MCQ, Stage 4: drag-and-drop HSK sentence builder).
+  - `modules/garden.js`: Renders the interactive plant canvas.
 - **State Management & 0ms Memory Caching:** Centralized local JS `state` object synchronized with `localStorage` and backend. Lesson 0 reference payloads are cached in memory (`state.pinyinLessonData`) upon initial fetch, allowing instant **0ms language toggling** (TH ↔ EN) without network latency.
 - **Localization & Language Purity Guardrail:** Custom robust i18n engine scanning DOM for `data-i18n` attributes. Pre-commit assertions (`validateLanguagePurity`) scan database seeding scripts to guarantee 0% mixed-language contamination in `_en` and `_th` fields.
 - **Key Libraries & Audio Architecture:** `hanzi-writer.min.js` (for stroke animations and character drawing), Native Web Speech API with explicit `zh-CN` voice-object binding.
@@ -46,11 +50,15 @@ HanPath operates as a Single Page Application (SPA) with a lightweight Node.js b
 - **Tech Stack:** Node.js, Express.js.
 - **Database:** Turso Cloud Database (SQLite distributed at the edge).
 - **Driver:** `@libsql/client` wrapper with custom exponential backoff retry logic for resilience against network instability.
-- **API Design & Static Serving:** RESTful endpoints. Static audio assets served via `app.use('/audio', express.static(...))` for high-speed local asset delivery. Deeply nested curriculum data is fetched via highly optimized batch SQL queries assembled in-memory.
+- **API Design & Static Serving:** RESTful endpoints. Includes detailed SRS integrations:
+  - `GET /api/srs/garden`: Fetches statistics, progress bar, and the full list of planted cards (joined with `vocab` to retrieve Pinyin and translations for frontend rendering).
+  - `POST /api/srs/fuse`: Receives two single characters, checks if they form a valid HSK compound word, and auto-plants the new compound card in the user's garden.
+- **Static Asset Delivery:** Served via standard static paths.
 
 **Database Schema Design:**
 - **Standardized Column Layout:** All user-facing translatable strings are explicitly separated into English (`_en`) and Thai (`_th`) columns in the database (e.g., `meaning_en`, `meaning_th` in the `vocab` table; `explanation_en`, `explanation_th` in the `grammar` table). This provides standard translation schemas across the entire database.
 - **Mixed-Language Character Preservation:** Shared linguistic attributes—specifically the original Chinese characters (`character` and `example_cn` columns) and their standard Pinyin pronunciations (`pinyin` and `example_py` columns)—are stored in unified, language-agnostic columns. Only the contextual explanations and translated meanings are split into English (`_en`) and Thai (`_th`) columns. This schema separation ensures that the core Chinese characters and pronunciations are never processed by translation engines, preventing character corruption and maintaining clean, mixed-language layouts.
+- **Polyphonic Homograph Handling:** Changed unique key constraints on vocabulary table from `UNIQUE(lesson_id, character)` to `UNIQUE(lesson_id, character, pinyin)`. This supports polyphonic homographs (e.g. `干` pronounced as `gān` vs `gàn`) in the database.
 - **SQL Translation Aliases:** The server routes fetch these language-specific fields and alias them (e.g. `meaning_en as meaning`) to maintain seamless backward compatibility with the frontend's legacy code.
 - **Quiz Elimination from Database:** The legacy `quizzes` table has been completely dropped from the database schema because post-lesson quizzes are generated dynamically in the frontend (inside `app.js`) using the lesson's active vocabulary list. This guarantees that quizzes are always dynamically localized and are in 100% synchronization with vocabulary.
 
@@ -220,8 +228,17 @@ Because of point 4 above, a targeted string-replacement patch to a `_th` field i
 - **Deferred Hand-Patching of Un-Rolled-Out Lessons (Aug 2):** After preparing a 10-record fix for the "character"/"lady" mistranslation bugs, realized (again prompted by a user question, this time about interaction with the *planned* rollout) that `patch_thai_translations.py` fully clears and regenerates every `_th` field for any lesson not yet locked `"llm"` — so a Thai-only patch to a still-pending lesson is silently overwritten the next time the rollout reaches it, regardless of whether that attempt succeeds via LLM or falls back again. Decided to hold all Thai-only fixes for lessons not yet rollout-locked, re-auditing after each lesson's rollout pass instead of patching twice. This reframes "hand-patch content bugs found via audit" as useful *only* for either (a) English/Chinese source corrections (which the rollout never touches and which also improve future translation attempts) or (b) lessons already permanently locked.
 - **`CITEMARK` Placeholder Mistranslation — Documented, Deliberately Not Fixed (Aug 2):** While explaining the placeholder-substitution mechanism to the user, traced a live example of it failing (`hsk1_day5`'s "Additional Vocabulary" grammar practice `prompt_th` ending in the garbled `ไซท์มาร์ก0` instead of the intended Chinese question) to Google Translate occasionally transliterating the literal `CITEMARK0` marker into Thai script instead of leaving it untouched, which breaks the exact-string-match restore step. Decided not to fix this in the same session: it's orthogonal to the citation-validation fix (affects only the Google-Translate fallback path, never the LLM path), and the priority for this project right now is reducing *reliance* on the fallback path (via the rollout) rather than perfecting its output quality. Documented clearly for a future session instead of leaving it as an offhand remark.
 - **Vocab Garden SRS & Automatic System Grading (Aug 8):** Designed and deployed a kid-friendly SRS memory garden. Eliminated confusing 4-button Anki self-grading menus in favor of automatic system evaluation (`MISSED`, `GOT_IT`, `PERFECT`). Integrated UTC+7 (Asia/Bangkok) date calculation protection, historical progress backfilling, Wilting Rescue Box (`times_forgotten >= 3`), and full-screen `#srs-view` review arena. Verified live on Turso Cloud DB and deployed to production.
+- **Vocab Garden Upgrade: Decoupled & Game-based Retention Engine (Aug 10):** Successfully refactored frontend into ES modules, overhauled the main dashboard to center-stage the memory garden canvas, and implemented active cognitive challenges. Added **Seed Fusion Lab** (interactive drag/drop and backend validation `/api/srs/fuse` to plant compound words) and **Sentence Quest Builder** (constructs sentences dynamically using mastered Stage 4 words).
+- **HSK 3 Curriculum Seeding (Aug 10):** Seeded HSK 3 Days 1, 2, and 3 vocabulary lessons into the live database.
 
 ---
+
+## 4. Retrospective Lessons Learned
+
+### Lesson #20: Vercel server startup crash diagnostic
+- **Issue:** During an automated code editing session, the server code was modified and saved without a critical closing block (`});`) inside the `app.post('/api/progress')` route handler in [server.js](file:///C:/Users/USER/OneDrive/Desktop/knowledge/My%20project/Chinese%20web%20learning/server.js). This caused Vercel serverless functions to crash at startup with `SyntaxError: Unexpected end of input`.
+- **Diagnostic Lesson:** Never push a javascript or node.js update to remote main/production without first verifying its syntax locally using parsing utilities (such as `node -c server.js` or parsing checkers). Pre-commit scripts and continuous integration syntax gates are highly recommended for solo/small team deployments to catch structural defects.
+
 
 ## 5. Historical Note: "Supporting Documentation for Tomorrow" (Written July 29, superseded July 31)
 

@@ -4,11 +4,11 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 
 ## Overall Implementation Summary
 
-- **Total Tasks**: 27 (excluding Maintenance & Bug Fixes)
-- **Completed Tasks**: 21
+- **Total Tasks**: 29 (excluding Maintenance & Bug Fixes)
+- **Completed Tasks**: 22
 - **In-Progress Tasks**: 0
-- **Not Started Tasks**: 6
-- **Overall Project Completion**: **~82%** (Core Web App: **~100%**)
+- **Not Started Tasks**: 7
+- **Overall Project Completion**: **~76%** (Core Web App: **~100%**)
 
 ---
 
@@ -32,6 +32,10 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Streak & Time-Spent Tracking** | Phase 4: Consistency & Retention | `Complete` | 100% | Tracks study streak and total hours; streaks reset dynamically if a day is skipped. |
 | **Daily Study Reminder System** | Phase 4: Consistency & Retention | `Complete` | 100% | Periodic interval checks on user-set reminder times and integrated UI status notifications. |
 | **User Progress Synchronization** | Phase 4: Consistency & Retention | `Complete` | 100% | Multi-storage model syncing local state (`localStorage`), Express SQLite backend, and IDE `student_progress.json` file. |
+| **Vocab Garden SRS: Engine Refactor** | Phase 4: Consistency & Retention | `Complete` | 100% | Decoupled monolithic app.js into clean, isolated modules: `event-bus.js`, `srs-engine.js`, `challenge-selector.js`, and `garden.js`. |
+| **Vocab Garden SRS: Dashboard Revamp** | Phase 4: Consistency & Retention | `Complete` | 100% | Revamped layout with Visual Garden canvas at center stage, habit-based notification banner, and compact lesson/quest sidebar. |
+| **Vocab Garden SRS: Active Challenges & Games** | Phase 4: Consistency & Retention | `Complete` | 100% | Implemented stage-based retrieval challenges (Hanzi MCQ, tone ID/input, translation MCQ), interleaved practice, Seed Fusion Lab, and Sentence Quests. |
+| **Vocab Garden SRS: API Integration** | Phase 4: Consistency & Retention | `Complete` | 100% | Integrated backend `/api/srs/garden` to return live plant lists and `/api/srs/fuse` to process and save compound fusions. |
 | **Settings & Account Management** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Dropdown selectors to change HSK level and database-wide user progress reset button. |
 | **Kid-friendly styling & animations** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Tailored kid-friendly theme with smooth bouncy spring-like physics and transitions; mobile layout refined. |
 | **Thai Localization Expansion** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Integrated a structural language-selection modal with full Turso DB translations for Thai (Vocab, Grammar, Dialogues). |
@@ -55,7 +59,7 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Google Translate → LLM Translation Migration** | Maintenance & Bug Fixes | `Complete` | 100% | Replaced stateless per-field `translate_en_to_th()` Google Translate calls with a single `gemini-3.5-flash` contextual LLM call per lesson. Migrated from deprecated `google-generativeai` to `google.genai` SDK. Added `--no-translate` CLI flag and `patch_thai_translations.py` for targeted Turso UPDATE patching. Confirmed `gemini-3.5-flash` working; `gemini-2.0-flash` quota-exhausted. |
 | **HSK Level Prefix Rendering Fix** | Maintenance & Bug Fixes | `Complete` | 100% | Updated `app.js` lesson ID regex from hardcoded `hsk1_day` to generic `/^hsk\d_day/` so Day numbers render correctly for HSK 2+ levels. |
 | **Thai Translation Patch (HSK1 & HSK2)** | Maintenance & Bug Fixes | `Complete` | 100% | **Aug 8 update:** Rollout 100% complete across all 44 lessons in HSK 1 (26/26) and HSK 2 (18/18). All generated lessons locked on high-quality LLM Thai translation (`_th_source = "llm"`). |
-| **Vocab Garden Spaced Repetition System (SRS)** | Phase 4: Consistency & Retention | `Complete` | 100% | Implemented kid-friendly Vocab Garden SRS with 4 plant stages (Seeds ➔ Sprouts ➔ Flowers ➔ Trees), Total Vocab Progress bar, UTC+7 date protection, historical backfilling, Wilting Rescue Box, and full-screen review arena (`#srs-view`). |
+| **Vercel Startup Crash & Syntax Diagnostic** | Maintenance & Bug Fixes | `Complete` | 100% | Resolved a server crash caused by a missing bracket closure in `server.js` route handlers. Instituted local syntax checking (`node -c`) before pushing commits. |
 | **Language-Contamination Validation Guardrails** | Maintenance & Bug Fixes | `Complete` | 100% | Added `find_thai_contamination()`, `find_incomplete_practice()`, and `find_chinese_field_contamination()` checks to `generate_hsk_full.py`'s validation block, feeding the existing retry loop so contaminated LLM responses (wrong language, missing example sentences, broken answer arrays) trigger automatic regeneration instead of being saved. |
 | **Field Masking for LLM JSON Structure Protection** | Maintenance & Bug Fixes | `Superseded` | 100% | July 29: Implemented `_mask_untranslatable_fields()`/`_unmask_fields()` to stop the LLM from modifying cn/py/character/pinyin fields, validated only against a hand-written ideal fake response. July 31: a live retry still failed with the same error masking was built to fix. Root cause: `_apply_translated_fields()` never reads these fields back from the LLM response at all, so the round-trip was validating something nothing downstream consumes — and the synthetic `_*_masked` names were arguably *harder* for the LLM to echo back correctly than the original ones. Replaced with `_strip_untranslatable_fields()` (deletes the fields from the payload, never expects them back); `test_field_masking.py` rewritten with an adversarial fixture. Logged as retrospective lesson #19. |
 | **Windows Console Encoding Crash Fix** | Maintenance & Bug Fixes | `Complete` | 100% | July 31: A live retry of hsk1_day4 crashed with `UnicodeEncodeError` when printing a validation error containing Chinese/Thai text, because Windows' default console encoding (`cp1252`) can't represent it — this killed the retry loop after attempt 1 instead of exhausting all 3 retries and falling back gracefully. Fixed by reconfiguring `sys.stdout`/`sys.stderr` to UTF-8 at the top of `generate_hsk_full.py`. |
@@ -105,15 +109,15 @@ gantt
 ### Phase Progress Breakdown
 
 1. **Phase 1: Database & Backend** (SQLite, REST API, Seeding)
-   - **Progress**: 79%
-   - *Next Action (as of Aug 6):* HSK 1 translation rollout is 100% complete. HSK 2 translation rollout is partially complete (QuotaExceededError on hsk2_day12). Next step is to re-run `python patch_thai_translations.py --level hsk2` tomorrow when quota resets to patch the remaining 7 lessons. Generating HSK 2 Days 18–21 is still separately pending.
+   - **Progress**: 85%
+   - *Next Action:* Seeding for HSK 3 and higher levels. HSK 1 and HSK 2 translation rollouts are 100% complete and locked on LLM Thai.
 2. **Phase 2: Diagnostic & Assessment** (Placement & Gating)
    - **Progress**: 100%
    - *Next Action*: Complete.
 3. **Phase 3: Core Learning Engine** (Vocab, Grammar, Dialogue, Quiz)
    - **Progress**: 100%
    - *Next Action*: Complete.
-4. **Phase 4: Consistency & Retention** (Streak, Time, Reminders, Sync)
+4. **Phase 4: Consistency & Retention** (Streak, Time, Reminders, Sync, Vocab Garden Upgrade)
    - **Progress**: 100%
    - *Next Action*: Complete.
 5. **Phase 5: Settings & UX Polishing** (Settings, Reset, Spring Animations)
