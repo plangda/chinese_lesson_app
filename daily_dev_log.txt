@@ -126,3 +126,11 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Enforced 100% target-language distractor generation on translation cards (querying from meaning_th instead of meaning_en) and added defensive guards preventing UI rendering crashes on missing or empty data states.
 - Optimized generate_hsk_full.py to strip untranslatable CJK and English fields from the output structure, instructing Gemini to return only target Thai keys, saving 47% of generated tokens and eliminating truncation failures.
 - Successfully generated and seeded HSK 3 Days 1–18 into the live Turso database before exhausting daily API quota limits.
+
+2026-08-13:
+- Refactored home page CSS grid, centered vertical memory garden canvas flow, resolved completed lessons nested scrollbars, and styled sticky header themed cyan glass mask.
+- Seeded the 214 Kangxi radicals into Turso and built a programmatic generator (setup_radical_fusion_auto.js) that automatically creates decomposition formulas for all single-character vocab in the curriculum.
+- Overhauled lesson sidebar layout (Option 1): separated Day prefixes from titles on recommended cards, replaced repetitive completion buttons with clean green checkmarks (✅), enabled direct row clickability for re-learning, and eliminated text walls on both desktop and mobile viewports.
+- Shortened button labels across English and Thai (Start / เริ่ม) in index.html and i18n.js.
+- Verified responsive layouts across Desktop (1200x800) and Mobile (375x667) viewports via Puppeteer end-to-end testing scripts.
+- Committed and pushed all updates to main branch on GitHub (commits 02c215f, 4b818e3).
