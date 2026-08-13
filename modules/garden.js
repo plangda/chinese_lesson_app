@@ -108,7 +108,8 @@ export class GardenRenderer {
       return `
         <div class="garden-tile"
              title="${plant.character} (${plant.pinyin || ''}) — ${meaning}"
-             style="font-size: 1.9rem; cursor: default; user-select: none; transition: transform 0.2s; line-height: 1;"
+             onclick="window.handleGardenPlantClick(${plant.vocab_id})"
+             style="font-size: 1.9rem; cursor: pointer; user-select: none; transition: transform 0.2s; line-height: 1;"
              onmouseover="this.style.transform='scale(1.3)'"
              onmouseout="this.style.transform='scale(1)'">
           ${s.emoji}

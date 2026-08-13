@@ -2542,11 +2542,18 @@ async function renderVocabGardenWidget() {
 }
 
 function setupSrsEventListeners() {
-  // Bind clicked plant events to open the Mobile/Tablet Plant Quick Modal
   eventBus.on('garden:plant-clicked', (plant) => {
     showPlantQuickModal(plant);
   });
 }
+
+window.handleGardenPlantClick = function(vocabId) {
+  const plants = state.lastGardenPlants || [];
+  const plant = plants.find(p => p.vocab_id == vocabId);
+  if (plant) {
+    showPlantQuickModal(plant);
+  }
+};
 
 window.showPlantQuickModal = function(plant) {
   let modal = document.getElementById('plant-quick-modal');
