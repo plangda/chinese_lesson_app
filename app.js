@@ -2561,6 +2561,9 @@ window.showPlantQuickModal = function(plant) {
     modal = document.createElement('div');
     modal.id = 'plant-quick-modal';
     modal.className = 'modal-backdrop';
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    };
     document.body.appendChild(modal);
   }
 
