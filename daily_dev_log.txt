@@ -134,5 +134,7 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Shortened button labels across English and Thai (Start / เริ่ม) in index.html and i18n.js.
 - Verified responsive layouts across Desktop (1200x800) and Mobile (375x667) viewports via Puppeteer end-to-end testing scripts.
 - Fixed Vocab Garden Tone Quiz: implemented generic multi-syllable Pinyin tone extractor (`extractTonesFromPinyin`) for 1, 2, 3, 4+ character words (including neutral 5th tones like `没关系` ➔ `2-1-5`) and corrected accent map typo (`'ì': 4`).
-- Fixed Sentence Quest: mapped SQL property aliases (`exampleCn`, `exampleEn`, `exampleTh`), added fallback sentence pool for newly unlocked plants, localized prompt translations, and implemented a smart Chinese word tokenizer (`tokenizeSentence`).
-- Committed and pushed all updates to main branch on GitHub (commits 02c215f, 4b818e3, 88adb4c, d099fbc).
+- Fixed Sentence Quest: mapped SQL property aliases (`exampleCn`, `exampleEn`, `exampleTh`), added fallback sentence pool for newly unlocked plants, localized prompt translations, implemented smart Chinese word tokenizer (`tokenizeSentence`), and added random unplayed sentence selection (`playedQuestVocabIds`).
+- Updated `server.js` `syncUserHistoricalSrs()` to enforce strict lesson-gated garden syncing (words only unlock in `user_vocab_srs` as the user completes each lesson, e.g. 4 lessons = ~48 words).
+- Built Mobile & Tablet Plant Quick Modal overlay (`showPlantQuickModal`) and optional single-word Cram Mode (`startTargetPractice`) without altering the main randomized batch review engine or dashboard UI.
+- Committed and pushed all updates to main branch on GitHub (commits 02c215f, 4b818e3, 88adb4c, d099fbc, 0a8f245, 3edf84c).
