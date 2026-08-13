@@ -3285,6 +3285,33 @@ let activeQuestSentence = '';
 let correctQuestSequence = [];
 let selectedQuestSequence = [];
 
+function tokenizeSentence(sentence, plants) {
+  const sortedVocab = (plants || [])
+    .map(p => p.character)
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+
+  let remaining = sentence;
+  const tokens = [];
+
+  while (remaining.length > 0) {
+    let matched = false;
+    for (const word of sortedVocab) {
+      if (word.length > 0 && remaining.startsWith(word)) {
+        tokens.push(word);
+        remaining = remaining.slice(word.length);
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      tokens.push(remaining[0]);
+      remaining = remaining.slice(1);
+    }
+  }
+  return tokens;
+}
+
 window.initSentenceQuest = async function() {
   const promptArea = document.getElementById('sentence-quest-prompt-area');
   const targetArea = document.getElementById('sentence-quest-target-slots');
@@ -3304,59 +3331,67 @@ window.initSentenceQuest = async function() {
     });
     if (!res.ok) return;
     const data = await res.json();
-    
-    // Basket are plants with stage 3+ (blooming or mastered)
-    const basket = (data.plants || []).filter(p => p.mastery_stage >= 3);
-    
-    if (basket.length < 3) {
+    const allPlants = data.plants || [];
+
+    if (allPlants.length === 0) {
       promptArea.textContent = '';
       poolArea.innerHTML = `
         <div style="color: var(--text-secondary); width: 100%; text-align: center; padding: 2rem;">
-          🧺 Your Harvest Basket needs at least 3 Blooming (🌻) or Mastered words to trigger a Sentence Quest!<br/>
-          You currently have <strong>${basket.length} / 3</strong> qualifying words. Keep watering due words to level them up!
+          🌱 Welcome to Sentence Quest! Complete your first HSK lesson to unlock vocabulary plants and trigger sentence challenges!
         </div>
       `;
       return;
     }
-    
-    // Find a card with an example sentence to use for the quest
-    const cardWithSentence = basket.find(c => c.example_sentence);
+
+    // 1. Try finding a plant with an example sentence from Stage 3+ (Blooming/Mastered) basket
+    const basket = allPlants.filter(p => p.mastery_stage >= 3);
+    let cardWithSentence = basket.find(c => c.exampleCn || c.example_sentence || c.example_cn);
+
+    // 2. Fallback: If Stage 3+ basket has no example sentences, search ALL unlocked plants
+    if (!cardWithSentence) {
+      cardWithSentence = allPlants.find(c => c.exampleCn || c.example_sentence || c.example_cn);
+    }
+
     if (!cardWithSentence) {
       promptArea.textContent = '';
-      poolArea.innerHTML = `<div style="color: var(--text-secondary); width: 100%; text-align: center; padding: 2rem;">Mastered words do not contain example sentences to generate a quest. Complete HSK lesson dialogues first!</div>`;
+      poolArea.innerHTML = `<div style="color: var(--text-secondary); width: 100%; text-align: center; padding: 2rem;">Complete more HSK lessons to unlock example sentences for Sentence Quest!</div>`;
       return;
     }
     
     // Clean target sentence
-    const cnSentence = cardWithSentence.example_sentence.replace(/[。，！？、,!?]/g, '');
+    const rawCn = cardWithSentence.exampleCn || cardWithSentence.example_sentence || cardWithSentence.example_cn || '';
+    const cnSentence = rawCn.replace(/[。，！？、,!?]/g, '').trim();
     activeQuestSentence = cnSentence;
-    correctQuestSequence = Array.from(cnSentence);
+
+    // Tokenize sentence into word blocks using unlocked vocabulary list
+    correctQuestSequence = tokenizeSentence(cnSentence, allPlants);
     
-    // Prompt translation
-    const exampleEn = cardWithSentence.meaning_en || 'Example sentence';
-    promptArea.innerHTML = `Translate into Chinese:<br/><span style="color: #fff; font-size: 1.35rem; font-family: var(--font-serif);">${exampleEn}</span>`;
+    // Prompt translation (EN or TH dynamically)
+    const translation = (state.currentLanguage === 'th' ? (cardWithSentence.exampleTh || cardWithSentence.exampleEn) : (cardWithSentence.exampleEn || cardWithSentence.exampleTh))
+      || cardWithSentence.meaning_en
+      || 'Translate into Chinese';
+
+    promptArea.innerHTML = `${state.currentLanguage === 'th' ? 'แปลเป็นภาษาจีน:' : 'Translate into Chinese:'}<br/><span style="color: #fff; font-size: 1.35rem; font-family: var(--font-serif);">${translation}</span>`;
     
-    // Shuffle correct cards and add distractors
-    const cardChars = [...correctQuestSequence];
-    const distractorChars = (data.plants || [])
-      .filter(p => p.character && p.character.length === 1 && !cardChars.includes(p.character))
+    // Distractor tokens from other garden plants
+    const distractorTokens = allPlants
       .map(p => p.character)
-      .slice(0, 8);
-    
-    // Select 3 random distractors
+      .filter(c => c && !correctQuestSequence.includes(c));
+
     const shuffleArray = (arr) => arr.sort(() => Math.random() - 0.5);
-    shuffleArray(distractorChars);
-    const pool = cardChars.concat(distractorChars.slice(0, 3));
+    shuffleArray(distractorTokens);
+    
+    const pool = correctQuestSequence.concat(distractorTokens.slice(0, 3));
     shuffleArray(pool);
     
     let poolHtml = '';
-    pool.forEach((char, idx) => {
+    pool.forEach((wordToken, idx) => {
       poolHtml += `
         <button class="btn btn-secondary quest-word-card" 
                 id="quest-word-${idx}" 
-                onclick="window.selectQuestWord('${char}', 'quest-word-${idx}')" 
-                style="font-size: 1.5rem; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); cursor: pointer;">
-          ${char}
+                onclick="window.selectQuestWord('${wordToken}', 'quest-word-${idx}')" 
+                style="font-size: 1.35rem; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); cursor: pointer; margin: 0.25rem;">
+          ${wordToken}
         </button>
       `;
     });

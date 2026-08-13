@@ -109,10 +109,12 @@ export class ChallengeSelector {
   /**
    * STAGE 2 (Phonology A): Tone Identification (Supports Multi-Character Words)
    */
+  /**
+   * STAGE 2 (Phonology A): Tone Identification (Supports 1, 2, 3, 4+ Character Words Dynamically)
+   */
   createToneChallenge(card, lang = 'en') {
     const chars = Array.from(card.character || '');
-    const syllables = (card.pinyin || '').trim().split(/\s+/);
-    const toneSequence = syllables.map(syl => String(this.extractToneNumber(syl)));
+    const toneSequence = this.extractTonesFromPinyin(card.pinyin || '', chars.length);
     const answer = toneSequence.join('-');
 
     return {
@@ -127,98 +129,30 @@ export class ChallengeSelector {
   }
 
   /**
-   * STAGE 2 (Phonology B): Pinyin Bubble Bank challenge
+   * Extracts an array of tone strings matching the character count for spaced or unspaced pinyin
    */
-  createPinyinChallenge(card, lang = 'en') {
-    const rawSyllables = (card.pinyin || '').trim().split(/\s+/);
-    const targetSyllables = rawSyllables.map(s => this.stripToneMarkers(s).toLowerCase()).filter(Boolean);
-    const cleanAnswer = targetSyllables.join('');
+  extractTonesFromPinyin(pinyinStr, charCount = 1) {
+    if (!pinyinStr) return Array(charCount).fill('5');
 
-    const distractorPinyins = this.getDistractors(card, 'pinyin', 6);
-    const distractorSyllables = [];
-    distractorPinyins.forEach(p => {
-      (p || '').trim().split(/\s+/).forEach(s => {
-        const clean = this.stripToneMarkers(s).toLowerCase();
-        if (clean && !targetSyllables.includes(clean)) {
-          distractorSyllables.push(clean);
-        }
-      });
-    });
-
-    const poolFallbacks = ['ma', 'wo', 'men', 'shi', 'hao', 'xian', 'le', 'de'];
-    while (distractorSyllables.length < 4) {
-      const f = poolFallbacks[distractorSyllables.length % poolFallbacks.length];
-      if (!targetSyllables.includes(f) && !distractorSyllables.includes(f)) {
-        distractorSyllables.push(f);
-      }
+    // 1. Split by space first if space-separated
+    const parts = pinyinStr.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === charCount) {
+      return parts.map(s => String(this.extractToneNumber(s)));
     }
 
-    const bankSyllables = this.shuffle([...targetSyllables, ...distractorSyllables.slice(0, 4)]);
+    // 2. Parse unspaced multi-syllable pinyin using standard Pinyin syllable regex
+    const SYLLABLE_REGEX = /(?:[b-df-hj-np-rt-z]|zh|ch|sh)?[aeiouüvāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜv]+(?:ng?|r)?/gi;
+    const matches = pinyinStr.match(SYLLABLE_REGEX) || [];
 
-    return {
-      type: 'PINYIN_BUBBLE',
-      prompt: lang === 'th' ? 'เลือกฟองพินอินเพื่อประสมคำที่ถูกต้อง:' : 'Assemble the pinyin bubbles in the correct order:',
-      question: card.character,
-      targetSyllables,
-      bankSyllables,
-      answer: cleanAnswer,
-      hint: lang === 'th' 
-        ? `คำใบ้วรรณยุกต์: ${card.pinyin} | ความหมาย: ${card.meaning}`
-        : `Tonal Hint: ${card.pinyin} | Meaning: ${card.meaning}`
-    };
-  }
-
-  /**
-   * STAGE 3: Meaning -> Hanzi is shown, pick correct translation
-   */
-  createTranslationChallenge(card, meaning, lang = 'en') {
-    const correctOption = meaning;
-    const distractors = this.getDistractors(card, 'meaning', 3);
-
-    // Fallbacks
-    while (distractors.length < 3) {
-      const fallbacks = lang === 'th'
-        ? ['เรียน; ศึกษา', 'สวัสดี; ทักทาย', 'น้ำ; แม่น้ำ', 'ลาก่อน; พบกันใหม่']
-        : ['to learn; study', 'hello; greetings', 'water; river', 'goodbye; see again'];
-      distractors.push(fallbacks[distractors.length % fallbacks.length]);
+    if (matches.length > 0) {
+      const tones = matches.map(s => String(this.extractToneNumber(s)));
+      if (tones.length === charCount) return tones;
+      if (tones.length > charCount) return tones.slice(0, charCount);
+      while (tones.length < charCount) tones.push('5');
+      return tones;
     }
 
-    const options = this.shuffle(distractors.slice(0, 3).concat([correctOption]));
-
-    return {
-      type: 'TRANSLATION',
-      prompt: lang === 'th' ? 'เลือกความหมายที่ถูกต้องของคำนี้:' : 'Choose the correct meaning of this word:',
-      question: card.character,
-      options,
-      answer: correctOption,
-      hint: lang === 'th' ? `พินอิน: ${card.pinyin}` : `Pinyin: ${card.pinyin}`
-    };
-  }
-
-  /**
-   * STAGE 4: Context -> Fill-in-the-blank sentence completion
-   */
-  createContextChallenge(card, exampleTranslation, lang = 'en') {
-    const sentence = card.exampleCn || card.example_sentence || '我今天很___。';
-    const masked = sentence.replace(new RegExp(card.character, 'g'), ' ____ ');
-
-    const correctOption = card.character;
-    const distractors = this.getDistractors(card, 'character', 3);
-
-    while (distractors.length < 3) {
-      distractors.push('是', '不', '吗');
-    }
-
-    const options = this.shuffle(distractors.concat([correctOption]));
-
-    return {
-      type: 'CONTEXT',
-      prompt: lang === 'th' ? 'เติมคำในประโยคให้ถูกต้อง:' : 'Complete the sentence with the correct word:',
-      question: masked,
-      options,
-      answer: correctOption,
-      hint: lang === 'th' ? `คำแปล: ${exampleTranslation}` : `Translation: ${exampleTranslation}`
-    };
+    return Array(charCount).fill('5');
   }
 
   /**
@@ -243,7 +177,7 @@ export class ChallengeSelector {
       'ā': 1, 'ē': 1, 'ī': 1, 'ō': 1, 'ū': 1, 'ǖ': 1,
       'á': 2, 'é': 2, 'í': 2, 'ó': 2, 'ú': 2, 'ǘ': 2,
       'ǎ': 3, 'ě': 3, 'ǐ': 3, 'ǒ': 3, 'ǔ': 3, 'ǚ': 3,
-      'à': 4, 'è': 4, 'í': 4, 'ò': 4, 'ù': 4, 'ǜ': 4
+      'à': 4, 'è': 4, 'ì': 4, 'ò': 4, 'ù': 4, 'ǜ': 4
     };
 
     for (const char of pinyin) {
