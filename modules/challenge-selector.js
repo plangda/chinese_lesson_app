@@ -107,50 +107,61 @@ export class ChallengeSelector {
   }
 
   /**
-   * STAGE 2 (Phonology A): Tone Identification
+   * STAGE 2 (Phonology A): Tone Identification (Supports Multi-Character Words)
    */
   createToneChallenge(card, lang = 'en') {
-    const toneNum = this.extractToneNumber(card.pinyin);
-    const toneLabels = lang === 'th' ? {
-      '1': 'เสียงที่ 1 (สูง, ระดับ - ā)',
-      '2': 'เสียงที่ 2 (จัตวา/ระดับกลางขึ้น - á)',
-      '3': 'เสียงที่ 3 (เอก/ระดับต่ำ - ǎ)',
-      '4': 'เสียงที่ 4 (โท/ระดับสูงลง - à)',
-      '5': 'เสียงเบา (สั้น, เบา - a)'
-    } : {
-      '1': '1st Tone (High, Level - ā)',
-      '2': '2nd Tone (Rising - á)',
-      '3': '3rd Tone (Low, Dipping - ǎ)',
-      '4': '4th Tone (Falling - à)',
-      '5': 'Neutral Tone (Light, Short - a)'
-    };
-
-    const options = ['1', '2', '3', '4', '5'].map(t => ({
-      value: t,
-      label: toneLabels[t]
-    }));
+    const chars = Array.from(card.character || '');
+    const syllables = (card.pinyin || '').trim().split(/\s+/);
+    const toneSequence = syllables.map(syl => String(this.extractToneNumber(syl)));
+    const answer = toneSequence.join('-');
 
     return {
       type: 'TONE_ID',
-      prompt: lang === 'th' ? 'ระบุเสียงวรรณยุกต์ที่ถูกต้องสำหรับตัวอักษรนี้:' : 'Identify the correct tone for this character:',
+      prompt: lang === 'th' ? 'เลือกเสียงวรรณยุกต์ที่ถูกต้องสำหรับแต่ละอักษร:' : 'Identify the correct tone for each character:',
       question: card.character,
-      options,
-      answer: String(toneNum),
+      chars,
+      toneSequence,
+      answer,
       hint: lang === 'th' ? `ความหมาย: ${card.meaning}` : `Meaning: ${card.meaning}`
     };
   }
 
   /**
-   * STAGE 2 (Phonology B): Pinyin Input challenge
+   * STAGE 2 (Phonology B): Pinyin Bubble Bank challenge
    */
   createPinyinChallenge(card, lang = 'en') {
-    const cleanPinyin = this.stripToneMarkers(card.pinyin).toLowerCase().replace(/\s/g, '');
+    const rawSyllables = (card.pinyin || '').trim().split(/\s+/);
+    const targetSyllables = rawSyllables.map(s => this.stripToneMarkers(s).toLowerCase()).filter(Boolean);
+    const cleanAnswer = targetSyllables.join('');
+
+    const distractorPinyins = this.getDistractors(card, 'pinyin', 6);
+    const distractorSyllables = [];
+    distractorPinyins.forEach(p => {
+      (p || '').trim().split(/\s+/).forEach(s => {
+        const clean = this.stripToneMarkers(s).toLowerCase();
+        if (clean && !targetSyllables.includes(clean)) {
+          distractorSyllables.push(clean);
+        }
+      });
+    });
+
+    const poolFallbacks = ['ma', 'wo', 'men', 'shi', 'hao', 'xian', 'le', 'de'];
+    while (distractorSyllables.length < 4) {
+      const f = poolFallbacks[distractorSyllables.length % poolFallbacks.length];
+      if (!targetSyllables.includes(f) && !distractorSyllables.includes(f)) {
+        distractorSyllables.push(f);
+      }
+    }
+
+    const bankSyllables = this.shuffle([...targetSyllables, ...distractorSyllables.slice(0, 4)]);
 
     return {
-      type: 'PINYIN_INPUT',
-      prompt: lang === 'th' ? 'พิมพ์พินอินที่ถูกต้อง (ไม่มีเครื่องหมายวรรณยุกต์หรือเว้นวรรค):' : 'Type the correct Pinyin (no tone markers or spaces):',
+      type: 'PINYIN_BUBBLE',
+      prompt: lang === 'th' ? 'เลือกฟองพินอินเพื่อประสมคำที่ถูกต้อง:' : 'Assemble the pinyin bubbles in the correct order:',
       question: card.character,
-      answer: cleanPinyin,
+      targetSyllables,
+      bankSyllables,
+      answer: cleanAnswer,
       hint: lang === 'th' 
         ? `คำใบ้วรรณยุกต์: ${card.pinyin} | ความหมาย: ${card.meaning}`
         : `Tonal Hint: ${card.pinyin} | Meaning: ${card.meaning}`
@@ -214,9 +225,12 @@ export class ChallengeSelector {
    * Cleans pinyin string of diacritics
    */
   stripToneMarkers(pinyin) {
+    if (!pinyin) return '';
     return pinyin
+      .split('|')[0]
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z]/g, '')
       .replace(/ü/g, 'v'); // standard pinyin typing convention
   }
 

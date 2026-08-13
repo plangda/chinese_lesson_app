@@ -226,6 +226,12 @@ async function main() {
     }
     
     console.log(`Successfully processed lessons. Imported/updated ${count} lessons.`);
+    
+    // Run the automated radical formula generator
+    console.log("Triggering auto-generation of Radical Fusion Formulas...");
+    const automateRadicals = require('./setup_radical_fusion_auto');
+    await automateRadicals();
+    console.log("Database update completely finished!");
 }
 
 main().catch(console.error);

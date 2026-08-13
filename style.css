@@ -1,5 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
 
+html {
+  font-size: 16px;
+}
+@media (max-width: 1024px) {
+  html {
+    font-size: 15px;
+  }
+}
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+@media (max-width: 480px) {
+  html {
+    font-size: 12px;
+  }
+}
+
 :root {
   /* Kid-Friendly Light Mode Palette */
   --bg-gradient: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%);
@@ -81,7 +100,10 @@ header {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--glass-border);
-  background: var(--glass-bg);
+  background: rgba(224, 247, 250, 0.92); /* Themed high-opacity cyan-glass */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -155,8 +177,9 @@ main {
 /* Dashboard View */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2.2fr 1fr;
   gap: 2rem;
+  align-items: start;
 }
 
 @media (max-width: 900px) {
@@ -322,7 +345,8 @@ main {
 
 .btn-accent {
   background: var(--accent);
-  color: var(--bg-darker);
+  color: var(--text-primary);
+  font-weight: bold;
   box-shadow: 0 4px 14px var(--accent-glow);
 }
 
@@ -1521,5 +1545,374 @@ main {
     overflow-y: auto;
     padding-right: 4px;
     scrollbar-width: thin;
+  }
+}
+
+/* ================================================
+   Vocab Garden Review Gamification (Priority 2)
+   ================================================ */
+@keyframes waterRipple {
+  0% { transform: scale(0.2); opacity: 0.8; }
+  50% { opacity: 0.35; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.water-splash-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(46, 196, 182, 0.35) 0%, rgba(0, 180, 216, 0.1) 70%, transparent 100%);
+  pointer-events: none;
+  animation: waterRipple 0.8s ease-out forwards;
+  border-radius: 16px;
+  z-index: 10;
+}
+
+@keyframes plantGrow {
+  0% { transform: scale(0.5) rotate(-10deg); opacity: 0.5; }
+  50% { transform: scale(1.4) rotate(10deg); }
+  75% { transform: scale(0.9) rotate(-5deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.plant-grow-active {
+  animation: plantGrow 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes plantWilt {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px) rotate(-8deg); }
+  40%, 80% { transform: translateX(8px) rotate(8deg); }
+}
+
+.plant-wilt-active {
+  animation: plantWilt 0.6s ease-in-out forwards;
+}
+
+/* Priority 4: Radical Fusion Visual Alchemy Animation */
+@keyframes alchemyGlow {
+  0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(0, 245, 212, 0.4)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 25px rgba(0, 245, 212, 0.9)); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(0, 245, 212, 0.4)); }
+}
+
+.alchemy-fuse-active {
+  animation: alchemyGlow 0.8s ease-in-out infinite;
+}
+
+/* ==========================================
+   APP STORE NATIVE COMPLIANCE & GLOBAL FIXES
+   ========================================== */
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Touch Targets & Anti-Web-Feel for buttons and interactive items */
+button, 
+.btn, 
+.quest-word-card, 
+.fusion-component-btn, 
+.tab-btn,
+.nav-btn,
+.manual-level-btn,
+.stage-card,
+.vocab-card,
+.radical-anchor-btn {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Allow selection only for definitions/explanations to keep it functional */
+.vocab-details-container,
+.lesson-card,
+.grammar-card,
+.dialogue-bubble,
+.selectable-text {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Safe Area Insets Propagation */
+header {
+  padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
+}
+
+main {
+  padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px));
+}
+
+/* ==========================================
+   RADICAL FUSION LAB RESPONSIVE SYSTEM
+   ========================================== */
+
+/* Universal Layout Container */
+.lab-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 2rem);
+  text-align: center;
+}
+
+/* Lab Header Area */
+.lab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 1rem;
+}
+
+.lab-header-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+  color: var(--text-primary);
+}
+
+.header-spacer {
+  width: 80px;
+}
+
+/* Horizontal Swiping Radical Tabs (Mobile First) */
+.tabs-scroll-container {
+  display: flex;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: flex-start;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+.tabs-scroll-container::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.radical-anchor-btn {
+  white-space: nowrap;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  flex-shrink: 0;
+  transition: var(--transition-smooth);
+}
+
+.radical-anchor-btn.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #e0e0e0 !important;
+  color: #9e9e9e !important;
+  border: 1px dashed #bdbdbd !important;
+}
+
+/* Active Anchor Hero Card Layout */
+.active-anchor-hero-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  margin-bottom: 2rem;
+  background: rgba(0, 245, 212, 0.05);
+  border-left: 4px solid var(--primary);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.hero-left {
+  text-align: left;
+}
+
+.hero-subtitle {
+  font-size: 0.9rem;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.25rem;
+}
+
+.hero-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  color: var(--text-primary);
+}
+
+.hero-right {
+  text-align: right;
+  min-width: min(200px, 100%);
+  flex: 1;
+  max-width: 300px;
+}
+
+.hero-progress-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* Component buttons pool */
+.components-grid-title {
+  margin-bottom: 1rem;
+  text-align: left;
+  font-family: var(--font-serif);
+  font-size: clamp(0.95rem, 3vw, 1.1rem);
+  color: var(--text-secondary);
+}
+
+.fusion-pool-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(0.5rem, 2vw, 0.75rem);
+  justify-content: flex-start;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: rgba(0,0,0,0.15);
+  border-radius: 12px;
+  min-height: 100px;
+  margin-bottom: 2rem;
+}
+
+.fusion-component-btn {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  width: clamp(50px, 12vw, 60px) !important;
+  height: clamp(50px, 12vw, 60px) !important;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  position: relative;
+  transition: var(--transition-smooth);
+}
+
+.fusion-component-btn.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #e0e0e0 !important;
+  color: #9e9e9e !important;
+  border: 1px dashed #bdbdbd !important;
+}
+
+.fusion-discovery-sparkle {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 0.8rem;
+  background: var(--bg-dark);
+  border-radius: 50%;
+  padding: 2px;
+}
+
+/* Alchemy Discovery Overlay Card */
+.fusion-result-container {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.fusion-success-card {
+  padding: clamp(1rem, 3vw, 1.5rem);
+  width: 100%;
+  max-width: 500px;
+  border-color: var(--success);
+  background: rgba(46, 196, 182, 0.08);
+  border-radius: 16px;
+  text-align: center;
+  animation: congratsScale 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fusion-canvas-target {
+  margin: 0.75rem auto;
+  width: clamp(120px, 35vw, 160px);
+  height: clamp(120px, 35vw, 160px);
+  border: 1px dashed rgba(0,245,212,0.4);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fusion-success-title {
+  font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+  color: var(--success);
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.fusion-success-pinyin {
+  font-size: clamp(1.1rem, 3vw, 1.25rem);
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.fusion-success-meaning {
+  font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+  color: var(--text-main);
+  margin-bottom: 0.75rem;
+  font-weight: bold;
+}
+
+.fusion-success-deconstruct {
+  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  padding: 0.75rem;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.fusion-success-planted {
+  margin-top: 0.5rem;
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
+  color: var(--success);
+}
+
+/* Responsive Media Queries for Stacking on Mobile Screens */
+@media (max-width: 768px) {
+  .active-anchor-hero-card {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  
+  .hero-left, .hero-right {
+    text-align: center;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  
+  .lab-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .header-spacer {
+    display: none;
+  }
+}
+
+/* Height-restricted (Landscape) overrides */
+@media (max-height: 480px) {
+  .lab-container {
+    padding: 0.5rem;
+  }
+  .lab-header {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+  .active-anchor-hero-card {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+  }
+  .fusion-pool-container {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
   }
 }

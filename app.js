@@ -2,10 +2,10 @@
  * HanPath - Core Application Engine (4-Stage Layout)
  */
 
-import { eventBus } from './modules/event-bus.js';
-import { srsEngine } from './modules/srs-engine.js';
-import { challengeSelector } from './modules/challenge-selector.js';
-import { gardenRenderer } from './modules/garden.js';
+import { eventBus } from './modules/event-bus.js?v=2';
+import { srsEngine } from './modules/srs-engine.js?v=2';
+import { challengeSelector } from './modules/challenge-selector.js?v=3';
+import { gardenRenderer } from './modules/garden.js?v=2';
 
 const state = {
   userLevel: null,
@@ -154,7 +154,7 @@ function loadProgress() {
         const mergedLessons = new Set([...(state.completedLessons || []), ...(serverData.completedLessons || [])]);
         serverData.completedLessons = Array.from(mergedLessons);
         
-        if (!serverData.userLevel && state.userLevel) {
+        if (state.userLevel) {
            serverData.userLevel = state.userLevel;
         }
 
@@ -353,7 +353,7 @@ function switchView(viewId) {
     }
   }
   if (viewId === "seed-fusion-lab-view") {
-    window.initSeedFusionLab();
+    window.initActiveRadicalLab();
   }
   if (viewId === "sentence-quest-view") {
     window.initSentenceQuest();
@@ -449,73 +449,71 @@ function setupEventListeners() {
     });
   }
 
+  const bindClick = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+  const bindChange = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('change', fn); };
+
   // Pre-test triggers
-  document.getElementById("start-pretest-btn").addEventListener("click", () => {
+  bindClick("start-pretest-btn", () => {
     switchView("pretest-view");
     initPretest();
   });
   
-  document.getElementById("begin-test-now-btn").addEventListener("click", () => {
-    document.getElementById("pretest-intro-screen").classList.add('hidden');
-    document.getElementById("pretest-quiz-screen").classList.remove('hidden');
+  bindClick("begin-test-now-btn", () => {
+    const intro = document.getElementById("pretest-intro-screen");
+    const quiz = document.getElementById("pretest-quiz-screen");
+    if (intro) intro.classList.add('hidden');
+    if (quiz) quiz.classList.remove('hidden');
     loadPretestQuestion();
   });
 
-  document.getElementById("skip-pretest-btn").addEventListener("click", () => {
+  bindClick("skip-pretest-btn", () => {
     state.hasTakenPlacementTest = true;
     state.userLevel = "hsk1"; // Default level
     saveProgress();
     switchView("dashboard-view");
   });
   
-  document.getElementById("pretest-next-btn").addEventListener("click", nextPretestQuestion);
-  document.getElementById("claim-placement-btn").addEventListener("click", () => {
+  bindClick("pretest-next-btn", nextPretestQuestion);
+  bindClick("claim-placement-btn", () => {
     switchView("dashboard-view");
   });
 
   // Banner pretest trigger
-  const bannerPretestBtn = document.getElementById("banner-pretest-btn");
-  if (bannerPretestBtn) {
-    bannerPretestBtn.addEventListener("click", () => {
-      switchView("pretest-view");
-      initPretest();
-    });
-  }
+  bindClick("banner-pretest-btn", () => {
+    switchView("pretest-view");
+    initPretest();
+  });
 
   // Pinyin Chart triggers
-  const pinyinChartBtn = document.getElementById("pinyin-chart-btn");
-  if (pinyinChartBtn) {
-    pinyinChartBtn.addEventListener("click", () => {
-      switchView("pinyin-chart-view");
-      initPinyinChart();
-    });
-  }
+  bindClick("pinyin-chart-btn", () => {
+    switchView("pinyin-chart-view");
+    initPinyinChart();
+  });
 
-  const pinyinBackBtn = document.getElementById("pinyin-back-btn");
-  if (pinyinBackBtn) {
-    pinyinBackBtn.addEventListener("click", () => {
-      switchView("dashboard-view");
-    });
-  }
+  bindClick("pinyin-back-btn", () => {
+    switchView("dashboard-view");
+  });
 
   // Lesson pretest triggers
-  document.getElementById("begin-lesson-test-btn").addEventListener("click", () => {
-    document.getElementById("lesson-pretest-intro-screen").classList.add('hidden');
-    document.getElementById("lesson-pretest-quiz-screen").classList.remove('hidden');
+  bindClick("begin-lesson-test-btn", () => {
+    const intro = document.getElementById("lesson-pretest-intro-screen");
+    const quiz = document.getElementById("lesson-pretest-quiz-screen");
+    if (intro) intro.classList.add('hidden');
+    if (quiz) quiz.classList.remove('hidden');
     startLessonPretestQuiz();
   });
 
-  document.getElementById("skip-lesson-test-entirely-btn").addEventListener("click", () => {
+  bindClick("skip-lesson-test-entirely-btn", () => {
     startLesson(state.currentLessonId);
   });
 
-  document.getElementById("lesson-pretest-next-btn").addEventListener("click", nextLessonPretestQuestion);
+  bindClick("lesson-pretest-next-btn", nextLessonPretestQuestion);
 
-  document.getElementById("lesson-pretest-start-study-btn").addEventListener("click", () => {
+  bindClick("lesson-pretest-start-study-btn", () => {
     startLesson(state.currentLessonId);
   });
 
-  document.getElementById("lesson-pretest-skip-lesson-btn").addEventListener("click", () => {
+  bindClick("lesson-pretest-skip-lesson-btn", () => {
     if (!state.completedLessons.includes(state.currentLessonId)) {
       state.completedLessons.push(state.currentLessonId);
       state.score += 30; // Bonus points for skipping via pre-test mastery!
@@ -524,12 +522,12 @@ function setupEventListeners() {
     switchView("dashboard-view");
   });
 
-  document.getElementById("lesson-pretest-exit-btn").addEventListener("click", () => {
+  bindClick("lesson-pretest-exit-btn", () => {
     switchView("dashboard-view");
   });
 
   // Reminder configurator
-  document.getElementById("set-reminder-btn").addEventListener("click", setupDailyReminders);
+  bindClick("set-reminder-btn", setupDailyReminders);
 
   // Welcome & Level Select
   document.querySelectorAll('.manual-level-btn').forEach(btn => {
@@ -540,13 +538,13 @@ function setupEventListeners() {
     });
   });
   
-  document.getElementById('change-level-select').addEventListener('change', (e) => {
+  bindChange('change-level-select', (e) => {
     state.userLevel = e.target.value;
     saveProgress();
     fetchCurriculumAndRender(state.userLevel);
   });
   
-  document.getElementById('reset-progress-btn').addEventListener('click', () => {
+  bindClick('reset-progress-btn', () => {
     showConfirmModal("title_confirm", "msg_reset_progress", () => {
       state.userLevel = null;
       state.completedLessons = [];
@@ -557,7 +555,7 @@ function setupEventListeners() {
     });
   });
 
-  document.getElementById('logout-btn').addEventListener('click', () => {
+  bindClick('logout-btn', () => {
     showConfirmModal("title_confirm", "msg_logout", () => {
       localStorage.removeItem("hanpath_token");
       localStorage.removeItem("hanpath_data_v2");
@@ -782,8 +780,17 @@ function renderDashboard() {
   if (todayPanel) {
     if (activeLesson) {
       todayPanel.classList.remove('hidden');
+      const dayNum = activeLesson.day_number || activeLesson.id.replace(/^hsk\d_day/, '');
+      const dayPrefixRaw = t('day_prefix', { day: dayNum });
+      const dayClean = dayPrefixRaw.replace(/:\s*$/, '');
+      
+      const todayDayLabel = document.getElementById('today-lesson-day-label');
+      if (todayDayLabel) {
+        todayDayLabel.textContent = `${dayClean} • ${state.userLevel.toUpperCase()}`;
+      }
+
       const todayTitle = document.getElementById('today-lesson-title');
-      if (todayTitle) todayTitle.textContent = t('day_prefix', { day: activeLesson.day_number || activeLesson.id.replace(/^hsk\d_day/, '') }) + ld(activeLesson, 'title');
+      if (todayTitle) todayTitle.textContent = ld(activeLesson, 'title');
       
       const todayDesc = document.getElementById('today-lesson-desc');
       if (todayDesc) {
@@ -856,25 +863,45 @@ function renderDashboard() {
     const isCompleted = state.completedLessons.includes(l.id);
     const div = document.createElement('div');
     div.className = `lesson-row glass-panel ${isCompleted ? 'completed' : ''}`;
+    div.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 12px; transition: transform 0.2s, background-color 0.2s;";
+    
+    const dayNum = l.day_number || l.id.replace(/^hsk\d_day/, '');
+    const dayLabel = t('day_prefix', { day: dayNum }).replace(/:\s*$/, '');
+    
     div.innerHTML = `
-      <div class="lesson-info">
-        <h4 class="mb-1">${t('day_prefix', { day: l.day_number || l.id.replace(/^hsk\d_day/, '') })}${ld(l, 'title')}</h4>
-        <div class="text-sm text-muted">
-          ${t('lesson_stages_info')}
-        </div>
+      <div class="lesson-info" style="display: flex; flex-direction: column; gap: 0.15rem; text-align: left;">
+        <span style="font-size: 0.7rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+          ${l.id === 'hsk1_day0' ? 'FOUNDATION' : `${dayLabel}`}
+        </span>
+        <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-color);">${ld(l, 'title')}</h4>
       </div>
-      <div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
         ${isCompleted ? 
-          `<button class="btn btn-primary btn-sm start-lesson-btn" data-id="${l.id}">${t('lbl_done')} (Re-learn)</button>` : 
-          `<button class="btn btn-primary btn-sm start-lesson-btn" data-id="${l.id}">${t('btn_start_lesson_short')}</button>`
+          `<span style="color: var(--success); font-size: 1.15rem; font-weight: bold; padding: 0.2rem;" title="Review lesson">✅</span>` : 
+          `<button class="btn btn-primary btn-sm start-lesson-btn" data-id="${l.id}" style="border-radius: 12px; padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: bold; border: none;">${t('btn_start_lesson_short')}</button>`
         }
       </div>
     `;
+    
+    if (isCompleted) {
+      div.style.cursor = 'pointer';
+      div.title = t('review_lesson_tooltip', 'Click to review this lesson');
+      div.addEventListener('click', () => routeToLesson(l.id));
+      
+      div.addEventListener('mouseenter', () => {
+        div.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+      });
+      div.addEventListener('mouseleave', () => {
+        div.style.backgroundColor = '';
+      });
+    }
+    
     container.appendChild(div);
   });
   
   document.querySelectorAll('.start-lesson-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
+      e.stopPropagation();
       const id = e.target.getAttribute('data-id');
       routeToLesson(id);
     });
@@ -985,10 +1012,11 @@ function renderVocabPane() {
       }
       tabsContainer.innerHTML = '';
 
+      const computedWidth = Math.min(200, window.innerWidth * 0.45);
       writer = HanziWriter.create('hanzi-writer-target', v.character.charAt(0), {
-        width: 200,
-        height: 200,
-        padding: 15,
+        width: computedWidth,
+        height: computedWidth,
+        padding: computedWidth * 0.08,
         strokeColor: '#ff3366',
         radicalColor: '#00f5d4',
         delayBetweenStrokes: 150
@@ -2396,7 +2424,7 @@ translateUI();
 
 function showConfirmModal(i18nKeyTitle, i18nKeyMsg, onConfirm) {
   const currentLang = state.currentLanguage || "en";
-  const dict = i18nDictionary[currentLang] || i18nDictionary['en'];
+  const dict = window.i18nDictionary[currentLang] || window.i18nDictionary['en'];
   
   document.getElementById('custom-confirm-title').textContent = dict[i18nKeyTitle] || dict['title_confirm'] || "Confirm";
   document.getElementById('custom-confirm-message').textContent = dict[i18nKeyMsg] || i18nKeyMsg;
@@ -2514,19 +2542,7 @@ async function renderVocabGardenWidget() {
 }
 
 function setupSrsEventListeners() {
-  const exitBtn = document.getElementById('srs-exit-btn');
-  if (exitBtn) {
-    exitBtn.addEventListener('click', () => {
-      if (state.srsXpEarned > 0) {
-        showConfirmModal('early_exit_title', 'early_exit_msg', () => {
-          srsEngine.currentBatch = [];
-          renderSrsCard();
-        });
-      } else {
-        switchView('dashboard-view');
-      }
-    });
-  }
+  // We'll use a globally bound handleEarlyExit function instead to ensure it fires.
 
   // Bind clicked plant events to start a single SRS session for that plant
   eventBus.on('garden:plant-clicked', (plant) => {
@@ -2542,6 +2558,16 @@ function setupSrsEventListeners() {
   });
 }
 
+window.handleEarlyExit = function() {
+  if (state.srsXpEarned > 0) {
+    showConfirmModal('early_exit_title', 'early_exit_msg', () => {
+      srsEngine.currentBatch = [];
+      renderSrsCard(); // This will trigger the summary screen since batch is empty
+    });
+  } else {
+    switchView('dashboard-view');
+  }
+};
 // Keep track of active challenge state
 let currentChallenge = null;
 let challengeAttempts = 0;
@@ -2561,7 +2587,10 @@ async function startSrsSession(mode = 'normal') {
       const gardenData = await res.json();
       // The garden endpoint returns { plants: [...] } — reshape each plant into the card format
       // that the SRS engine expects (same fields as /api/srs/due cards)
-      cards = (gardenData.plants || []).map(p => ({
+      // Limit to 15 to prevent massive review queues
+      const shuffledPlants = (gardenData.plants || []).sort(() => Math.random() - 0.5).slice(0, 15);
+      
+      cards = shuffledPlants.map(p => ({
         srs_id: p.vocab_id,
         vocab_id: p.vocab_id,
         character: p.character,
@@ -2605,6 +2634,105 @@ async function startSrsSession(mode = 'normal') {
 }
 window.startSrsSession = startSrsSession;
 
+// Priority 3: Bubble & Tone Drag/Drop state
+let activePinyinSelection = [];
+let activeToneSelection = [];
+
+window.selectPinyinBubble = function(syllable, bankIdx) {
+  if (!currentChallenge) return;
+  activePinyinSelection.push(syllable);
+  const bankBtn = document.getElementById(`pinyin-bank-btn-${bankIdx}`);
+  if (bankBtn) bankBtn.style.visibility = 'hidden';
+  renderPinyinBubbleSlots();
+};
+
+window.removePinyinBubble = function(slotIdx) {
+  if (slotIdx >= 0 && slotIdx < activePinyinSelection.length) {
+    const removed = activePinyinSelection.splice(slotIdx, 1)[0];
+    const bankBtns = document.querySelectorAll('.pinyin-bank-bubble');
+    bankBtns.forEach(btn => {
+      if (btn.textContent.trim() === removed && btn.style.visibility === 'hidden') {
+        btn.style.visibility = 'visible';
+      }
+    });
+    renderPinyinBubbleSlots();
+  }
+};
+
+function renderPinyinBubbleSlots() {
+  const container = document.getElementById('pinyin-bubble-slots');
+  if (!container || !currentChallenge) return;
+  const numSlots = currentChallenge.targetSyllables ? currentChallenge.targetSyllables.length : 1;
+  let html = '';
+  for (let i = 0; i < numSlots; i++) {
+    const val = activePinyinSelection[i] || '';
+    if (val) {
+      html += `
+        <div onclick="window.removePinyinBubble(${i})" 
+             style="min-width: 65px; padding: 0.6rem 1rem; border-radius: 12px; background: var(--primary); color: #000; font-weight: bold; font-size: 1.25rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,245,212,0.3);">
+          ${val}
+        </div>
+      `;
+    } else {
+      html += `
+        <div style="min-width: 65px; height: 46px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-weight: bold;">
+          ___
+        </div>
+      `;
+    }
+  }
+  container.innerHTML = html;
+}
+
+window.submitBubbleWatering = function() {
+  const userAns = activePinyinSelection.join('');
+  window.checkChallengeAnswer(userAns);
+};
+
+window.selectToneBubble = function(toneNum) {
+  if (!currentChallenge || !currentChallenge.chars) return;
+  const targetLen = currentChallenge.chars.length;
+  if (activeToneSelection.length < targetLen) {
+    activeToneSelection.push(String(toneNum));
+    renderToneSlots();
+  }
+};
+
+window.clearToneSlot = function(slotIdx) {
+  if (slotIdx >= 0 && slotIdx < activeToneSelection.length) {
+    activeToneSelection.splice(slotIdx, 1);
+    renderToneSlots();
+  }
+};
+
+function renderToneSlots() {
+  const container = document.getElementById('tone-character-slots');
+  if (!container || !currentChallenge || !currentChallenge.chars) return;
+
+  const toneLabels = { '1': 'ā (1st)', '2': 'á (2nd)', '3': 'ǎ (3rd)', '4': 'à (4th)', '5': 'a (5th)' };
+
+  let html = '';
+  currentChallenge.chars.forEach((char, idx) => {
+    const toneVal = activeToneSelection[idx] || '';
+    const label = toneVal ? (toneLabels[toneVal] || toneVal) : '?';
+    html += `
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0.4rem;">
+        <div onclick="window.clearToneSlot(${idx})" 
+             style="min-width: 65px; padding: 0.4rem 0.8rem; border-radius: 10px; background: ${toneVal ? 'rgba(46, 196, 182, 0.25)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${toneVal ? 'var(--success)' : 'rgba(255,255,255,0.15)'}; color: ${toneVal ? 'var(--success)' : 'var(--text-muted)'}; font-weight: bold; cursor: pointer; text-align: center;">
+          ${label}
+        </div>
+        <div style="font-size: 2.5rem; font-family: var(--font-serif); color: var(--primary);">${char}</div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+window.submitToneWatering = function() {
+  const userAns = activeToneSelection.join('-');
+  window.checkChallengeAnswer(userAns);
+};
+
 function renderSrsCard() {
   const container = document.getElementById('srs-arena-container');
   if (!container) return;
@@ -2641,28 +2769,83 @@ function renderSrsCard() {
   // Build the challenge HTML
   const stageIcons = { 1: '🌱 Seed (Recognition)', 2: '🌿 Sprout (Phonology)', 3: '🌻 Flower (Meaning)', 4: '🌳 Harvest (Context)' };
   const stageIcon = stageIcons[activeCard.mastery_stage] || '🌱 Seed';
+  const plantState = gardenRenderer ? gardenRenderer.getPlantState(activeCard) : { emoji: '🌱' };
 
   let questionDisplay = '';
   let interactionArea = '';
 
-  if (currentChallenge.type === 'PINYIN_INPUT') {
+  if (currentChallenge.type === 'PINYIN_BUBBLE' || currentChallenge.type === 'PINYIN_INPUT') {
+    activePinyinSelection = [];
     questionDisplay = `
       <div class="active-challenge-question" style="font-size: 4rem; font-family: var(--font-serif); color: var(--primary); margin: 0.5rem 0;">
         ${currentChallenge.question}
       </div>
     `;
+
+    let bankHtml = '';
+    const bankList = currentChallenge.bankSyllables || [currentChallenge.answer];
+    bankList.forEach((syl, bIdx) => {
+      bankHtml += `
+        <button id="pinyin-bank-btn-${bIdx}" class="btn btn-secondary pinyin-bank-bubble" 
+                onclick="window.selectPinyinBubble('${syl}', ${bIdx})" 
+                style="padding: 0.6rem 1.2rem; font-size: 1.2rem; font-weight: bold; border-radius: 20px; background: rgba(255,255,255,0.05);">
+          ${syl}
+        </button>
+      `;
+    });
+
     interactionArea = `
-      <div style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 0.75rem;">
-        <input type="text" id="srs-pinyin-input" class="glass-panel" 
-               style="width: 100%; padding: 0.75rem 1rem; border-radius: 12px; text-align: center; font-size: 1.25rem; color: #fff; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15);" 
-               placeholder="Type pinyin without tones..." autocomplete="off" />
-        <button class="btn btn-primary" onclick="window.submitPinyinChallengeAnswer()" style="padding: 0.75rem;">Submit Answer</button>
+      <div style="width: 100%; max-width: 480px; display: flex; flex-direction: column; align-items: center; gap: 1.25rem;">
+        <div id="pinyin-bubble-slots" style="display: flex; gap: 0.75rem; justify-content: center; min-height: 50px; flex-wrap: wrap;">
+          <!-- Filled dynamically by renderPinyinBubbleSlots -->
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center;">
+          ${bankHtml}
+        </div>
+        <button class="btn btn-primary" onclick="window.submitBubbleWatering()" style="padding: 0.75rem 2.5rem; margin-top: 0.5rem;">
+          ${t('btn_water_srs') || '💦 Water'}
+        </button>
+      </div>
+    `;
+  } else if (currentChallenge.type === 'TONE_ID' && currentChallenge.chars) {
+    activeToneSelection = [];
+    questionDisplay = ``; // Integrated into character slots below
+
+    let toneBankHtml = '';
+    const toneOpts = [
+      { val: '1', lbl: '1st (ā)' },
+      { val: '2', lbl: '2nd (á)' },
+      { val: '3', lbl: '3rd (ǎ)' },
+      { val: '4', lbl: '4th (à)' },
+      { val: '5', lbl: '5th (a)' }
+    ];
+
+    toneOpts.forEach(t => {
+      toneBankHtml += `
+        <button class="btn btn-secondary challenge-opt-btn" 
+                onclick="window.selectToneBubble('${t.val}')" 
+                style="padding: 0.6rem 0.8rem; font-weight: bold; border-radius: 12px;">
+          ${t.lbl}
+        </button>
+      `;
+    });
+
+    interactionArea = `
+      <div style="width: 100%; max-width: 500px; display: flex; flex-direction: column; align-items: center; gap: 1.5rem;">
+        <div id="tone-character-slots" style="display: flex; gap: 1.5rem; justify-content: center; margin: 1rem 0; flex-wrap: wrap;">
+          <!-- Rendered dynamically by renderToneSlots -->
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; width: 100%;">
+          ${toneBankHtml}
+        </div>
+        <button class="btn btn-primary" onclick="window.submitToneWatering()" style="padding: 0.75rem 2.5rem; margin-top: 0.5rem;">
+          ${t('btn_water_srs') || '💦 Water'}
+        </button>
       </div>
     `;
   } else {
-    // Multiple Choice Challenge (RECOGNITION, TONE_ID, TRANSLATION, CONTEXT)
+    // Multiple Choice Challenge (RECOGNITION, TRANSLATION, CONTEXT)
     const isContext = currentChallenge.type === 'CONTEXT';
-    const isTone = currentChallenge.type === 'TONE_ID';
     
     questionDisplay = `
       <div class="active-challenge-question" style="font-size: ${isContext ? '1.5rem' : '4.25rem'}; font-family: ${isContext ? 'inherit' : 'var(--font-serif)'}; color: var(--primary); margin: 0.5rem 0; font-weight: ${isContext ? 'bold' : 'normal'}; line-height: 1.4;">
@@ -2670,7 +2853,7 @@ function renderSrsCard() {
       </div>
     `;
 
-    let buttonHtml = `<div class="active-challenge-options" style="display: grid; grid-template-columns: ${isTone ? 'repeat(5, 1fr)' : 'repeat(2, 1fr)'}; gap: 0.75rem; width: 100%; max-width: 500px; margin-top: 1rem;">`;
+    let buttonHtml = `<div class="active-challenge-options" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; width: 100%; max-width: 500px; margin-top: 1rem;">`;
     
     currentChallenge.options.forEach(opt => {
       const optVal = typeof opt === 'object' ? opt.value : opt;
@@ -2688,9 +2871,12 @@ function renderSrsCard() {
   }
 
   container.innerHTML = `
-    <div style="margin-bottom: 0.5rem;">
+    <div style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
       <span class="tag" style="background: rgba(46, 196, 182, 0.15); color: var(--success); border: none; font-size: 0.85rem; font-weight: bold;">
         ${stageIcon}
+      </span>
+      <span id="srs-plant-badge" style="font-size: 1.6rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); transition: transform 0.3s ease;">
+        ${plantState.emoji}
       </span>
     </div>
     
@@ -2712,17 +2898,10 @@ function renderSrsCard() {
     </div>
   `;
 
-  // Focus input if pinyin input challenge
-  if (currentChallenge.type === 'PINYIN_INPUT') {
-    const input = document.getElementById('srs-pinyin-input');
-    if (input) {
-      input.focus();
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          window.submitPinyinChallengeAnswer();
-        }
-      });
-    }
+  if (currentChallenge.type === 'PINYIN_BUBBLE' || currentChallenge.type === 'PINYIN_INPUT') {
+    renderPinyinBubbleSlots();
+  } else if (currentChallenge.type === 'TONE_ID' && currentChallenge.chars) {
+    renderToneSlots();
   }
 }
 window.renderSrsCard = renderSrsCard;
@@ -2760,9 +2939,26 @@ window.checkChallengeAnswer = async function(userAnswer) {
   const input = document.getElementById('srs-pinyin-input');
   if (input) input.disabled = true;
 
+  const plantBadge = document.getElementById('srs-plant-badge');
+  const cardContainer = document.getElementById('srs-arena-container');
+
   if (isCorrect) {
     feedback.innerHTML = `<span style="color: var(--success);">✅ Correct! Excellent job.</span>`;
     
+    // Trigger water splash ripple overlay on card
+    if (cardContainer) {
+      const splash = document.createElement('div');
+      splash.className = 'water-splash-overlay';
+      cardContainer.style.position = 'relative';
+      cardContainer.appendChild(splash);
+      setTimeout(() => splash.remove(), 850);
+    }
+
+    // Trigger plant grow bounce animation
+    if (plantBadge) {
+      plantBadge.classList.add('plant-grow-active');
+    }
+
     // Highlight correct button
     buttons.forEach(b => {
       const onclickAttr = b.getAttribute('onclick');
@@ -2779,6 +2975,11 @@ window.checkChallengeAnswer = async function(userAnswer) {
   } else {
     feedback.innerHTML = `<span style="color: var(--danger);">❌ Try again! Correct answer was: ${currentChallenge.answer}</span>`;
     
+    // Trigger plant wilt shake animation
+    if (plantBadge) {
+      plantBadge.classList.add('plant-wilt-active');
+    }
+
     // Highlight incorrect button
     buttons.forEach(b => {
       const onclickAttr = b.getAttribute('onclick');
@@ -2849,146 +3050,227 @@ async function plantLessonSrs(lessonId) {
 window.plantLessonSrs = plantLessonSrs;
 
 // ==========================================
-// 🧪 SEED FUSION LAB GAME LOGIC
+// 🧪 ACTIVE RADICAL DISCOVERY LAB LOGIC
 // ==========================================
-let fusionSlot1 = null;
-let fusionSlot2 = null;
+let activeAnchor = null;
 
-window.initSeedFusionLab = async function() {
+window.initActiveRadicalLab = async function() {
   try {
     const token = localStorage.getItem("hanpath_token");
-    const poolRes = await fetch('/api/srs/fusion-pool', {
+    const res = await fetch('/api/srs/fusion/anchors', {
       headers: { "Authorization": "Bearer " + token }
     });
-    if (!poolRes.ok) return;
-    const poolData = await poolRes.json();
-    const fuseableChars = poolData.chars || [];
-
-    // Clear slots
-    fusionSlot1 = null;
-    fusionSlot2 = null;
-    window.updateFusionSlotsUI();
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("Anchors fetch failed:", res.status, errText);
+      document.getElementById('radical-tabs-container').innerHTML = `<div style="color: #ff4757; font-weight: bold; padding: 1rem;">Failed to load anchors. Please check console for details. ${res.status}: ${res.statusText}</div>`;
+      return;
+    }
+    const data = await res.json();
+    const anchors = data.anchors || [];
     
-    const poolContainer = document.getElementById('fusion-seed-pool');
-    if (!poolContainer) return;
+    const tabsContainer = document.getElementById('radical-tabs-container');
+    if (!tabsContainer) return;
     
-    if (fuseableChars.length === 0) {
-      poolContainer.innerHTML = `<div style="color: var(--text-secondary); width: 100%; text-align: center; padding: 1.5rem;">No fuseable characters found in the database.</div>`;
+    // Clear state
+    activeAnchor = null;
+    document.getElementById('fusion-result-area').style.display = 'none';
+    document.getElementById('fusion-seed-pool').innerHTML = '';
+    
+    if (anchors.length === 0) {
+      tabsContainer.innerHTML = `<div style="color: var(--text-secondary);">No anchors available yet.</div>`;
       return;
     }
     
-    // Limit to 40 tiles for readability
-    const displayChars = fuseableChars.slice(0, 40);
     let html = '';
-    displayChars.forEach(char => {
-      html += `
-        <button class="btn btn-secondary seed-pool-card" 
-                onclick="window.selectFusionSeed('${char}')" 
-                style="font-size: 1.5rem; width: 60px; height: 60px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);">
-          ${char}
-        </button>
-      `;
+    let firstEligibleAnchor = null;
+    
+    anchors.forEach((a, i) => {
+      const localizedName = state.currentLanguage === 'th' ? (a.name_th || a.name_en) : a.name_en;
+      
+      if (a.user_learned > 0) {
+        if (!firstEligibleAnchor) firstEligibleAnchor = a;
+        html += `
+          <button class="btn btn-secondary radical-anchor-btn" 
+                  id="anchor-tab-${a.id}"
+                  onclick="window.selectRadicalAnchor('${a.id}', '${a.symbol}', '${localizedName}', ${a.total_discoveries}, ${a.user_discovered})">
+            ${a.icon} ${a.symbol} ${localizedName}
+          </button>
+        `;
+      } else {
+        html += `
+          <button class="btn btn-secondary radical-anchor-btn locked" 
+                  disabled
+                  title="Unlock words with this radical by completing more lessons!">
+            🔒 ❓ ${localizedName}
+          </button>
+        `;
+      }
     });
-    poolContainer.innerHTML = html;
-    document.getElementById('fusion-result-area').innerHTML = '';
+    tabsContainer.innerHTML = html;
+    
+    // Select first eligible anchor by default, or clear if none
+    if (firstEligibleAnchor) {
+      const firstLocalName = state.currentLanguage === 'th' ? (firstEligibleAnchor.name_th || firstEligibleAnchor.name_en) : firstEligibleAnchor.name_en;
+      window.selectRadicalAnchor(firstEligibleAnchor.id, firstEligibleAnchor.symbol, firstLocalName, firstEligibleAnchor.total_discoveries, firstEligibleAnchor.user_discovered);
+    } else {
+      document.getElementById('hero-anchor-name').innerText = `Keep learning to unlock!`;
+      document.getElementById('hero-anchor-progress-text').innerText = `Progress: 0 / 0 Discovered`;
+      document.getElementById('fusion-seed-pool').innerHTML = `<div style="padding: 1rem; color: var(--text-secondary);">No active radicals available yet. Complete more lessons to unlock components!</div>`;
+    }
+    
   } catch (err) {
-    console.error("Failed to initialize Seed Fusion Lab:", err);
+    console.error("Failed to initialize Radical Discovery Lab:", err);
   }
 };
 
-window.selectFusionSeed = function(char) {
-  if (!fusionSlot1) {
-    fusionSlot1 = char;
-  } else if (!fusionSlot2) {
-    fusionSlot2 = char;
-  } else {
-    // Both full - shift slot 2 to slot 1 and insert in slot 2
-    fusionSlot1 = fusionSlot2;
-    fusionSlot2 = char;
+window.selectRadicalAnchor = async function(id, symbol, name, total, userDiscovered) {
+  activeAnchor = id;
+  document.getElementById('fusion-result-area').style.display = 'none';
+  
+  // Highlight active tab
+  document.querySelectorAll('#radical-tabs-container .btn').forEach(btn => {
+    btn.classList.remove('btn-accent');
+    btn.classList.add('btn-secondary');
+  });
+  const activeTab = document.getElementById(`anchor-tab-${id}`);
+  if (activeTab) {
+    activeTab.classList.remove('btn-secondary');
+    activeTab.classList.add('btn-accent');
   }
-  window.updateFusionSlotsUI();
+  
+  // Update Hero Card
+  document.getElementById('hero-anchor-name').innerText = `${symbol} — ${name}`;
+  document.getElementById('hero-anchor-progress-text').innerText = `Progress: ${userDiscovered} / ${total} Discovered`;
+  const pct = total > 0 ? Math.round((userDiscovered / total) * 100) : 0;
+  document.getElementById('hero-anchor-progress-fill').style.width = `${pct}%`;
+  
+  // Fetch components
+  try {
+    const token = localStorage.getItem("hanpath_token");
+    const levelStr = state.userLevel || 'hsk1';
+    const res = await fetch(`/api/srs/fusion/components?anchor=${encodeURIComponent(id)}&level=${levelStr}`, {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error("Components fetch failed:", res.status, errText);
+      document.getElementById('fusion-seed-pool').innerHTML = `<div style="color: #ff4757; font-weight: bold; padding: 1rem;">Failed to load components. ${res.status}: ${res.statusText}</div>`;
+      return;
+    }
+    const data = await res.json();
+    const components = data.components || [];
+    
+    const pool = document.getElementById('fusion-seed-pool');
+    let html = '';
+    components.forEach(c => {
+      const isDisc = c.discovered === 1;
+      const hasLearned = c.has_learned === 1;
+      
+      if (hasLearned) {
+        html += `
+          <button class="btn ${isDisc ? 'btn-secondary' : 'btn-accent'} fusion-component-btn" 
+                  onclick="window.fuseComponent(${c.formula_id})">
+            ${c.symbol}
+            ${isDisc ? '<div class="fusion-discovery-sparkle">✨</div>' : ''}
+          </button>
+        `;
+      } else {
+        html += `
+          <button class="btn btn-secondary fusion-component-btn locked" 
+                  disabled
+                  title="Keep playing lessons to unlock this mystery component!">
+            ❓
+          </button>
+        `;
+      }
+    });
+    pool.innerHTML = html;
+  } catch (err) {
+    console.error("Failed to load components:", err);
+  }
 };
 
-window.clearFusionSlot = function(slotNum) {
-  if (slotNum === 1) fusionSlot1 = null;
-  if (slotNum === 2) fusionSlot2 = null;
-  window.updateFusionSlotsUI();
-};
-
-window.updateFusionSlotsUI = function() {
-  const s1 = document.getElementById('fusion-slot-1');
-  const s2 = document.getElementById('fusion-slot-2');
-  if (s1) {
-    s1.innerHTML = fusionSlot1 ? `<span style="font-weight: bold; color: #fff;">${fusionSlot1}</span>` : '➕';
-    s1.style.borderColor = fusionSlot1 ? 'var(--primary)' : 'rgba(255,255,255,0.15)';
-  }
-  if (s2) {
-    s2.innerHTML = fusionSlot2 ? `<span style="font-weight: bold; color: #fff;">${fusionSlot2}</span>` : '➕';
-    s2.style.borderColor = fusionSlot2 ? 'var(--primary)' : 'rgba(255,255,255,0.15)';
-  }
-};
-
-window.triggerSeedFusion = async function() {
+window.fuseComponent = async function(formulaId) {
   const resultArea = document.getElementById('fusion-result-area');
-  if (!resultArea) return;
-  
-  if (!fusionSlot1 || !fusionSlot2) {
-    resultArea.innerHTML = `<span style="color: var(--danger);">⚠️ Select two seeds to fuse!</span>`;
-    return;
-  }
-  
-  resultArea.innerHTML = `<span style="color: var(--accent); animation: pulse 1s infinite;">⚡ Fusing ${fusionSlot1} + ${fusionSlot2}... ⚡</span>`;
+  resultArea.style.display = 'flex';
+  resultArea.innerHTML = `<span style="color: var(--accent); animation: pulse 1s infinite;">⚡ Synthesizing... ⚡</span>`;
   
   try {
     const token = localStorage.getItem("hanpath_token");
-    const res = await fetch('/api/srs/fuse', {
+    const res = await fetch('/api/srs/fusion/combine', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token
       },
-      body: JSON.stringify({ char1: fusionSlot1, char2: fusionSlot2 })
+      body: JSON.stringify({ formula_id: formulaId })
     });
+    
     if (!res.ok) {
-      resultArea.innerHTML = `<span style="color: var(--danger);">Server connection error. Try again.</span>`;
+      resultArea.innerHTML = `<span style="color: var(--danger);">Server connection error.</span>`;
       return;
     }
+    
     const data = await res.json();
     if (data.success) {
-      // Play audio reinforcement for the newly fused compound word!
-      playTone(data.word.character);
+      if (typeof playTone === "function") playTone(data.word.character);
       
       const localizedMeaning = state.currentLanguage === 'th' ? (data.word.meaning_th || data.word.meaning) : data.word.meaning;
       const localizedDeconstruct = state.currentLanguage === 'th' ? (data.word.deconstruct_th || data.word.deconstruct) : data.word.deconstruct;
       
       resultArea.innerHTML = `
-        <div class="glass-panel" style="padding: 1.5rem; max-width: 500px; border-color: var(--success); background: rgba(46, 196, 182, 0.08); border-radius: 16px; margin: 0 auto; text-align: center; animation: congratsScale 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-          <div style="font-size: 1.5rem; color: var(--success); font-weight: bold; margin-bottom: 0.5rem;">🎉 FUSION SUCCESSFUL!</div>
-          <div style="font-size: 3.5rem; font-family: var(--font-serif); color: var(--primary); margin: 0.25rem 0;">
-            ${data.word.character}
-          </div>
-          <div style="font-size: 1.25rem; font-weight: bold; color: #fff; margin-bottom: 0.5rem;">
+        <div class="glass-panel alchemy-fuse-active fusion-success-card">
+          <div class="fusion-success-title">🎉 DISCOVERY SUCCESSFUL!</div>
+          <div id="fusion-writer-target" class="fusion-canvas-target"></div>
+          <div class="fusion-success-pinyin">
             🔊 ${data.word.pinyin}
           </div>
-          <div style="font-size: 1.05rem; color: var(--text-main); margin-bottom: 0.75rem; font-weight: bold;">
+          <div class="fusion-success-meaning">
             ${localizedMeaning}
           </div>
-          <div style="font-size: 0.85rem; color: var(--text-secondary); background: rgba(255,255,255,0.03); border-radius: 8px; padding: 0.75rem; line-height: 1.4;">
+          <div class="fusion-success-deconstruct">
             <strong>Structure:</strong> ${localizedDeconstruct}
+          </div>
+          <div class="fusion-success-planted">
+            🪴 Auto-Planted to your SRS Vocab Garden!
           </div>
         </div>
       `;
-      // Clear slots
-      fusionSlot1 = null;
-      fusionSlot2 = null;
-      window.updateFusionSlotsUI();
+
+      if (typeof HanziWriter !== "undefined" && data.word.character) {
+        setTimeout(() => {
+          try {
+            const writerTarget = document.getElementById('fusion-writer-target');
+            if (writerTarget) {
+              writerTarget.innerHTML = '';
+              const computedWidth = Math.min(150, window.innerWidth * 0.4);
+              const fusionWriter = HanziWriter.create('fusion-writer-target', data.word.character.charAt(0), {
+                width: computedWidth,
+                height: computedWidth,
+                padding: computedWidth * 0.08,
+                strokeColor: '#00f5d4',
+                radicalColor: '#ff3366',
+                delayBetweenStrokes: 150
+              });
+              fusionWriter.animateCharacter();
+            }
+          } catch (e) {
+            console.warn('HanziWriter init in fusion failed:', e);
+          }
+        }, 100);
+      }
+
+      // Refresh the tabs/components to update the progress/badges without losing context
+      const currentTab = document.querySelector('#radical-tabs-container .btn-primary');
+      if (currentTab) {
+        // Soft refresh by clicking the tab again to fetch updated lists
+        // Note: activeTab.click() resets display to 'none', so we override it
+        currentTab.click(); 
+        setTimeout(() => { document.getElementById('fusion-result-area').style.display = 'flex'; }, 50);
+      }
     } else {
-      resultArea.innerHTML = `
-        <span style="color: var(--danger);">${data.message}</span>
-        <br/><small style="color:var(--text-secondary); margin-top: 0.5rem; display: block;">
-          💡 Try combining: 你+好, 学+生, 老+师, 中+国, 日+本
-        </small>
-      `;
+      resultArea.innerHTML = `<span style="color: var(--danger);">${data.message || 'Error'}</span>`;
     }
   } catch (err) {
     console.error("Fusion call failed:", err);
@@ -3164,14 +3446,11 @@ window.playTone = playTone;
 window.speakText = speakText;
 window.switchView = switchView;
 window.switchPane = switchPane;
-window.selectWord = selectWord;
 window.startLesson = startLesson;
-window.prevWord = prevWord;
-window.nextWord = nextWord;
-window.checkQuizAnswer = checkQuizAnswer;
-window.checkPretestAnswer = checkPretestAnswer;
 window.renderVocabGardenWidget = renderVocabGardenWidget;
 window.localizeLessonObject = localizeLessonObject;
+window.challengeSelector = challengeSelector;
+window.srsEngine = srsEngine;
 
 // Hook setupSrsEventListeners into initialization
 if (typeof document !== 'undefined') {

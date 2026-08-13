@@ -140,3 +140,37 @@ As the HanPath team progresses through the development phases, this document ser
 1. **Holistic Visual Testing:** UAT scripts must test for true screen visibility (e.g., checking if `offsetParent !== null` or `getBoundingClientRect().width > 0`) rather than just reading isolated CSS properties.
 2. **Encoding Awareness:** Always explicitly declare file encoding (e.g., UTF-8) when programmatically reading or appending to files, especially text-based CSS/HTML assets, to prevent silent parsing failures (Mojibake).
 3. **Refactor in Isolation:** When standardising an architecture, ensure the migration is 100% complete across both logic (JavaScript) and templates (HTML) before declaring success, and visually verify edge cases.
+
+## 26. Prioritize User Pacing and Structural Planning Over Immediate Execution
+**The Error:** The developer acted unilaterally to modify code (`app.js`, `server.js`, `challenge-selector.js`) immediately after a bug was reported, ignoring the user's explicit request to "do some more research before fix it."
+**The Cause:**
+1. A bias toward immediate, reactive bug fixing over reading the full context of the user's prompt (which requested a pause and a brainstorm).
+2. Failure to deeply internalize Lesson #19, which explicitly states to "Ask before running anything... confirm it's structurally necessary first via a free code read."
+**Prevention:**
+1. **Explicit Acknowledgment of Constraints:** Before writing any code or modifying any files, explicitly check if the user asked for a *plan*, a *brainstorm*, or a *fix*. 
+2. **Consent-Based Execution:** Never modify files or restart servers without explicit permission unless the user has specifically given a "fix this" directive. If the directive is ambiguous, default to planning and asking for approval first.
+
+## 27. Task Management and Stateful Server Restarts
+**The Error:** After fixing a syntax error that crashed the backend, the user was still unable to access the app and reported "Now I cannot access. Please test before hand-on seriously."
+**The Cause:** The backend server (`node server.js`) was launched as a background task, but its success or failure was not verified. It is easy to assume a server started successfully if the command returns immediately, but it might crash a few milliseconds later due to port conflicts or code errors.
+**Prevention:**
+1. **Verify Background Tasks:** Always use `manage_task` to check the `status` of a long-running background command shortly after it starts to ensure it didn't immediately crash.
+2. **End-to-End Verification:** Perform a `curl` or local HTTP request against the server endpoint (e.g., `http://localhost:3000/api/health` or similar) to verify it is actively listening and responding before handing the application back to the user.
+
+## 28. Nested Scrollbars UX Anti-Pattern
+- **Issue:** Nested scrollbars (e.g., completed lessons scrollbox inside a scrollable sidebar column) degrade usability, hide information needlessly, and make the screen feel cluttered.
+- **Prevention:** Let child elements and lists expand naturally within scrollable sidebars or pages, relying on a single top-level container scrollbar. 
+
+## 29. Glassmorphism Sticky Headers & Scroll Collisions
+- **Issue:** Text scrolling underneath a sticky header clashed and created unreadable overlapping text due to high transparency and lack of filter masking.
+- **Prevention:** Set sticky header backgrounds to a higher opacity (`>= 0.9` themed cyan/white) combined with `backdrop-filter: blur(12px)` and subtle drop shadows. This blurs and masks content scrolling underneath, keeping navigation elements completely legible.
+
+## 30. Flexbox Slotted Layouts & Implicit Row Stacking
+- **Issue:** The Memory Garden progress badges, matrix canvas, status labels, and watering CTAs squished side-by-side into cramped vertical strips on desktop.
+- **Prevention:** When utilizing slots that load dynamic HTML components, avoid setting `display: flex` on the slot container without an explicit `flex-direction: column` override. Defaulting to row-direction shifts block elements horizontally, ruining the layout flow.
+
+## 31. Text Walls and Button Redundancy in Sidebar Lists
+- **Issue:** Repeating full action buttons (e.g. `✓ Done (Re-learn)`) and verbose descriptions on every row of a list creates heavy visual noise, clutters narrow mobile viewports, and makes the UI feel text-heavy.
+- **Prevention:** Split title structures into small, styled sub-labels (e.g., `Day 5 • Numbers`) and bold headings. Replace repetitive completed action buttons with simple status icons (`✅`) and make the row itself interactive (clickable card with hover effects), drastically saving screen space and improving mobile readability.
+
+

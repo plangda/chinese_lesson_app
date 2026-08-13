@@ -53,21 +53,18 @@ function getBkkDateString(offsetDays = 0) {
 // Helper: Auto-plant historical words from completed lessons if SRS table is empty
 async function syncUserHistoricalSrs(database, userId, userLevel = 'hsk1', completedLessons = []) {
   try {
+    if (!completedLessons || completedLessons.length === 0) return;
     const tomorrowStr = getBkkDateString(1);
     
-    // Plant words from all completed lessons if not already present
-    if (completedLessons && completedLessons.length > 0) {
-      for (const lessonId of completedLessons) {
-        const vocabList = await database.all('SELECT id, lesson_id, character FROM vocab WHERE lesson_id = ?', [lessonId]);
-        for (const v of vocabList) {
-          await database.run(`
-            INSERT OR IGNORE INTO user_vocab_srs
-            (user_id, vocab_id, lesson_id, character, mastery_stage, interval_days, next_review_date)
-            VALUES (?, ?, ?, ?, 1, 1, ?)
-          `, [userId, v.id, v.lesson_id, v.character, tomorrowStr]);
-        }
-      }
-    }
+    // Single bulk SQL insertion for all words across all completed lessons
+    const placeholders = completedLessons.map(() => '?').join(',');
+    await database.run(`
+      INSERT OR IGNORE INTO user_vocab_srs
+      (user_id, vocab_id, lesson_id, character, mastery_stage, interval_days, next_review_date)
+      SELECT ?, id, lesson_id, character, 1, 1, ?
+      FROM vocab
+      WHERE lesson_id IN (${placeholders})
+    `, [userId, tomorrowStr, ...completedLessons]);
   } catch (err) {
     console.error("Historical SRS sync warning:", err.message);
   }
@@ -730,69 +727,132 @@ app.post('/api/srs/plant-lesson', requireAuth, async (req, res) => {
   }
 });
 
-// GET /api/srs/fusion-pool — Returns all single characters that can form valid 2-char compounds in the vocab DB
-app.get('/api/srs/fusion-pool', requireAuth, async (req, res) => {
+// GET /api/srs/fusion/anchors — Returns the list of available anchor radicals
+app.get('/api/srs/fusion/anchors', requireAuth, async (req, res) => {
   try {
-    // Find every 2-character word in the vocab table
-    const compounds = await db.all(
-      `SELECT character FROM vocab WHERE LENGTH(character) = 2 LIMIT 300`
-    );
-    // Extract both characters from each compound (e.g. "你好" → ["你", "好"])
-    const charSet = new Set();
-    compounds.forEach(c => {
-      if (c.character && c.character.length === 2) {
-        charSet.add(c.character[0]);
-        charSet.add(c.character[1]);
+    const userId = req.user ? req.user.id : 1;
+    const levelStr = req.query.level || '1';
+    const level = parseInt(levelStr.replace('hsk', ''), 10) || 1;
+    
+    // Group by symbol to prevent duplicate tabs across HSK levels, and join with radicals table
+    const anchors = await db.all(`
+      SELECT 
+        f.anchor_id as id, 
+        f.anchor_symbol as symbol, 
+        MIN(f.hsk_level) as hsk_level,
+        COUNT(f.id) as total_discoveries,
+        SUM(CASE WHEN ud.id IS NOT NULL THEN 1 ELSE 0 END) as user_discovered,
+        SUM(CASE WHEN uv.id IS NOT NULL THEN 1 ELSE 0 END) as user_learned,
+        r.meaning_en as name_en,
+        r.meaning_th as name_th,
+        r.icon
+      FROM radical_fusion_formulas f
+      LEFT JOIN user_radical_discoveries ud ON ud.formula_id = f.id AND ud.user_id = ?
+      LEFT JOIN user_vocab_srs uv ON f.vocab_id = uv.vocab_id AND uv.user_id = ?
+      LEFT JOIN radicals r ON f.anchor_symbol = r.symbol
+      WHERE f.hsk_level <= ?
+      GROUP BY f.anchor_id, f.anchor_symbol
+      ORDER BY user_learned DESC, hsk_level ASC, user_discovered DESC, total_discoveries DESC
+    `, [userId, userId, level]);
+    
+    // Ensure fallbacks for missing radicals (in case a radical formula is added before the radical dictionary is updated)
+    anchors.forEach(a => {
+      if (!a.name_en) {
+        a.name_en = a.symbol;
+        a.name_th = a.symbol;
+        a.icon = '🧩';
       }
     });
-    res.json({ chars: [...charSet] });
+
+    res.json({ anchors });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// POST /api/srs/fuse - Attempt to fuse two single characters into a compound HSK word
-app.post('/api/srs/fuse', requireAuth, async (req, res) => {
+// GET /api/srs/fusion/components — Returns valid components for an anchor
+app.get('/api/srs/fusion/components', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user ? req.user.id : 1;
+    const { anchor } = req.query;
+    if (!anchor) return res.status(400).json({ error: 'anchor query param is required' });
+
+    const levelStr = req.query.level || '1';
+    const level = parseInt(levelStr.replace('hsk', ''), 10) || 1;
+
+    const components = await db.all(`
+      SELECT 
+        f.id as formula_id,
+        f.component_symbol as symbol,
+        f.result_character as result,
+        (CASE WHEN ud.id IS NOT NULL THEN 1 ELSE 0 END) as discovered,
+        (CASE WHEN uv.id IS NOT NULL THEN 1 ELSE 0 END) as has_learned
+      FROM radical_fusion_formulas f
+      LEFT JOIN user_radical_discoveries ud ON ud.formula_id = f.id AND ud.user_id = ?
+      LEFT JOIN user_vocab_srs uv ON uv.vocab_id = f.vocab_id AND uv.user_id = ?
+      WHERE (f.anchor_id = ? OR f.anchor_symbol = ?) AND f.hsk_level <= ?
+      ORDER BY discovered ASC, has_learned DESC
+    `, [userId, userId, anchor, anchor, level]);
+    
+    res.json({ anchor, components });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/srs/fusion/combine - Attempt to fuse
+app.post('/api/srs/fusion/combine', requireAuth, async (req, res) => {
   try {
     const userId = req.body.userId || (req.user ? req.user.id : 1);
-    const { char1, char2 } = req.body;
+    const { formula_id } = req.body;
 
-    if (!char1 || !char2) {
-      return res.status(400).json({ error: 'char1 and char2 are required' });
+    if (!formula_id) {
+      return res.status(400).json({ error: 'formula_id is required' });
     }
 
-    const comb1 = char1 + char2;
-    const comb2 = char2 + char1;
+    const formula = await db.get('SELECT * FROM radical_fusion_formulas WHERE id = ?', [formula_id]);
+    if (!formula) return res.status(404).json({ error: 'Formula not found' });
 
-    // Find the compound word in vocabulary database
-    let word = await db.get('SELECT * FROM vocab WHERE character = ? OR character = ?', [comb1, comb2]);
-    
-    if (!word) {
-      return res.json({ success: false, message: `No HSK compound word found for '${comb1}' or '${comb2}'.` });
+    // Track discovery
+    try {
+      await db.run('INSERT INTO user_radical_discoveries (user_id, formula_id) VALUES (?, ?)', [userId, formula_id]);
+    } catch (e) {
+      // Ignore unique constraint error if already discovered
     }
 
-    // Auto-plant the fused word into SRS table if not already present
-    const existing = await db.get('SELECT id FROM user_vocab_srs WHERE user_id = ? AND vocab_id = ?', [userId, word.id]);
-    if (!existing) {
-      const tomorrowStr = getBkkDateString(1);
-      await db.run(`
-        INSERT INTO user_vocab_srs (user_id, vocab_id, lesson_id, character, mastery_stage, interval_days, next_review_date)
-        VALUES (?, ?, ?, ?, 1, 1, ?)
-      `, [userId, word.id, word.lesson_id, word.character, tomorrowStr]);
-    }
+    // Prepare response data
+    let wordData = {
+      id: formula.vocab_id || null,
+      character: formula.result_character,
+      pinyin: '',
+      meaning: '',
+      meaning_th: '',
+      deconstruct: formula.deconstruct_en || 'No deconstruction details available.',
+      deconstruct_th: formula.deconstruct_th || ''
+    };
 
-    res.json({
-      success: true,
-      word: {
-        id: word.id,
-        character: word.character,
-        pinyin: word.pinyin,
-        meaning: word.meaning_en || word.meaning,
-        meaning_th: word.meaning_th,
-        deconstruct: word.deconstruct_en || word.deconstruct || 'No deconstruction details available.',
-        deconstruct_th: word.deconstruct_th
+    if (formula.vocab_id) {
+      const vocab = await db.get('SELECT * FROM vocab WHERE id = ?', [formula.vocab_id]);
+      if (vocab) {
+        wordData.pinyin = vocab.pinyin;
+        wordData.meaning = vocab.meaning_en || vocab.meaning;
+        wordData.meaning_th = vocab.meaning_th;
+        wordData.deconstruct = vocab.deconstruct_en || vocab.deconstruct || wordData.deconstruct;
+        wordData.deconstruct_th = vocab.deconstruct_th || wordData.deconstruct_th;
+
+        // Auto-plant
+        const existing = await db.get('SELECT id FROM user_vocab_srs WHERE user_id = ? AND vocab_id = ?', [userId, formula.vocab_id]);
+        if (!existing) {
+          const tomorrowStr = getBkkDateString(1);
+          await db.run(`
+            INSERT INTO user_vocab_srs (user_id, vocab_id, lesson_id, character, mastery_stage, interval_days, next_review_date)
+            VALUES (?, ?, ?, ?, 1, 1, ?)
+          `, [userId, formula.vocab_id, vocab.lesson_id, formula.result_character, tomorrowStr]);
+        }
       }
-    });
+    }
+
+    res.json({ success: true, word: wordData });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

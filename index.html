@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="no-referrer">
   <title>HanPath - Daily Chinese Learning App</title>
   <meta name="description" content="Assess your level, learn Chinese in structured 1-hour daily lessons, and build consistency.">
   <link rel="icon" type="image/png" href="favicon.png?v=5">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=9">
   <script src="hanzi-writer.min.js?v=5"></script>
 </head>
 <body>
@@ -207,7 +207,7 @@
       </div>
 
       <!-- 2. Main Dashboard Layout (Grid columns: 2.2fr left, 1fr right) -->
-      <div class="dashboard-grid" style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 2rem; align-items: start;">
+      <div class="dashboard-grid">
         
         <!-- Left Area: Garden Canvas -->
         <div style="display: flex; flex-direction: column; gap: 2rem;">
@@ -224,8 +224,7 @@
               </div>
             </div>
             
-            <!-- Garden Canvas Slot (Renders the plant grid or onboarding Empty State) -->
-            <div id="main-garden-canvas-slot" style="min-height: 300px; display: flex; align-items: center; justify-content: center; width: 100%;">
+            <div id="main-garden-canvas-slot" style="min-height: 300px; width: 100%;">
               <!-- Renders modules/garden.js Grid -->
             </div>
           </div>
@@ -248,15 +247,20 @@
         <!-- Right Area: Lessons & Quests Sidebar -->
         <div class="dashboard-sidebar" style="display: flex; flex-direction: column; gap: 2rem;">
           
-          <!-- Today's Lesson Panel (Compact Sidebar form) -->
-          <div id="today-lesson-panel" class="glass-panel" style="padding: 1.5rem; border-color: var(--primary); background: linear-gradient(135deg, rgba(255, 51, 102, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-              <span class="tag" style="background: var(--primary); color: white; border: none; font-size: 0.7rem; font-weight: bold; padding: 2px 8px; border-radius: 4px;">CURRENT LESSON</span>
-              <span id="today-lesson-duration" style="font-size: 0.75rem; color: var(--accent); font-weight: bold;">⏳ 60 Min</span>
+          <!-- Today's Lesson Panel (Option 1: Simplified Card) -->
+          <div id="today-lesson-panel" class="glass-panel" style="padding: 1.25rem; border-color: var(--primary); border-radius: 16px; background: linear-gradient(135deg, rgba(255, 51, 102, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <span id="today-lesson-tag" class="tag" style="background: rgba(255, 51, 102, 0.1); color: var(--primary); font-size: 0.7rem; font-weight: 700; border-radius: 12px; border: none; padding: 2px 8px;">RECOMMENDED</span>
+              <span id="today-lesson-duration" style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">⏱️ 60m</span>
             </div>
-            <h3 id="today-lesson-title" style="font-family: var(--font-serif); margin: 0 0 0.5rem 0; font-size: 1.15rem;">Day 1: Greetings</h3>
-            <button id="today-lesson-start-btn" class="btn btn-primary btn-sm" style="width: 100%; font-weight: bold; font-size: 0.85rem; padding: 0.5rem;">
-              🚀 Start Lesson
+            
+            <div style="display: flex; flex-direction: column; gap: 0.15rem; margin-bottom: 0.75rem;">
+              <span id="today-lesson-day-label" style="font-size: 0.75rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Day 1</span>
+              <h3 id="today-lesson-title" style="font-family: var(--font-serif); margin: 0; font-size: 1.25rem; line-height: 1.3;">Greetings</h3>
+            </div>
+
+            <button id="today-lesson-start-btn" class="btn btn-primary" style="width: 100%; border-radius: 20px; font-weight: bold; padding: 0.6rem; font-size: 0.85rem;">
+              Start Lesson
             </button>
           </div>
 
@@ -265,7 +269,7 @@
             <h3 style="margin: 0 0 0.75rem 0; font-family: var(--font-serif); font-size: 1.1rem; display: flex; align-items: center; gap: 0.4rem;">
               <span>📖</span> Unlocked Lessons
             </h3>
-            <div id="dashboard-lessons-container" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; padding-right: 0.25rem;">
+            <div id="dashboard-lessons-container" style="display: flex; flex-direction: column; gap: 0.5rem;">
               <!-- Completed and unlocked lessons loaded dynamically -->
             </div>
           </div>
@@ -670,7 +674,7 @@
             <div id="typing-prompt-cn" style="font-size: 2.2rem; font-weight: bold; margin-bottom: 0.2rem;">你好</div>
             <div id="typing-prompt-desc" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">Hello (nǐhǎo)</div>
             
-            <input type="text" id="pinyin-typing-input" placeholder="Type pinyin e.g. nihao..." style="width: 100%; max-width: 320px; padding: 0.75rem; border-radius: 8px; border: 2px solid var(--primary, #00f5d4); background: rgba(255,255,255,0.05); color: #fff; text-align: center; font-size: 1.1rem; margin-bottom: 1rem;" autocomplete="off" />
+            <input type="text" id="pinyin-typing-input" placeholder="Type pinyin e.g. nihao..." style="width: 100%; max-width: 320px; padding: 0.75rem; border-radius: 8px; border: 2px solid var(--primary); background: rgba(255,255,255,0.8); color: var(--text-primary); text-align: center; font-size: 1.1rem; margin-bottom: 1rem; outline: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);" autocomplete="off" />
             
             <div id="pinyin-typing-candidates" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; min-height: 40px; margin-bottom: 1rem;"></div>
             <div id="pinyin-typing-feedback" style="font-weight: bold; min-height: 24px;"></div>
@@ -686,7 +690,7 @@
       <div class="glass-panel" style="max-width: 700px; margin: 0 auto; padding: 2rem;">
         <!-- Header Controls -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1rem;">
-          <button id="srs-exit-btn" class="btn btn-secondary btn-sm" data-i18n="btn_back_to_dashboard">← Back to Dashboard</button>
+          <button id="srs-exit-btn" class="btn btn-secondary btn-sm" onclick="handleEarlyExit()" data-i18n="btn_early_exit">🚪 Early Exit</button>
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span style="font-size: 1.2rem;">🪴</span>
             <h3 style="margin: 0; font-family: var(--font-serif);" data-i18n="srs_view_title">Vocab Garden Watering Room</h3>
@@ -700,41 +704,43 @@
       </div>
     </section>
 
-    <!-- 9. SEED FUSION LAB VIEW -->
+    <!-- 9. ACTIVE RADICAL DISCOVERY LAB VIEW -->
     <section id="seed-fusion-lab-view" class="view-section">
-      <div class="glass-panel" style="max-width: 800px; margin: 0 auto; padding: 2rem; text-align: center;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1rem;">
+      <div class="glass-panel lab-container">
+        <div class="lab-header">
           <button class="btn btn-secondary btn-sm" onclick="window.switchView('dashboard-view')">← Back to Garden</button>
-          <h2 style="margin: 0; font-family: var(--font-serif);">🧪 Seed Fusion Lab</h2>
-          <div style="width: 80px;"></div>
+          <h2 class="lab-header-title">🧪 Active Radical Discovery Lab</h2>
+          <div class="header-spacer"></div>
         </div>
         
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-          Fuse two single-character seed cards to unlock a compound HSK word!
-        </p>
-
-        <!-- Fusion Slots -->
-        <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; margin-bottom: 3rem;">
-          <div id="fusion-slot-1" class="glass-panel fusion-dropzone" style="width: 120px; height: 120px; border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; cursor: pointer;" onclick="window.clearFusionSlot(1)">
-            ➕
-          </div>
-          <div style="font-size: 2rem; color: var(--accent);">+</div>
-          <div id="fusion-slot-2" class="glass-panel fusion-dropzone" style="width: 120px; height: 120px; border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; cursor: pointer;" onclick="window.clearFusionSlot(2)">
-            ➕
-          </div>
-        </div>
-
-        <button class="btn btn-primary" id="trigger-fusion-btn" style="padding: 0.75rem 3rem; font-weight: bold; font-size: 1.1rem; border-radius: 30px;" onclick="window.triggerSeedFusion()">
-          ⚡ FUSE SEEDS ⚡
-        </button>
-
-        <div id="fusion-result-area" style="margin-top: 2rem; min-height: 100px; display: flex; align-items: center; justify-content: center;">
-        </div>
-
-        <!-- Available Single Character Seeds -->
-        <h3 style="margin-top: 3rem; margin-bottom: 1rem; text-align: left; font-family: var(--font-serif);">Select Seeds to Fuse</h3>
-        <div id="fusion-seed-pool" style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: flex-start; padding: 1rem; background: rgba(0,0,0,0.1); border-radius: 12px; min-height: 100px;">
+        <!-- Anchor Category Tabs -->
+        <div id="radical-tabs-container" class="tabs-scroll-container">
           <!-- Loaded dynamically -->
+        </div>
+
+        <!-- Active Anchor Hero Card -->
+        <div id="active-anchor-hero" class="glass-panel active-anchor-hero-card">
+          <div class="hero-left">
+            <div class="hero-subtitle">Active Anchor</div>
+            <h3 id="hero-anchor-name" class="hero-title">-</h3>
+          </div>
+          <div class="hero-right">
+            <div class="hero-progress-text" id="hero-anchor-progress-text">Progress: 0 / 0 Discovered</div>
+            <div class="progress-bar-container">
+              <div id="hero-anchor-progress-fill" class="progress-bar-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Component Grid -->
+        <h3 class="components-grid-title">Guaranteed Valid Components (Tap to discover!)</h3>
+        <div id="fusion-seed-pool" class="fusion-pool-container">
+          <!-- Loaded dynamically -->
+        </div>
+
+        <!-- Discovery Result Overlay / Card -->
+        <div id="fusion-result-area" class="fusion-result-container">
+          <!-- Content injected here via app.js -->
         </div>
       </div>
     </section>
@@ -777,8 +783,8 @@
   </main>
 
   <!-- hsk1_data.js removed, using dynamic backend -->
-  <script src="i18n.js?v=5" defer></script>
-  <script type="module" src="app.js?v=8" defer></script>
+  <script src="i18n.js?v=9" defer></script>
+  <script type="module" src="app.js?v=22" defer></script>
 
   <!-- Pinyin Tone Modal -->
   <div id="pinyin-tone-modal" class="modal-overlay hidden" >
