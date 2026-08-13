@@ -137,4 +137,5 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Fixed Sentence Quest: mapped SQL property aliases (`exampleCn`, `exampleEn`, `exampleTh`), added fallback sentence pool for newly unlocked plants, localized prompt translations, implemented smart Chinese word tokenizer (`tokenizeSentence`), and added random unplayed sentence selection (`playedQuestVocabIds`).
 - Updated `server.js` `syncUserHistoricalSrs()` to enforce strict lesson-gated garden syncing (words only unlock in `user_vocab_srs` as the user completes each lesson, e.g. 4 lessons = ~48 words).
 - Built Mobile & Tablet Plant Quick Modal overlay (`showPlantQuickModal`) and optional single-word Cram Mode (`startTargetPractice`) without altering the main randomized batch review engine or dashboard UI.
-- Committed and pushed all updates to main branch on GitHub (commits 02c215f, 4b818e3, 88adb4c, d099fbc, 0a8f245, 3edf84c).
+- Fixed plant tile click listeners in `modules/garden.js` (`handleGardenPlantClick`) and implemented Option A centered glassmorphism pop-up overlay (`.modal-backdrop` + `.modal-card`).
+- Committed and pushed all updates to main branch on GitHub (commits 02c215f, 4b818e3, 88adb4c, d099fbc, 0a8f245, 3edf84c, 1d581a6, e99536c).
