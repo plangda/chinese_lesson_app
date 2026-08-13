@@ -50,13 +50,16 @@ function getBkkDateString(offsetDays = 0) {
   return d.toISOString().split('T')[0];
 }
 
-// Helper: Auto-plant historical words from completed lessons if SRS table is empty
+// Helper: Auto-plant historical words from completed lessons if SRS table is empty or out of sync
 async function syncUserHistoricalSrs(database, userId, userLevel = 'hsk1', completedLessons = []) {
   try {
-    if (!completedLessons || completedLessons.length === 0) return;
+    if (!completedLessons || completedLessons.length === 0) {
+      await database.run('DELETE FROM user_vocab_srs WHERE user_id = ?', [userId]);
+      return;
+    }
     const tomorrowStr = getBkkDateString(1);
     
-    // Single bulk SQL insertion for all words across all completed lessons
+    // Single bulk SQL insertion for all words across completed lessons
     const placeholders = completedLessons.map(() => '?').join(',');
     await database.run(`
       INSERT OR IGNORE INTO user_vocab_srs
@@ -65,6 +68,12 @@ async function syncUserHistoricalSrs(database, userId, userLevel = 'hsk1', compl
       FROM vocab
       WHERE lesson_id IN (${placeholders})
     `, [userId, tomorrowStr, ...completedLessons]);
+
+    // Purge any user_vocab_srs rows that belong to uncompleted lessons
+    await database.run(`
+      DELETE FROM user_vocab_srs
+      WHERE user_id = ? AND lesson_id NOT IN (${placeholders})
+    `, [userId, ...completedLessons]);
   } catch (err) {
     console.error("Historical SRS sync warning:", err.message);
   }

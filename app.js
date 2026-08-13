@@ -2461,8 +2461,8 @@ async function renderVocabGardenWidget() {
     const res = await fetch('/api/srs/garden', {
       headers: { "Authorization": "Bearer " + token }
     });
-    if (!res.ok) return;
     const data = await res.json();
+    state.lastGardenPlants = data.plants || [];
 
     // Update total badge
     const totalBadge = document.getElementById('garden-total-badge');
@@ -2542,21 +2542,82 @@ async function renderVocabGardenWidget() {
 }
 
 function setupSrsEventListeners() {
-  // We'll use a globally bound handleEarlyExit function instead to ensure it fires.
-
-  // Bind clicked plant events to start a single SRS session for that plant
+  // Bind clicked plant events to open the Mobile/Tablet Plant Quick Modal
   eventBus.on('garden:plant-clicked', (plant) => {
-    // Play audio feedback
-    playTone(plant.character);
-    
-    // Start session
-    srsEngine.initSession([plant], 1);
+    showPlantQuickModal(plant);
+  });
+}
+
+window.showPlantQuickModal = function(plant) {
+  let modal = document.getElementById('plant-quick-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'plant-quick-modal';
+    modal.className = 'modal-backdrop';
+    document.body.appendChild(modal);
+  }
+
+  const localizedMeaning = state.currentLanguage === 'th' ? (plant.meaning_th || plant.meaning) : (plant.meaning || plant.meaning_en);
+  const localizedDeconstruct = state.currentLanguage === 'th' ? (plant.deconstruct_th || plant.deconstruct) : (plant.deconstruct || plant.deconstruct_en);
+  
+  const stageMap = {
+    1: { name: '🌱 Seed', nameTh: '🌱 เมล็ดพันธุ์' },
+    2: { name: '🌿 Sprout', nameTh: '🌿 ต้นกล้า' },
+    3: { name: '🌻 Blooming', nameTh: '🌻 ดอกไม้' },
+    4: { name: '🌳 Mastered Tree', nameTh: '🌳 ต้นไม้นำโชค' }
+  };
+  const stageInfo = stageMap[plant.mastery_stage] || stageMap[1];
+  const stageName = state.currentLanguage === 'th' ? stageInfo.nameTh : stageInfo.name;
+
+  modal.innerHTML = `
+    <div class="modal-card glass-panel" style="max-width: 420px; width: 90%; text-align: center; position: relative; padding: 1.75rem 1.25rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15);">
+      <button class="modal-close-btn" onclick="document.getElementById('plant-quick-modal').classList.remove('active')" style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 1.5rem; color: var(--text-secondary); cursor: pointer;">&times;</button>
+      
+      <div style="font-size: 3.5rem; font-family: var(--font-serif); color: var(--primary); margin-bottom: 0.25rem;">
+        ${plant.character}
+      </div>
+      <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent); margin-bottom: 0.5rem;">
+        ${plant.pinyin || ''}
+      </div>
+      
+      <div style="font-size: 1.05rem; font-weight: 600; color: #fff; margin-bottom: 0.75rem;">
+        ${localizedMeaning || ''}
+      </div>
+
+      <div style="display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; background: rgba(46, 196, 182, 0.15); color: var(--success); font-size: 0.85rem; font-weight: bold; margin-bottom: 1.25rem;">
+        ${stageName}
+      </div>
+
+      ${localizedDeconstruct ? `<div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem; background: rgba(255,255,255,0.02); padding: 0.6rem; border-radius: 8px;">🧩 ${localizedDeconstruct}</div>` : ''}
+
+      <div style="display: flex; gap: 0.75rem; justify-content: center; width: 100%;">
+        <button class="btn btn-secondary" onclick="playTone('${plant.character}')" style="flex: 1; padding: 0.75rem; border-radius: 12px; font-weight: bold;">
+          🔊 Listen
+        </button>
+        <button class="btn btn-primary" onclick="window.startTargetPractice(${plant.vocab_id})" style="flex: 1; padding: 0.75rem; border-radius: 12px; font-weight: bold;">
+          🎯 Target Practice
+        </button>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('active');
+  playTone(plant.character);
+};
+
+window.startTargetPractice = function(vocabId) {
+  const modal = document.getElementById('plant-quick-modal');
+  if (modal) modal.classList.remove('active');
+
+  const activeCard = (state.lastGardenPlants || []).find(p => p.vocab_id == vocabId);
+  if (activeCard) {
+    srsEngine.initSession([activeCard], 1);
     state.srsSessionMode = 'single';
     state.srsXpEarned = 0;
     switchView('srs-view');
     renderSrsCard();
-  });
-}
+  }
+};
 
 window.handleEarlyExit = function() {
   if (state.srsXpEarned > 0) {
