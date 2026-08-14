@@ -107,6 +107,92 @@ export class ChallengeSelector {
   }
 
   /**
+   * STAGE 2 (Phonology B): Pinyin Identification
+   */
+  createPinyinChallenge(card, lang = 'en') {
+    const correctOption = card.pinyin || '';
+    const distractors = this.getDistractors(card, 'pinyin', 3);
+    const fallbackList = ['mǎ', 'bā', 'hǎo', 'nǐ', 'xiè'];
+    while (distractors.length < 3) {
+      const fb = fallbackList.find(p => p !== correctOption && !distractors.includes(p));
+      distractors.push(fb || 'yě');
+    }
+    const options = this.shuffle(distractors.concat([correctOption]));
+
+    return {
+      type: 'PINYIN',
+      prompt: lang === 'th' ? 'เลือกพินอินที่ถูกต้องสำหรับ:' : 'Select the correct Pinyin for:',
+      question: card.character,
+      options,
+      answer: correctOption,
+      hint: lang === 'th' ? `ความหมาย: ${card.meaning_th || card.meaning}` : `Meaning: ${card.meaning}`
+    };
+  }
+
+  /**
+   * STAGE 3 (Meaning): Hanzi to Translation
+   */
+  createTranslationChallenge(card, meaning, lang = 'en') {
+    const meaningField = lang === 'th' ? 'meaning_th' : 'meaning';
+    const correctOption = (card[meaningField] || meaning || card.meaning || card.meaning_en || '');
+    const distractors = this.getDistractors(card, meaningField, 3);
+
+    const fallbackMeanings = lang === 'th' 
+      ? ['สวัสดี', 'ขอบคุณ', 'ลาก่อน', 'ดี', 'กิน'] 
+      : ['Hello', 'Thank you', 'Goodbye', 'Good', 'Eat'];
+
+    while (distractors.length < 3) {
+      const pick = fallbackMeanings.find(m => m !== correctOption && !distractors.includes(m));
+      if (pick) distractors.push(pick);
+      else distractors.push(lang === 'th' ? `ตัวเลือก ${distractors.length + 1}` : `Option ${distractors.length + 1}`);
+    }
+
+    const options = this.shuffle(distractors.concat([correctOption]));
+
+    return {
+      type: 'TRANSLATION',
+      prompt: lang === 'th' ? 'เลือกความหมายที่ถูกต้องสำหรับ:' : 'Select the correct meaning for:',
+      question: card.character,
+      options,
+      answer: correctOption,
+      hint: lang === 'th' ? `พินอิน: ${card.pinyin}` : `Pinyin: ${card.pinyin}`
+    };
+  }
+
+  /**
+   * STAGE 4 (Context): Cloze Sentence Fill-in-the-Blank
+   */
+  createContextChallenge(card, example, lang = 'en') {
+    const exampleCn = card.exampleCn || card.example_cn || '';
+    const correctOption = card.character || '';
+    
+    let questionText = exampleCn;
+    if (exampleCn && exampleCn.includes(correctOption)) {
+      questionText = exampleCn.replace(correctOption, '_____');
+    } else if (exampleCn) {
+      questionText = `${exampleCn} ( _____ )`;
+    } else {
+      questionText = `_____ (${card.pinyin || ''})`;
+    }
+
+    const distractors = this.getDistractors(card, 'character', 3);
+    while (distractors.length < 3) {
+      distractors.push(this.generateRandomHanziFallback(distractors.concat([correctOption])));
+    }
+
+    const options = this.shuffle(distractors.concat([correctOption]));
+
+    return {
+      type: 'CONTEXT',
+      prompt: lang === 'th' ? 'เติมคำในช่องว่างด้วยอักษรที่ถูกต้อง:' : 'Fill in the blank with the correct character:',
+      question: questionText,
+      options,
+      answer: correctOption,
+      hint: lang === 'th' ? `พินอิน: ${card.pinyin}` : `Pinyin: ${card.pinyin}`
+    };
+  }
+
+  /**
    * STAGE 2 (Phonology A): Tone Identification (Supports Multi-Character Words)
    */
   /**

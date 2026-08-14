@@ -459,6 +459,9 @@ app.post('/api/progress', requireAuth, async (req, res) => {
       userId
     ]);
     
+    // Auto-sync historical completed lessons into SRS table when progress is updated
+    await syncUserHistoricalSrs(db, userId, body.userLevel || 'hsk1', body.completedLessons || []);
+
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -484,8 +487,11 @@ app.get('/api/srs/garden', requireAuth, async (req, res) => {
     const hskLevel = progress.hsk_level || 'hsk1';
     const completedLessons = JSON.parse(progress.completed_lessons || '[]');
     
-    // Auto-sync historical completed lessons into SRS table
-    await syncUserHistoricalSrs(db, userId, hskLevel, completedLessons);
+    // Auto-sync historical completed lessons into SRS table ONLY if user has no planted cards yet
+    const existingCards = await db.get('SELECT COUNT(id) as cnt FROM user_vocab_srs WHERE user_id = ?', [userId]);
+    if (!existingCards || existingCards.cnt === 0) {
+      await syncUserHistoricalSrs(db, userId, hskLevel, completedLessons);
+    }
 
     const todayStr = getBkkDateString(0);
 

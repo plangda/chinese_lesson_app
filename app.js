@@ -1728,6 +1728,10 @@ function showCurriculumMilestoneNotification(title, message) {
 
 
 function routeToLesson(id) {
+  if (id === 'hsk1_day0') {
+    startLesson('hsk1_day0');
+    return;
+  }
   if (!state.hasTakenPlacementTest) {
     showConfirmModal("title_confirm", "msg_pretest_rec", () => {
       switchView("pretest-view");
@@ -3042,7 +3046,7 @@ window.checkChallengeAnswer = async function(userAnswer) {
     // Audio reinforcement
     playTone(activeCard.character);
 
-    await submitSrsWatering(activeCard.vocab_id, challengeAttempts + 1, challengeHintsUsed, true);
+    submitSrsWatering(activeCard.vocab_id, challengeAttempts + 1, challengeHintsUsed, true);
   } else {
     feedback.innerHTML = `<span style="color: var(--danger);">❌ Try again! Correct answer was: ${currentChallenge.answer}</span>`;
     
@@ -3060,20 +3064,23 @@ window.checkChallengeAnswer = async function(userAnswer) {
       }
     });
 
-    await submitSrsWatering(activeCard.vocab_id, challengeAttempts + 1, challengeHintsUsed, false);
+    submitSrsWatering(activeCard.vocab_id, challengeAttempts + 1, challengeHintsUsed, false);
   }
 };
 
-async function submitSrsWatering(vocabId, attemptsCount, hintsUsed, isCorrect) {
+function submitSrsWatering(vocabId, attemptsCount, hintsUsed, isCorrect) {
   try {
     const engineResult = srsEngine.recordResult(isCorrect, hintsUsed);
     
     if (isCorrect) {
       const activeCard = srsEngine.currentQueue.find(c => c.vocab_id === vocabId);
       const calculated = srsEngine.calculateSM2(activeCard, engineResult.systemGrade);
+      state.srsXpEarned += (calculated.xpEarned || 10);
+      state.score += (calculated.xpEarned || 10);
+      saveProgress();
 
       const token = localStorage.getItem("hanpath_token");
-      const res = await fetch('/api/srs/water', {
+      fetch('/api/srs/water', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -3085,18 +3092,20 @@ async function submitSrsWatering(vocabId, attemptsCount, hintsUsed, isCorrect) {
           hintsUsed,
           grade: engineResult.systemGrade 
         })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        state.srsXpEarned += (data.xpEarned || calculated.xpEarned);
-        state.score += (data.xpEarned || calculated.xpEarned);
-        saveProgress();
-      }
+      }).then(async res => {
+        if (res.ok) {
+          const data = await res.json();
+          if (data.xpEarned && data.xpEarned !== calculated.xpEarned) {
+            state.score += (data.xpEarned - calculated.xpEarned);
+            saveProgress();
+          }
+        }
+      }).catch(err => console.error("Async SRS watering sync failed:", err));
     }
     
     setTimeout(() => {
       renderSrsCard();
-    }, 1500);
+    }, 700);
   } catch (err) {
     console.error("Failed to submit SRS watering:", err);
   }
