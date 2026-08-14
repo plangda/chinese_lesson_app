@@ -139,3 +139,12 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Built Mobile & Tablet Plant Quick Modal overlay (`showPlantQuickModal`) and optional single-word Cram Mode (`startTargetPractice`) without altering the main randomized batch review engine or dashboard UI.
 - Fixed plant tile click listeners in `modules/garden.js` (`handleGardenPlantClick`) and implemented Option A centered glassmorphism pop-up overlay (`.modal-backdrop` + `.modal-card`).
 - Committed and pushed all updates to main branch on GitHub (commits 02c215f, 4b818e3, 88adb4c, d099fbc, 0a8f245, 3edf84c, 1d581a6, e99536c).
+
+2026-08-14:
+- Conducted high-performance web architecture research and authored strategic research report (performance_and_media_architecture_research.md) covering local-first offline storage, audio sprite sheets, edge CDN deployment, and progressive prefetching for HSK 4-6.
+- Implemented Phase A performance optimizations & runtime bug fixes: added missing createPinyinChallenge, createTranslationChallenge, and createContextChallenge methods to modules/challenge-selector.js to unblock Target Practice and Stages 2-4 review quizzes.
+- Made submitSrsWatering non-blocking (async background server sync) in app.js and reduced quiz transition delay from 1500ms to 700ms.
+- Updated routeToLesson in app.js to bypass the lesson pre-test modal for hsk1_day0 (Foundation Pinyin Suite), opening the Pinyin chart directly.
+- Optimized GET /api/srs/garden route in server.js to eliminate historical DB write queries on every GET request, moving sync to POST progress updates.
+- Verified syntax and runtime health with node -c and local test server on port 3000.
+- Committed and pushed changes to main branch on GitHub (commit 9fa6c17) to trigger automated Vercel production deployment.
