@@ -4032,7 +4032,10 @@ function showMockExamResultModal(report) {
   renderMockExamDetailedReview(report);
 
   modal.style.display = 'flex';
+  modal.style.opacity = '1';
+  modal.style.pointerEvents = 'auto';
   modal.classList.remove('hidden');
+  modal.classList.add('active');
 }
 
 function toggleMockExamReview() {
@@ -4112,7 +4115,10 @@ window.exitMockExamEarly = exitMockExamEarly;
 function closeMockExamResultModal() {
   const modal = document.getElementById('mock-exam-result-modal');
   if (modal) {
+    modal.classList.remove('active');
     modal.style.display = 'none';
+    modal.style.opacity = '0';
+    modal.style.pointerEvents = 'none';
     modal.classList.add('hidden');
   }
   switchView('dashboard-view');
