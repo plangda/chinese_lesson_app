@@ -1,0 +1,67 @@
+{
+  "hsk_level": "hsk1",
+  "source": "CTI / Hanban Official Sample Test Series (H10901-H10903)",
+  "total_questions": 40,
+  "sections": [
+    {
+      "name": "listening",
+      "question_count": 20,
+      "parts": [
+        {
+          "part": 1,
+          "question_count": 5,
+          "type": "TRUE_FALSE",
+          "description": "Listen to a short phrase/word twice, judge if picture matches phrase."
+        },
+        {
+          "part": 2,
+          "question_count": 5,
+          "type": "PICTURE_MATCH",
+          "description": "Listen to a sentence twice, pick correct picture from A-E."
+        },
+        {
+          "part": 3,
+          "question_count": 5,
+          "type": "MCQ",
+          "description": "Listen to a 2-line dialogue twice, answer question."
+        },
+        {
+          "part": 4,
+          "question_count": 5,
+          "type": "MCQ",
+          "description": "Listen to a short statement/question twice, pick correct answer A/B/C."
+        }
+      ]
+    },
+    {
+      "name": "reading",
+      "question_count": 20,
+      "parts": [
+        {
+          "part": 1,
+          "question_count": 5,
+          "type": "TRUE_FALSE",
+          "description": "Read word + picture, judge if match is correct."
+        },
+        {
+          "part": 2,
+          "question_count": 5,
+          "type": "PICTURE_MATCH",
+          "description": "Read sentence, match with picture A-E."
+        },
+        {
+          "part": 3,
+          "question_count": 5,
+          "type": "MCQ",
+          "description": "Read question/statement, match with response A-E."
+        },
+        {
+          "part": 4,
+          "question_count": 5,
+          "type": "CLOZE",
+          "description": "Fill in missing vocabulary word in sentence from options."
+        }
+      ]
+    }
+  ]
+}

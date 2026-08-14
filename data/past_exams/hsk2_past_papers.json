@@ -1,0 +1,67 @@
+{
+  "hsk_level": "hsk2",
+  "source": "CTI / Hanban Official Sample Test Series (H20901-H20903)",
+  "total_questions": 55,
+  "sections": [
+    {
+      "name": "listening",
+      "question_count": 35,
+      "parts": [
+        {
+          "part": 1,
+          "question_count": 10,
+          "type": "TRUE_FALSE",
+          "description": "Listen to a short phrase twice, judge true/false."
+        },
+        {
+          "part": 2,
+          "question_count": 10,
+          "type": "PICTURE_MATCH",
+          "description": "Listen to dialogue twice, match picture A-E."
+        },
+        {
+          "part": 3,
+          "question_count": 10,
+          "type": "MCQ",
+          "description": "Listen to 2-line conversation twice, select answer A/B/C."
+        },
+        {
+          "part": 4,
+          "question_count": 5,
+          "type": "MCQ",
+          "description": "Listen to 4-line conversation twice, select answer A/B/C."
+        }
+      ]
+    },
+    {
+      "name": "reading",
+      "question_count": 20,
+      "parts": [
+        {
+          "part": 1,
+          "question_count": 5,
+          "type": "PICTURE_MATCH",
+          "description": "Read sentence, match with picture A-E."
+        },
+        {
+          "part": 2,
+          "question_count": 5,
+          "type": "CLOZE",
+          "description": "Fill in missing vocabulary word in sentence."
+        },
+        {
+          "part": 3,
+          "question_count": 5,
+          "type": "TRUE_FALSE",
+          "description": "Read sentence pair, judge logic."
+        },
+        {
+          "part": 4,
+          "question_count": 5,
+          "type": "MCQ",
+          "description": "Read short dialogue, match questions with answers A-E."
+        }
+      ]
+    }
+  ]
+}

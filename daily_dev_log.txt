@@ -148,3 +148,7 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Optimized GET /api/srs/garden route in server.js to eliminate historical DB write queries on every GET request, moving sync to POST progress updates.
 - Verified syntax and runtime health with node -c and local test server on port 3000.
 - Committed and pushed changes to main branch on GitHub (commit 9fa6c17) to trigger automated Vercel production deployment.
+- Initialized Phase 1 of HSK 1-3 Official Mock Exam System: created data/past_exams/ directory and authored past paper reference templates (hsk1_past_papers.json, hsk2_past_papers.json, hsk3_past_papers.json) based on official CTI/Hanban sample papers.
+- Executed database migration migrate_mock_exams_schema.js, creating mock_exam_questions and user_exam_results tables in Turso Cloud DB with index idx_mock_questions_level_sec.
+- Authored offline question bank generator script generate_hsk_mock_exams.py using google.genai SDK (gemini-3.5-flash) to produce localized EN/TH questions with target_vocab_words diagnostic mapping.
+- Authored seeder script insert_mock_exams.js, resolving target vocabulary characters to database IDs and seeding initial questions into Turso Cloud DB. Verified live record count.
