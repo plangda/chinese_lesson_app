@@ -873,6 +873,222 @@ app.post('/api/srs/fusion/combine', requireAuth, async (req, res) => {
   }
 });
 
+// ==========================================
+// OFFICIAL HSK 1-3 MOCK EXAM ENDPOINTS
+// ==========================================
+
+// GET /api/mock-exams/summary - Get level availability & user's best scores
+app.get('/api/mock-exams/summary', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const stats = await db.all(`
+      SELECT hsk_level, COUNT(id) as total_questions 
+      FROM mock_exam_questions 
+      GROUP BY hsk_level
+    `);
+    const history = await db.all(`
+      SELECT hsk_level, MAX(total_score) as best_score, MAX(passed) as has_passed, MAX(created_at) as last_taken
+      FROM user_exam_results
+      WHERE user_id = ?
+      GROUP BY hsk_level
+    `, [userId]);
+
+    const levelMap = {
+      hsk1: { level: 'hsk1', name: 'HSK 1', questionsTarget: 40, timeLimitMinutes: 35, maxScore: 200, passScore: 120 },
+      hsk2: { level: 'hsk2', name: 'HSK 2', questionsTarget: 55, timeLimitMinutes: 45, maxScore: 200, passScore: 120 },
+      hsk3: { level: 'hsk3', name: 'HSK 3', questionsTarget: 80, timeLimitMinutes: 85, maxScore: 300, passScore: 180 }
+    };
+
+    const result = Object.keys(levelMap).map(lvl => {
+      const info = levelMap[lvl];
+      const qStat = stats.find(s => s.hsk_level === lvl);
+      const hStat = history.find(h => h.hsk_level === lvl);
+      return {
+        ...info,
+        availableQuestions: qStat ? qStat.total_questions : 0,
+        bestScore: hStat ? hStat.best_score : null,
+        hasPassed: hStat ? hStat.has_passed === 1 : false,
+        lastTaken: hStat ? hStat.last_taken : null
+      };
+    });
+
+    res.json({ levels: result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/mock-exams/:level - Fetch questions for an exam session
+app.get('/api/mock-exams/:level', requireAuth, async (req, res) => {
+  try {
+    const level = req.params.level;
+    const questions = await db.all(`
+      SELECT 
+        id, hsk_level, section, question_type, 
+        prompt_cn, prompt_py, prompt_en, prompt_th, 
+        audio_url, image_url, options_json, correct_answer,
+        explanation_en, explanation_th, target_vocab_ids, target_grammar_ids
+      FROM mock_exam_questions
+      WHERE hsk_level = ?
+      ORDER BY section ASC, id ASC
+    `, [level]);
+
+    const parsed = questions.map(q => ({
+      ...q,
+      options: JSON.parse(q.options_json || '[]'),
+      targetVocabIds: JSON.parse(q.target_vocab_ids || '[]'),
+      targetGrammarIds: JSON.parse(q.target_grammar_ids || '[]')
+    }));
+
+    res.json({ level, questions: parsed });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/mock-exams/submit - Submit answers, grade, auto-plant missed words, and return report card
+app.post('/api/mock-exams/submit', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { hskLevel, timeSpentSeconds, answers } = req.body;
+
+    if (!hskLevel || !answers) {
+      return res.status(400).json({ error: 'Missing required exam data' });
+    }
+
+    const questionIds = Object.keys(answers);
+    if (questionIds.length === 0) {
+      return res.status(400).json({ error: 'No answers submitted' });
+    }
+
+    const placeholders = questionIds.map(() => '?').join(',');
+    const dbQuestions = await db.all(`
+      SELECT id, hsk_level, section, correct_answer, target_vocab_ids, target_grammar_ids, explanation_en, explanation_th
+      FROM mock_exam_questions
+      WHERE id IN (${placeholders})
+    `, questionIds);
+
+    let listeningCorrect = 0, listeningTotal = 0;
+    let readingCorrect = 0, readingTotal = 0;
+    let writingCorrect = 0, writingTotal = 0;
+    const missedVocabIds = [];
+    const missedGrammarIds = [];
+
+    dbQuestions.forEach(q => {
+      const userAns = (answers[q.id] || '').trim();
+      const isCorrect = userAns.toLowerCase() === (q.correct_answer || '').trim().toLowerCase();
+      
+      if (q.section === 'listening') {
+        listeningTotal++;
+        if (isCorrect) listeningCorrect++;
+      } else if (q.section === 'writing') {
+        writingTotal++;
+        if (isCorrect) writingCorrect++;
+      } else {
+        readingTotal++;
+        if (isCorrect) readingCorrect++;
+      }
+
+      if (!isCorrect) {
+        const vIds = JSON.parse(q.target_vocab_ids || '[]');
+        missedVocabIds.push(...vIds);
+        const gIds = JSON.parse(q.target_grammar_ids || '[]');
+        missedGrammarIds.push(...gIds);
+      }
+    });
+
+    const isHsk3 = hskLevel === 'hsk3';
+    const maxScore = isHsk3 ? 300 : 200;
+    const passThreshold = isHsk3 ? 180 : 120;
+
+    const listeningScore = listeningTotal > 0 ? Math.round((listeningCorrect / listeningTotal) * 100) : 0;
+    const readingScore = readingTotal > 0 ? Math.round((readingCorrect / readingTotal) * 100) : 0;
+    const writingScore = writingTotal > 0 ? Math.round((writingCorrect / writingTotal) * 100) : 0;
+    const totalScore = isHsk3 ? (listeningScore + readingScore + writingScore) : (listeningScore + readingScore);
+    const passed = totalScore >= passThreshold ? 1 : 0;
+
+    // Auto-plant missed vocabulary into user's SRS garden with times_forgotten += 3 (Wilting Rescue Box)
+    const uniqueMissedVocabIds = Array.from(new Set(missedVocabIds));
+    if (uniqueMissedVocabIds.length > 0) {
+      const tomorrowStr = getBkkDateString(1);
+      for (const vId of uniqueMissedVocabIds) {
+        const vocab = await db.get('SELECT id, character, lesson_id FROM vocab WHERE id = ?', [vId]);
+        if (vocab) {
+          const existing = await db.get('SELECT id, times_forgotten FROM user_vocab_srs WHERE user_id = ? AND vocab_id = ?', [userId, vId]);
+          if (existing) {
+            await db.run(`
+              UPDATE user_vocab_srs 
+              SET times_forgotten = times_forgotten + 3, next_review_date = ?, mastery_stage = 1
+              WHERE id = ?
+            `, [tomorrowStr, existing.id]);
+          } else {
+            await db.run(`
+              INSERT INTO user_vocab_srs (user_id, vocab_id, lesson_id, character, mastery_stage, interval_days, next_review_date, times_forgotten)
+              VALUES (?, ?, ?, ?, 1, 1, ?, 3)
+            `, [userId, vocab.id, vocab.lesson_id, vocab.character, tomorrowStr]);
+          }
+        }
+      }
+    }
+
+    const weaknessSummary = {
+      listeningAccuracy: listeningTotal > 0 ? Math.round((listeningCorrect / listeningTotal) * 100) : 100,
+      readingAccuracy: readingTotal > 0 ? Math.round((readingCorrect / readingTotal) * 100) : 100,
+      writingAccuracy: writingTotal > 0 ? Math.round((writingCorrect / writingTotal) * 100) : 100,
+      missedVocabCount: uniqueMissedVocabIds.length,
+      missedGrammarCount: Array.from(new Set(missedGrammarIds)).length
+    };
+
+    await db.run(`
+      INSERT INTO user_exam_results
+      (user_id, hsk_level, listening_score, reading_score, writing_score, total_score, passed, time_spent_seconds, weakness_summary_json)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      userId,
+      hskLevel,
+      listeningScore,
+      readingScore,
+      writingScore,
+      totalScore,
+      passed,
+      timeSpentSeconds || 0,
+      JSON.stringify(weaknessSummary)
+    ]);
+
+    let missedVocabWords = [];
+    if (uniqueMissedVocabIds.length > 0) {
+      const vPlaceholders = uniqueMissedVocabIds.map(() => '?').join(',');
+      const missedVocabRows = await db.all(`
+        SELECT id, character, pinyin, meaning_en, meaning_th 
+        FROM vocab 
+        WHERE id IN (${vPlaceholders})
+      `, uniqueMissedVocabIds);
+      missedVocabWords = missedVocabRows.map(r => ({
+        id: r.id,
+        character: r.character,
+        pinyin: r.pinyin,
+        meaning: r.meaning_en,
+        meaning_th: r.meaning_th
+      }));
+    }
+
+    res.json({
+      passed: passed === 1,
+      totalScore,
+      maxScore,
+      passThreshold,
+      listeningScore,
+      readingScore,
+      writingScore: isHsk3 ? writingScore : null,
+      weaknessSummary,
+      missedVocabWords,
+      plantedCount: uniqueMissedVocabIds.length
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Start server locally (Vercel will ignore this and use module.exports)
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {

@@ -241,6 +241,80 @@
               </div>
             </div>
           </div>
+
+          <!-- Official HSK Mock Exam Hall Card -->
+          <div id="mock-exam-hall-card" class="glass-panel" style="padding: 1.75rem; border-radius: var(--border-radius-md); border-color: rgba(255, 215, 0, 0.25); background: linear-gradient(135deg, rgba(255, 215, 0, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem;">
+              <div>
+                <h3 style="margin: 0 0 0.25rem 0; font-family: var(--font-serif); display: flex; align-items: center; gap: 0.5rem; font-size: 1.35rem;">
+                  <span>🏆</span> <span data-i18n="mock_exam_hall_title">Official HSK Mock Exam Hall</span>
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin: 0;" data-i18n="mock_exam_hall_desc">
+                  Test your official Chinese proficiency under standard timed exam rules.
+                </p>
+              </div>
+            </div>
+
+            <!-- 3 Level Exam Cards Grid -->
+            <div id="mock-exam-levels-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+              <!-- HSK 1 Card -->
+              <div class="glass-panel" style="padding: 1.25rem; border-radius: 14px; background: rgba(0,0,0,0.15); border: 1px solid rgba(0, 245, 212, 0.2); display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                    <span class="tag tag-hsk1" style="font-size: 0.75rem; font-weight: 700;">HSK 1</span>
+                    <span style="font-size: 0.75rem; color: var(--success); font-weight: 600;" data-i18n="mock_exam_unlocked">🔓 Unlocked</span>
+                  </div>
+                  <h4 style="margin: 0 0 0.4rem 0; font-size: 1.1rem; font-family: var(--font-serif);">HSK 1 Mock Exam</h4>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+                    <div>⏱️ 35 Mins • 40 Questions</div>
+                    <div>🎧 20 Listening • 📖 20 Reading</div>
+                    <div id="hsk1-best-score-badge" style="margin-top: 0.4rem; color: var(--accent); font-weight: 600;">🏆 Best: <span data-i18n="mock_exam_not_taken">Not taken yet</span></div>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="window.startMockExamSession('hsk1')" style="width: 100%; padding: 0.6rem; font-weight: bold; border-radius: 10px; margin-top: 0.5rem;" data-i18n="mock_exam_take_btn">
+                  🚀 Take Mock Exam
+                </button>
+              </div>
+
+              <!-- HSK 2 Card -->
+              <div class="glass-panel" style="padding: 1.25rem; border-radius: 14px; background: rgba(0,0,0,0.15); border: 1px solid rgba(255, 159, 28, 0.2); display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                    <span class="tag tag-hsk2" style="font-size: 0.75rem; font-weight: 700;">HSK 2</span>
+                    <span style="font-size: 0.75rem; color: var(--success); font-weight: 600;" data-i18n="mock_exam_unlocked">🔓 Unlocked</span>
+                  </div>
+                  <h4 style="margin: 0 0 0.4rem 0; font-size: 1.1rem; font-family: var(--font-serif);">HSK 2 Mock Exam</h4>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+                    <div>⏱️ 45 Mins • 55 Questions</div>
+                    <div>🎧 35 Listening • 📖 20 Reading</div>
+                    <div id="hsk2-best-score-badge" style="margin-top: 0.4rem; color: var(--accent); font-weight: 600;">🏆 Best: <span data-i18n="mock_exam_not_taken">Not taken yet</span></div>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="window.startMockExamSession('hsk2')" style="width: 100%; padding: 0.6rem; font-weight: bold; border-radius: 10px; margin-top: 0.5rem;" data-i18n="mock_exam_take_btn">
+                  🚀 Take Mock Exam
+                </button>
+              </div>
+
+              <!-- HSK 3 Card -->
+              <div class="glass-panel" style="padding: 1.25rem; border-radius: 14px; background: rgba(0,0,0,0.15); border: 1px solid rgba(255, 51, 102, 0.2); display: flex; flex-direction: column; justify-content: space-between; gap: 0.75rem;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                    <span class="tag tag-hsk3" style="font-size: 0.75rem; font-weight: 700;">HSK 3</span>
+                    <span style="font-size: 0.75rem; color: var(--success); font-weight: 600;" data-i18n="mock_exam_unlocked">🔓 Unlocked</span>
+                  </div>
+                  <h4 style="margin: 0 0 0.4rem 0; font-size: 1.1rem; font-family: var(--font-serif);">HSK 3 Mock Exam</h4>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+                    <div>⏱️ 85 Mins • 80 Questions</div>
+                    <div>🎧 40 List • 📖 30 Read • ✍️ 10 Write</div>
+                    <div id="hsk3-best-score-badge" style="margin-top: 0.4rem; color: var(--accent); font-weight: 600;">🏆 Best: <span data-i18n="mock_exam_not_taken">Not taken yet</span></div>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="window.startMockExamSession('hsk3')" style="width: 100%; padding: 0.6rem; font-weight: bold; border-radius: 10px; margin-top: 0.5rem;" data-i18n="mock_exam_take_btn">
+                  🚀 Take Mock Exam
+                </button>
+              </div>
+            </div>
+          </div>
           
         </div>
 
@@ -780,11 +854,138 @@
       </div>
     </section>
 
+    <!-- 11. OFFICIAL HSK MOCK EXAM ARENA VIEW -->
+    <section id="mock-exam-view" class="view-section">
+      <div class="glass-panel" style="max-width: 800px; margin: 0 auto; padding: 2rem; border-radius: var(--border-radius-md); border-color: rgba(255, 215, 0, 0.25);">
+        
+        <!-- Exam Arena Sticky Control Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <button class="btn btn-secondary btn-sm" onclick="window.exitMockExamEarly()" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+              🚪 Exit Exam
+            </button>
+            <div>
+              <h3 id="mock-exam-arena-title" style="margin: 0; font-family: var(--font-serif); font-size: 1.2rem;">HSK 1 Mock Exam</h3>
+              <span id="mock-exam-section-tag" class="tag tag-hsk1" style="font-size: 0.75rem; padding: 2px 8px; margin-top: 0.2rem; display: inline-block;">🎧 Listening Section</span>
+            </div>
+          </div>
+
+          <!-- Official Exam Timer & Progress Widget -->
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="timer-widget glass-panel" style="background: rgba(255, 51, 102, 0.1); border-color: rgba(255, 51, 102, 0.3); padding: 0.4rem 0.9rem;">
+              <span style="font-size: 1.1rem; animation: pulse 2s infinite;">⏱️</span>
+              <div id="mock-exam-timer-display" style="font-weight: 700; font-size: 1.1rem; font-family: monospace; color: var(--primary);">35:00</div>
+            </div>
+            <span id="mock-exam-question-progress" style="font-weight: 700; color: var(--accent); font-size: 0.9rem;">Q 1 of 40</span>
+          </div>
+        </div>
+
+        <!-- Question Container -->
+        <div id="mock-exam-question-container" style="min-height: 380px; display: flex; flex-direction: column; justify-content: space-between;">
+          <!-- Dynamically populated question card (Audio player, prompt, options) -->
+        </div>
+
+        <!-- Exam Bottom Navigation Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem; margin-top: 1.5rem;">
+          <button id="mock-exam-prev-btn" class="btn btn-secondary" onclick="window.navigateMockExam(-1)">
+            ⬅️ Previous
+          </button>
+          <button id="mock-exam-submit-btn" class="btn btn-primary" onclick="window.submitMockExam()" style="background: linear-gradient(135deg, #00f5d4 0%, #00bbf9 100%); color: #000; font-weight: bold; padding: 0.75rem 2rem; border-radius: 12px; box-shadow: 0 0 20px rgba(0, 245, 212, 0.3);" data-i18n="mock_exam_submit_btn">
+            📝 Submit Exam
+          </button>
+          <button id="mock-exam-next-btn" class="btn btn-primary" onclick="window.navigateMockExam(1)">
+            Next ➡️
+          </button>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
   <!-- hsk1_data.js removed, using dynamic backend -->
   <script src="i18n.js?v=9" defer></script>
   <script type="module" src="app.js?v=22" defer></script>
+
+  <!-- Official HSK Mock Exam Diagnostic Score Report Modal -->
+  <div id="mock-exam-result-modal" class="modal-backdrop hidden" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); z-index: 10000; justify-content: center; align-items: center; padding: 1.5rem;">
+    <div class="glass-panel" style="max-width: 650px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2.25rem; border-radius: 20px; border-color: rgba(255, 215, 0, 0.35); text-align: center;">
+      
+      <div id="mock-exam-result-badge" style="font-size: 4rem; margin-bottom: 0.5rem;">🎉</div>
+      <h2 id="mock-exam-result-heading" style="font-family: var(--font-serif); margin: 0 0 0.5rem 0; font-size: 1.8rem;">Official Mock Exam Result</h2>
+      <p id="mock-exam-result-subheading" style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+        Here is your diagnostic performance report based on official HSK 3.0 grading standards.
+      </p>
+
+      <!-- Score Card Box -->
+      <div class="glass-panel" style="padding: 1.5rem; border-radius: 16px; background: rgba(0,0,0,0.25); margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+        <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;" data-i18n="mock_exam_score_total">Total Scaled Score</div>
+            <div id="mock-exam-total-score" style="font-size: 2.8rem; font-weight: 800; color: var(--accent); font-family: monospace;">180 / 200</div>
+          </div>
+          <div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Status</div>
+            <div id="mock-exam-pass-status" style="font-size: 1.5rem; font-weight: 800; color: var(--success);">PASS 🎉</div>
+          </div>
+        </div>
+
+        <div id="mock-exam-sections-breakdown" style="display: flex; justify-content: space-around; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem; font-size: 0.9rem;">
+          <div>🎧 Listening: <strong id="mock-exam-score-listening" style="color: var(--primary);">90 / 100</strong></div>
+          <div>📖 Reading: <strong id="mock-exam-score-reading" style="color: var(--accent);">90 / 100</strong></div>
+          <div id="mock-exam-score-writing-box" class="hidden">✍️ Writing: <strong id="mock-exam-score-writing" style="color: var(--success);">80 / 100</strong></div>
+        </div>
+      </div>
+
+      <!-- Diagnostic Sub-skills Breakdown -->
+      <div class="glass-panel" style="padding: 1.25rem; border-radius: 14px; background: rgba(255,255,255,0.02); text-align: left; margin-bottom: 1.5rem;">
+        <h4 style="margin: 0 0 0.75rem 0; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;" data-i18n="mock_exam_subskill_title">
+          📊 Sub-Skill Diagnostic Breakdown
+        </h4>
+        <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.85rem;">
+          <div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
+              <span>🎧 Listening Comprehension</span>
+              <span id="mock-exam-diag-listening-pct">90%</span>
+            </div>
+            <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+              <div id="mock-exam-diag-listening-bar" style="width: 90%; height: 100%; background: var(--primary);"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
+              <span>📖 Reading &amp; Vocabulary</span>
+              <span id="mock-exam-diag-reading-pct">85%</span>
+            </div>
+            <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+              <div id="mock-exam-diag-reading-bar" style="width: 85%; height: 100%; background: var(--accent);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Missed Words Auto-Planted Box -->
+      <div id="mock-exam-missed-words-panel" class="glass-panel hidden" style="padding: 1.25rem; border-radius: 14px; background: rgba(255, 51, 102, 0.05); border-left: 4px solid var(--primary); text-align: left; margin-bottom: 1.5rem;">
+        <h4 style="margin: 0 0 0.5rem 0; color: var(--primary); font-size: 0.9rem;" data-i18n="mock_exam_missed_vocab_title">
+          🎯 Missed Exam Words (Auto-Planted into Garden Rescue Box)
+        </h4>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0 0 0.75rem 0;">
+          These words have been automatically planted into your Vocab Garden Rescue Box for high-priority watering tomorrow!
+        </p>
+        <div id="mock-exam-missed-words-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+          <!-- Injected missed character tags -->
+        </div>
+      </div>
+
+      <!-- Modal Actions -->
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="window.closeMockExamResultModal()" style="padding: 0.8rem 2.5rem; font-weight: bold; border-radius: 12px; box-shadow: 0 0 20px var(--primary-glow);" data-i18n="mock_exam_btn_return">
+          🚀 Return to Dashboard
+        </button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- Pinyin Tone Modal -->
   <div id="pinyin-tone-modal" class="modal-overlay hidden" >

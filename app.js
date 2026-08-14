@@ -351,6 +351,9 @@ function switchView(viewId) {
     } else {
       renderDashboard();
     }
+    if (typeof window.loadMockExamSummary === 'function') {
+      window.loadMockExamSummary();
+    }
   }
   if (viewId === "seed-fusion-lab-view") {
     window.initActiveRadicalLab();
@@ -3556,6 +3559,428 @@ window.checkSentenceQuest = function() {
   }
 };
 
+// ==========================================
+// 🏆 OFFICIAL HSK 1-3 MOCK EXAM CONTROLLER
+// ==========================================
+let currentMockExamSession = {
+  hskLevel: 'hsk1',
+  questions: [],
+  currentIndex: 0,
+  userAnswers: {},
+  reorderState: {},
+  timerInterval: null,
+  secondsRemaining: 0,
+  totalTimeSeconds: 0
+};
+
+async function loadMockExamSummary() {
+  try {
+    const token = localStorage.getItem("hanpath_token");
+    const res = await fetch('/api/mock-exams/summary', {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const levels = data.levels || [];
+    
+    levels.forEach(lvl => {
+      const badge = document.getElementById(`${lvl.level}-best-score-badge`);
+      if (badge) {
+        if (lvl.bestScore !== null && lvl.bestScore !== undefined) {
+          const passTag = lvl.hasPassed ? '🎉 PASS' : '⚠️ RETAKE';
+          badge.innerHTML = `🏆 Best: <strong>${lvl.bestScore} / ${lvl.maxScore}</strong> (${passTag})`;
+        } else {
+          badge.innerHTML = `🏆 Best: <span>${t('mock_exam_not_taken')}</span>`;
+        }
+      }
+    });
+  } catch (err) {
+    console.error("Failed to load mock exam summary:", err);
+  }
+}
+window.loadMockExamSummary = loadMockExamSummary;
+
+async function startMockExamSession(level) {
+  try {
+    const token = localStorage.getItem("hanpath_token");
+    const res = await fetch(`/api/mock-exams/${level}`, {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) {
+      alert("Failed to load mock exam questions. Please try again.");
+      return;
+    }
+    const data = await res.json();
+    const questions = data.questions || [];
+    if (questions.length === 0) {
+      alert("No questions available for this level yet.");
+      return;
+    }
+
+    const timeLimits = {
+      hsk1: 35 * 60,
+      hsk2: 45 * 60,
+      hsk3: 85 * 60
+    };
+    const totalTime = timeLimits[level] || 35 * 60;
+
+    currentMockExamSession = {
+      hskLevel: level,
+      questions: questions,
+      currentIndex: 0,
+      userAnswers: {},
+      reorderState: {},
+      timerInterval: null,
+      secondsRemaining: totalTime,
+      totalTimeSeconds: totalTime
+    };
+
+    // Start countdown timer
+    clearInterval(currentMockExamSession.timerInterval);
+    currentMockExamSession.timerInterval = setInterval(() => {
+      currentMockExamSession.secondsRemaining--;
+      updateMockExamTimerDisplay();
+      if (currentMockExamSession.secondsRemaining <= 0) {
+        clearInterval(currentMockExamSession.timerInterval);
+        alert("Time is up! Submitting your exam automatically...");
+        submitMockExam();
+      }
+    }, 1000);
+
+    // Switch view
+    switchView('mock-exam-view');
+    updateMockExamTimerDisplay();
+    renderMockExamQuestion();
+  } catch (err) {
+    console.error("Failed to start mock exam session:", err);
+    alert("Error launching mock exam session.");
+  }
+}
+window.startMockExamSession = startMockExamSession;
+
+function updateMockExamTimerDisplay() {
+  const display = document.getElementById('mock-exam-timer-display');
+  if (!display) return;
+  const secs = Math.max(0, currentMockExamSession.secondsRemaining);
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  display.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function renderMockExamQuestion() {
+  const session = currentMockExamSession;
+  const q = session.questions[session.currentIndex];
+  if (!q) return;
+
+  const total = session.questions.length;
+  const idx = session.currentIndex;
+
+  const titleElem = document.getElementById('mock-exam-arena-title');
+  if (titleElem) titleElem.textContent = `${session.hskLevel.toUpperCase()} Mock Exam`;
+
+  const secElem = document.getElementById('mock-exam-section-tag');
+  if (secElem) {
+    const secName = q.section === 'listening' ? t('mock_exam_listening_sec') : (q.section === 'writing' ? t('mock_exam_writing_sec') : t('mock_exam_reading_sec'));
+    secElem.textContent = secName;
+    secElem.className = `tag tag-${session.hskLevel}`;
+  }
+
+  const progElem = document.getElementById('mock-exam-question-progress');
+  if (progElem) progElem.textContent = `Q ${idx + 1} of ${total}`;
+
+  const prevBtn = document.getElementById('mock-exam-prev-btn');
+  if (prevBtn) prevBtn.disabled = (idx === 0);
+
+  const nextBtn = document.getElementById('mock-exam-next-btn');
+  if (nextBtn) nextBtn.disabled = (idx === total - 1);
+
+  const localizedPrompt = state.currentLanguage === 'th' ? (q.prompt_th || q.prompt_en) : (q.prompt_en || q.prompt_th);
+  const container = document.getElementById('mock-exam-question-container');
+  if (!container) return;
+
+  const selectedAnswer = session.userAnswers[q.id] || '';
+
+  let html = `<div class="glass-panel" style="padding: 1.5rem; border-radius: 14px; background: rgba(0,0,0,0.15); margin-bottom: 1rem;">`;
+
+  if (q.section === 'listening') {
+    html += `
+      <div style="margin-bottom: 1.5rem; text-align: center; background: rgba(255, 51, 102, 0.08); padding: 1.25rem; border-radius: 14px; border: 1px solid rgba(255, 51, 102, 0.2);">
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Official HSK Audio Prompt (Plays 2 Times)</div>
+        <button class="btn btn-primary" onclick="window.playMockExamAudio('${encodeURIComponent(q.prompt_cn)}', '${q.audio_url || ''}')" style="padding: 0.75rem 2rem; font-weight: bold; border-radius: 24px; box-shadow: 0 4px 15px rgba(255,51,102,0.25);">
+          🔊 ${t('mock_exam_audio_play')}
+        </button>
+      </div>
+    `;
+  }
+
+  html += `
+    <div style="margin-bottom: 1.5rem; text-align: center;">
+      ${q.image_url ? `<div style="margin-bottom: 1rem;"><img src="${q.image_url}" alt="Exam Illustration" style="max-height: 140px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" onerror="this.style.display='none'" /></div>` : ''}
+      <div style="font-size: 1.75rem; font-weight: bold; font-family: var(--font-serif); margin-bottom: 0.35rem; color: var(--text-primary);">${q.prompt_cn}</div>
+      ${q.prompt_py ? `<div style="font-size: 1rem; color: var(--accent); margin-bottom: 0.5rem;">${q.prompt_py}</div>` : ''}
+      ${localizedPrompt ? `<div style="font-size: 0.9rem; color: var(--text-secondary);">${localizedPrompt}</div>` : ''}
+    </div>
+  `;
+
+  html += `<div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 500px; margin: 0 auto;">`;
+
+  if (q.question_type === 'TRUE_FALSE') {
+    const isTrueSelected = selectedAnswer === 'True';
+    const isFalseSelected = selectedAnswer === 'False';
+    html += `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <button class="btn ${isTrueSelected ? 'btn-primary' : 'btn-secondary'}" 
+                onclick="window.selectMockExamAnswer(${q.id}, 'True')"
+                style="padding: 1rem; font-size: 1.2rem; font-weight: bold; border-radius: 12px;">
+          ✓ True / 对
+        </button>
+        <button class="btn ${isFalseSelected ? 'btn-primary' : 'btn-secondary'}" 
+                onclick="window.selectMockExamAnswer(${q.id}, 'False')"
+                style="padding: 1rem; font-size: 1.2rem; font-weight: bold; border-radius: 12px;">
+          ✗ False / 错
+        </button>
+      </div>
+    `;
+  } else if (q.question_type === 'REORDER') {
+    const options = q.options || [];
+    const currentOrder = session.reorderState[q.id] || [];
+    
+    html += `
+      <div style="margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">
+        Click words to assemble the sentence:
+      </div>
+      <div id="reorder-tray-${q.id}" style="min-height: 50px; padding: 0.75rem; border: 2px dashed rgba(0, 245, 212, 0.3); border-radius: 10px; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; align-items: center; background: rgba(0,0,0,0.2); margin-bottom: 1rem;">
+        ${currentOrder.length === 0 ? '<span style="color: var(--text-muted); font-size: 0.85rem;">Click word blocks below in order</span>' : ''}
+        ${currentOrder.map((w, wIdx) => `
+          <button class="btn btn-primary btn-sm" onclick="window.removeMockReorderWord(${q.id}, ${wIdx})" style="font-size: 1.1rem; padding: 0.4rem 0.8rem; border-radius: 8px;">
+            ${w}
+          </button>
+        `).join('')}
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">
+        ${options.map((w, wIdx) => `
+          <button class="btn btn-secondary btn-sm" onclick="window.addMockReorderWord(${q.id}, '${w}')" style="font-size: 1.1rem; padding: 0.4rem 0.8rem; border-radius: 8px;">
+            ${w}
+          </button>
+        `).join('')}
+      </div>
+    `;
+  } else {
+    const options = q.options || [];
+    options.forEach(opt => {
+      const isSelected = (selectedAnswer === opt);
+      html += `
+        <button class="btn ${isSelected ? 'btn-primary' : 'btn-secondary'}" 
+                onclick="window.selectMockExamAnswer(${q.id}, '${opt.replace(/'/g, "\\'")}')"
+                style="padding: 0.85rem 1.25rem; text-align: left; border-radius: 12px; font-size: 1rem; font-weight: ${isSelected ? 'bold' : 'normal'}; display: flex; align-items: center; justify-content: space-between; border-color: ${isSelected ? 'var(--primary)' : 'rgba(255,255,255,0.1)'};">
+          <span>${opt}</span>
+          ${isSelected ? '<span>✓</span>' : ''}
+        </button>
+      `;
+    });
+  }
+
+  html += `</div></div>`;
+  container.innerHTML = html;
+}
+window.renderMockExamQuestion = renderMockExamQuestion;
+
+function selectMockExamAnswer(questionId, answer) {
+  currentMockExamSession.userAnswers[questionId] = answer;
+  renderMockExamQuestion();
+}
+window.selectMockExamAnswer = selectMockExamAnswer;
+
+function addMockReorderWord(questionId, word) {
+  if (!currentMockExamSession.reorderState[questionId]) {
+    currentMockExamSession.reorderState[questionId] = [];
+  }
+  currentMockExamSession.reorderState[questionId].push(word);
+  currentMockExamSession.userAnswers[questionId] = currentMockExamSession.reorderState[questionId].join('');
+  renderMockExamQuestion();
+}
+window.addMockReorderWord = addMockReorderWord;
+
+function removeMockReorderWord(questionId, index) {
+  if (currentMockExamSession.reorderState[questionId]) {
+    currentMockExamSession.reorderState[questionId].splice(index, 1);
+    currentMockExamSession.userAnswers[questionId] = currentMockExamSession.reorderState[questionId].join('');
+    renderMockExamQuestion();
+  }
+}
+window.removeMockReorderWord = removeMockReorderWord;
+
+function navigateMockExam(direction) {
+  const newIndex = currentMockExamSession.currentIndex + direction;
+  if (newIndex >= 0 && newIndex < currentMockExamSession.questions.length) {
+    currentMockExamSession.currentIndex = newIndex;
+    renderMockExamQuestion();
+  }
+}
+window.navigateMockExam = navigateMockExam;
+
+function playMockExamAudio(encodedText, audioUrl) {
+  const text = decodeURIComponent(encodedText || '');
+  if (audioUrl) {
+    const audio = new Audio(audioUrl);
+    audio.play().catch(() => {
+      speakTwice(text);
+    });
+  } else {
+    speakTwice(text);
+  }
+}
+window.playMockExamAudio = playMockExamAudio;
+
+function speakTwice(text) {
+  if (!('speechSynthesis' in window) || !text) return;
+  window.speechSynthesis.cancel();
+  
+  const utter1 = new SpeechSynthesisUtterance(text);
+  utter1.lang = 'zh-CN';
+  utter1.rate = 0.85;
+
+  const utter2 = new SpeechSynthesisUtterance(text);
+  utter2.lang = 'zh-CN';
+  utter2.rate = 0.85;
+
+  utter1.onend = () => {
+    setTimeout(() => {
+      window.speechSynthesis.speak(utter2);
+    }, 1200);
+  };
+
+  window.speechSynthesis.speak(utter1);
+}
+
+async function submitMockExam() {
+  clearInterval(currentMockExamSession.timerInterval);
+  const timeSpent = currentMockExamSession.totalTimeSeconds - currentMockExamSession.secondsRemaining;
+  
+  try {
+    const token = localStorage.getItem("hanpath_token");
+    const res = await fetch('/api/mock-exams/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        hskLevel: currentMockExamSession.hskLevel,
+        timeSpentSeconds: timeSpent,
+        answers: currentMockExamSession.userAnswers
+      })
+    });
+
+    if (!res.ok) {
+      alert("Failed to submit exam results.");
+      return;
+    }
+
+    const report = await res.json();
+    showMockExamResultModal(report);
+  } catch (err) {
+    console.error("Failed to submit mock exam:", err);
+    alert("Network error submitting exam.");
+  }
+}
+window.submitMockExam = submitMockExam;
+
+function showMockExamResultModal(report) {
+  const modal = document.getElementById('mock-exam-result-modal');
+  if (!modal) return;
+
+  const badge = document.getElementById('mock-exam-result-badge');
+  if (badge) badge.textContent = report.passed ? '🎉' : '📚';
+
+  const heading = document.getElementById('mock-exam-result-heading');
+  if (heading) heading.textContent = report.passed ? t('mock_exam_passed') : t('mock_exam_failed');
+
+  const scoreElem = document.getElementById('mock-exam-total-score');
+  if (scoreElem) scoreElem.textContent = `${report.totalScore} / ${report.maxScore}`;
+
+  const statusElem = document.getElementById('mock-exam-pass-status');
+  if (statusElem) {
+    statusElem.textContent = report.passed ? 'PASS 🎉' : 'RETAKE ⚠️';
+    statusElem.style.color = report.passed ? 'var(--success)' : 'var(--accent)';
+  }
+
+  const listElem = document.getElementById('mock-exam-score-listening');
+  if (listElem) listElem.textContent = `${report.listeningScore} / 100`;
+
+  const readElem = document.getElementById('mock-exam-score-reading');
+  if (readElem) readElem.textContent = `${report.readingScore} / 100`;
+
+  const writeBox = document.getElementById('mock-exam-score-writing-box');
+  const writeElem = document.getElementById('mock-exam-score-writing');
+  if (writeBox && writeElem) {
+    if (report.writingScore !== null && report.writingScore !== undefined) {
+      writeBox.classList.remove('hidden');
+      writeElem.textContent = `${report.writingScore} / 100`;
+    } else {
+      writeBox.classList.add('hidden');
+    }
+  }
+
+  const listPct = report.weaknessSummary ? report.weaknessSummary.listeningAccuracy : 100;
+  const readPct = report.weaknessSummary ? report.weaknessSummary.readingAccuracy : 100;
+  
+  const listPctElem = document.getElementById('mock-exam-diag-listening-pct');
+  const listBar = document.getElementById('mock-exam-diag-listening-bar');
+  if (listPctElem) listPctElem.textContent = `${listPct}%`;
+  if (listBar) listBar.style.width = `${listPct}%`;
+
+  const readPctElem = document.getElementById('mock-exam-diag-reading-pct');
+  const readBar = document.getElementById('mock-exam-diag-reading-bar');
+  if (readPctElem) readPctElem.textContent = `${readPct}%`;
+  if (readBar) readBar.style.width = `${readPct}%`;
+
+  const missedPanel = document.getElementById('mock-exam-missed-words-panel');
+  const missedList = document.getElementById('mock-exam-missed-words-list');
+  const missedWords = report.missedVocabWords || [];
+
+  if (missedPanel && missedList) {
+    if (missedWords.length > 0) {
+      missedPanel.classList.remove('hidden');
+      missedList.innerHTML = missedWords.map(w => {
+        const localizedMeaning = state.currentLanguage === 'th' ? (w.meaning_th || w.meaning) : (w.meaning || w.meaning_th);
+        return `
+          <div class="tag" style="background: rgba(255, 51, 102, 0.15); color: var(--primary); font-size: 0.85rem; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255, 51, 102, 0.3);">
+            <strong>${w.character}</strong> (${w.pinyin}): ${localizedMeaning}
+          </div>
+        `;
+      }).join('');
+    } else {
+      missedPanel.classList.add('hidden');
+    }
+  }
+
+  modal.style.display = 'flex';
+  modal.classList.remove('hidden');
+}
+
+function exitMockExamEarly() {
+  if (confirm("Are you sure you want to exit the mock exam? Your current answers will not be graded.")) {
+    clearInterval(currentMockExamSession.timerInterval);
+    switchView('dashboard-view');
+  }
+}
+window.exitMockExamEarly = exitMockExamEarly;
+
+function closeMockExamResultModal() {
+  const modal = document.getElementById('mock-exam-result-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+  }
+  switchView('dashboard-view');
+  loadMockExamSummary();
+  if (typeof renderVocabGardenWidget === 'function') {
+    renderVocabGardenWidget();
+  }
+}
+window.closeMockExamResultModal = closeMockExamResultModal;
+
 // Global exports of other functions accessed via HTML to ensure ESM backward compatibility
 window.playTone = playTone;
 window.speakText = speakText;
@@ -3571,5 +3996,9 @@ window.srsEngine = srsEngine;
 if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
     setupSrsEventListeners();
+    if (typeof loadMockExamSummary === 'function') {
+      loadMockExamSummary();
+    }
   });
 }
+

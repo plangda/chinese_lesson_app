@@ -307,7 +307,28 @@ const i18nDictionary = {
 
     // Early Exit (added 2026-08-10)
     "early_exit_title": "Finish Session Early?",
-    "early_exit_msg": "Do you want to end your review session now and claim your earned XP? Your progress on completed words is already saved."
+    "early_exit_msg": "Do you want to end your review session now and claim your earned XP? Your progress on completed words is already saved.",
+
+    // Official HSK Mock Exam Hall (added 2026-08-14)
+    "mock_exam_hall_title": "🏆 Official HSK Mock Exam Hall",
+    "mock_exam_hall_desc": "Test your official Chinese proficiency under standard timed exam rules (Listening, Reading, and Writing).",
+    "mock_exam_take_btn": "🚀 Take Mock Exam",
+    "mock_exam_unlocked": "🔓 Unlocked (Take Now)",
+    "mock_exam_best_score": "🏆 Best Score: {{score}}",
+    "mock_exam_not_taken": "Not taken yet",
+    "mock_exam_submit_btn": "📝 Submit Exam",
+    "mock_exam_listening_sec": "🎧 Listening Section",
+    "mock_exam_reading_sec": "📖 Reading Section",
+    "mock_exam_writing_sec": "✍️ Writing Section",
+    "mock_exam_result_title": "Official Mock Exam Result",
+    "mock_exam_passed": "🎉 CONGRATULATIONS! YOU PASSED!",
+    "mock_exam_failed": "Keep practicing! You can pass on your next attempt.",
+    "mock_exam_score_total": "Total Scaled Score",
+    "mock_exam_subskill_title": "📊 Sub-Skill Diagnostic Breakdown",
+    "mock_exam_missed_vocab_title": "🎯 Missed Exam Words (Auto-Planted into Garden Rescue Box)",
+    "mock_exam_btn_return": "🚀 Return to Dashboard",
+    "mock_exam_btn_plant_garden": "🪴 Plant in Garden Rescue Box",
+    "mock_exam_audio_play": "🔊 Listen (Plays 2x)"
   },
   
   th: {
@@ -613,7 +634,28 @@ const i18nDictionary = {
 
     // Early Exit TH (added 2026-08-10)
     "early_exit_title": "จบการฝึกก่อนเวลา?",
-    "early_exit_msg": "คุณต้องการจบการทบทวนตอนนี้และรับ XP หรือไม่? ความคืบหน้าของคำศัพท์ที่ทบทวนเสร็จแล้วจะถูกบันทึกไว้"
+    "early_exit_msg": "คุณต้องการจบการทบทวนตอนนี้และรับ XP หรือไม่? ความคืบหน้าของคำศัพท์ที่ทบทวนเสร็จแล้วจะถูกบันทึกไว้",
+
+    // Official HSK Mock Exam Hall TH (added 2026-08-14)
+    "mock_exam_hall_title": "🏆 ศูนย์สอบจำลอง HSK ทางการ",
+    "mock_exam_hall_desc": "ทดสอบวัดระดับภาษาจีนตามมาตรฐานการสอบจับเวลาจริง (การฟัง, การอ่าน, และการเขียน)",
+    "mock_exam_take_btn": "🚀 เริ่มทำข้อสอบจำลอง",
+    "mock_exam_unlocked": "🔓 ปลดล็อกแล้ว (เริ่มสอบได้ทันที)",
+    "mock_exam_best_score": "🏆 คะแนนสูงสุด: {{score}}",
+    "mock_exam_not_taken": "ยังไม่ได้สอบ",
+    "mock_exam_submit_btn": "📝 ส่งข้อสอบ",
+    "mock_exam_listening_sec": "🎧 ส่วนการฟัง",
+    "mock_exam_reading_sec": "📖 ส่วนการอ่าน",
+    "mock_exam_writing_sec": "✍️ ส่วนการเขียน",
+    "mock_exam_result_title": "ผลการสอบจำลองทางการ",
+    "mock_exam_passed": "🎉 ยินดีด้วย! คุณสอบผ่านแล้ว!",
+    "mock_exam_failed": "พยายามต่อไปนะ! ครั้งหน้าทำได้แน่นอน",
+    "mock_exam_score_total": "คะแนนรวมทั้งหมด",
+    "mock_exam_subskill_title": "📊 วิเคราะห์ความสามารถรายทักษะ",
+    "mock_exam_missed_vocab_title": "🎯 คำศัพท์ที่ตอบผิด (เพิ่มเข้าสวนเพื่อทบทวนอัตโนมัติ)",
+    "mock_exam_btn_return": "🚀 กลับสู่หน้าหลัก",
+    "mock_exam_btn_plant_garden": "🪴 ปลูกในสวนคำศัพท์",
+    "mock_exam_audio_play": "🔊 ฟังเสียง (เล่น 2 รอบ)"
   }
 };
 

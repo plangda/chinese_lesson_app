@@ -152,3 +152,9 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Executed database migration migrate_mock_exams_schema.js, creating mock_exam_questions and user_exam_results tables in Turso Cloud DB with index idx_mock_questions_level_sec.
 - Authored offline question bank generator script generate_hsk_mock_exams.py using google.genai SDK (gemini-3.5-flash) to produce localized EN/TH questions with target_vocab_words diagnostic mapping.
 - Authored seeder script insert_mock_exams.js, resolving target vocabulary characters to database IDs and seeding initial questions into Turso Cloud DB. Verified live record count.
+- Implemented Phase 2 & 3 Mock Exam backend endpoints in server.js: GET /api/mock-exams/summary, GET /api/mock-exams/:level, and POST /api/mock-exams/submit with auto-grading, diagnostic sub-skill calculation, and automated SRS rescue-box planting for missed vocabulary (times_forgotten += 3).
+- Integrated Official HSK Mock Exam Hall dashboard UI card in index.html with 3 unlocked level cards (HSK 1, HSK 2, HSK 3) and live best-score badges.
+- Built #mock-exam-view Exam Arena with countdown timers (35m/45m/85m), 2x auto-repeating audio prompt player (with Web Speech API fallback), and interactive question cards (True/False, MCQ, Cloze, Sentence Reordering).
+- Built #mock-exam-result-modal diagnostic score report card displaying official scaled score, Pass/Fail status (60% threshold), sub-skill performance progress bars, and auto-planted missed vocabulary character chips.
+- Localized all new Mock Exam Hall, Exam Arena, and Diagnostic Report Card UI strings in i18n.js in English and Thai.
+- Verified local test server on port 3000 and deployed to GitHub and Vercel production.
