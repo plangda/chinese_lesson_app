@@ -3699,30 +3699,36 @@ function renderMockExamQuestion() {
   if (!container) return;
 
   const selectedAnswer = session.userAnswers[q.id] || '';
+  const isListening = (q.section === 'listening');
+  const isHsk3 = (session.hskLevel === 'hsk3');
 
-  let html = `<div class="glass-panel" style="padding: 1.5rem; border-radius: 14px; background: rgba(0,0,0,0.15); margin-bottom: 1rem;">`;
+  let html = `<div class="glass-panel" style="padding: 1.75rem; border-radius: 16px; background: rgba(0,0,0,0.15); margin-bottom: 1rem;">`;
 
-  if (q.section === 'listening') {
+  // 1. If Listening question, render Audio Player button (transcript hidden during exam)
+  if (isListening) {
     html += `
-      <div style="margin-bottom: 1.5rem; text-align: center; background: rgba(255, 51, 102, 0.08); padding: 1.25rem; border-radius: 14px; border: 1px solid rgba(255, 51, 102, 0.2);">
-        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Official HSK Audio Prompt (Plays 2 Times)</div>
-        <button class="btn btn-primary" onclick="window.playMockExamAudio('${encodeURIComponent(q.prompt_cn)}', '${q.audio_url || ''}')" style="padding: 0.75rem 2rem; font-weight: bold; border-radius: 24px; box-shadow: 0 4px 15px rgba(255,51,102,0.25);">
+      <div style="margin-bottom: 1.5rem; text-align: center; background: rgba(255, 51, 102, 0.08); padding: 1.5rem; border-radius: 16px; border: 1px solid rgba(255, 51, 102, 0.25);">
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Official HSK Listening Prompt (Plays 2 Times)</div>
+        <button class="btn btn-primary" onclick="window.playMockExamAudio('${encodeURIComponent(q.prompt_cn)}', '${q.audio_url || ''}')" style="padding: 0.85rem 2.25rem; font-weight: bold; border-radius: 28px; box-shadow: 0 4px 18px rgba(255,51,102,0.3); font-size: 1.05rem;">
           🔊 ${t('mock_exam_audio_play')}
         </button>
       </div>
     `;
+    if (q.image_url) {
+      html += `<div style="margin-bottom: 1.25rem; text-align: center;"><img src="${q.image_url}" alt="Exam Illustration" style="max-height: 140px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);" onerror="this.style.display='none'" /></div>`;
+    }
+  } else {
+    // Reading or Writing section prompt
+    html += `
+      <div style="margin-bottom: 1.5rem; text-align: center;">
+        ${q.image_url ? `<div style="margin-bottom: 1rem;"><img src="${q.image_url}" alt="Exam Illustration" style="max-height: 140px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);" onerror="this.style.display='none'" /></div>` : ''}
+        <div style="font-size: 1.85rem; font-weight: bold; font-family: var(--font-serif); margin-bottom: 0.4rem; color: var(--text-primary);">${q.prompt_cn}</div>
+        ${(!isHsk3 && q.prompt_py) ? `<div style="font-size: 1.05rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: 500;">${q.prompt_py}</div>` : ''}
+      </div>
+    `;
   }
 
-  html += `
-    <div style="margin-bottom: 1.5rem; text-align: center;">
-      ${q.image_url ? `<div style="margin-bottom: 1rem;"><img src="${q.image_url}" alt="Exam Illustration" style="max-height: 140px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" onerror="this.style.display='none'" /></div>` : ''}
-      <div style="font-size: 1.75rem; font-weight: bold; font-family: var(--font-serif); margin-bottom: 0.35rem; color: var(--text-primary);">${q.prompt_cn}</div>
-      ${q.prompt_py ? `<div style="font-size: 1rem; color: var(--accent); margin-bottom: 0.5rem;">${q.prompt_py}</div>` : ''}
-      ${localizedPrompt ? `<div style="font-size: 0.9rem; color: var(--text-secondary);">${localizedPrompt}</div>` : ''}
-    </div>
-  `;
-
-  html += `<div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 500px; margin: 0 auto;">`;
+  html += `<div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 520px; margin: 0 auto;">`;
 
   if (q.question_type === 'TRUE_FALSE') {
     const isTrueSelected = selectedAnswer === 'True';
@@ -3749,20 +3755,40 @@ function renderMockExamQuestion() {
       <div style="margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">
         Click words to assemble the sentence:
       </div>
-      <div id="reorder-tray-${q.id}" style="min-height: 50px; padding: 0.75rem; border: 2px dashed rgba(0, 245, 212, 0.3); border-radius: 10px; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; align-items: center; background: rgba(0,0,0,0.2); margin-bottom: 1rem;">
+      <div id="reorder-tray-${q.id}" style="min-height: 54px; padding: 0.75rem; border: 2px dashed rgba(0, 245, 212, 0.4); border-radius: 12px; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; align-items: center; background: rgba(0,0,0,0.25); margin-bottom: 1rem;">
         ${currentOrder.length === 0 ? '<span style="color: var(--text-muted); font-size: 0.85rem;">Click word blocks below in order</span>' : ''}
         ${currentOrder.map((w, wIdx) => `
-          <button class="btn btn-primary btn-sm" onclick="window.removeMockReorderWord(${q.id}, ${wIdx})" style="font-size: 1.1rem; padding: 0.4rem 0.8rem; border-radius: 8px;">
+          <button class="btn btn-primary btn-sm" onclick="window.removeMockReorderWord(${q.id}, ${wIdx})" style="font-size: 1.15rem; padding: 0.45rem 0.9rem; border-radius: 8px;">
             ${w}
           </button>
         `).join('')}
       </div>
       <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">
         ${options.map((w, wIdx) => `
-          <button class="btn btn-secondary btn-sm" onclick="window.addMockReorderWord(${q.id}, '${w}')" style="font-size: 1.1rem; padding: 0.4rem 0.8rem; border-radius: 8px;">
+          <button class="btn btn-secondary btn-sm" onclick="window.addMockReorderWord(${q.id}, '${w}')" style="font-size: 1.15rem; padding: 0.45rem 0.9rem; border-radius: 8px;">
             ${w}
           </button>
         `).join('')}
+      </div>
+    `;
+  } else if (q.question_type === 'CLOZE_CHAR') {
+    // HSK 3 Writing Part 2: Pinyin Character Fill
+    const options = q.options || [];
+    html += `
+      <div style="margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-secondary); text-align: center;">
+        Select the correct Chinese character to fill the blank:
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.75rem;">
+        ${options.map(opt => {
+          const isSelected = (selectedAnswer === opt);
+          return `
+            <button class="btn ${isSelected ? 'btn-primary' : 'btn-secondary'}" 
+                    onclick="window.selectMockExamAnswer(${q.id}, '${opt.replace(/'/g, "\\'")}')"
+                    style="padding: 1rem; font-size: 1.6rem; font-weight: bold; font-family: var(--font-serif); border-radius: 12px; border-color: ${isSelected ? 'var(--primary)' : 'rgba(255,255,255,0.1)'};">
+              ${opt}
+            </button>
+          `;
+        }).join('')}
       </div>
     `;
   } else {

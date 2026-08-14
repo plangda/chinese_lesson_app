@@ -39,6 +39,9 @@ async function insertMockExams() {
   const tx = await db.transaction();
 
   try {
+    // Clear existing mock exam questions to ensure clean state
+    await tx.run('DELETE FROM mock_exam_questions');
+
     for (const q of questions) {
       const hskLevel = q.hsk_level || 'hsk1';
       const section = q.section || 'listening';
@@ -49,7 +52,12 @@ async function insertMockExams() {
       const promptTh = q.prompt_th || '';
       const audioUrl = q.audio_url || '';
       const imageUrl = q.image_url || '';
-      const optionsJson = JSON.stringify(q.options_json || []);
+      
+      let optionsArray = q.options_json || [];
+      if (questionType === 'REORDER' && (!optionsArray || optionsArray.length === 0)) {
+        optionsArray = promptCn.split(/\s*\/\s*/).map(s => s.trim()).filter(Boolean);
+      }
+      const optionsJson = JSON.stringify(optionsArray);
       const correctAnswer = q.correct_answer || '';
       const explanationEn = q.explanation_en || '';
       const explanationTh = q.explanation_th || '';
