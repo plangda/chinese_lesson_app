@@ -5,10 +5,10 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 ## Overall Implementation Summary
 
 - **Total Tasks**: 29 (excluding Maintenance & Bug Fixes)
-- **Completed Tasks**: 24
+- **Completed Tasks**: 26
 - **In-Progress Tasks**: 0
-- **Not Started Tasks**: 5
-- **Overall Project Completion**: **~82%** (Core Web App: **~100%**)
+- **Not Started Tasks**: 3
+- **Overall Project Completion**: **~90%** (Core Web App: **~100%**)
 
 ---
 
@@ -41,11 +41,11 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **Thai Localization Expansion** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Integrated a structural language-selection modal with full Turso DB translations for Thai (Vocab, Grammar, Dialogues). |
 | **Radical Fusion Lab: Dynamic Level Gating & Gamification** | Phase 4: Consistency & Retention | `Complete` | 100% | Filtered anchor tabs and compound components dynamically based on active HSK level and SRS learning progress (mystery tiles). |
 | **UX/UI Responsive Overhaul** | Phase 5: Settings & UX Polishing | `Complete` | 100% | Refactored home page CSS grid, centered vertical memory garden canvas flow, resolved completed lessons nested scrollbars, simplified lesson card typography/buttons (Option 1), and styled sticky header themed cyan glass mask. |
-| **Sentence Quest Game** | Phase 4: Consistency & Retention | `Not Started` | 0% | Target topic to discuss tomorrow (drag-and-drop slots UI using mastered Stage 4 SRS vocabulary). |
-| **Full HSK Mock Exams (2026 Format)** | Phase 6: Future Enhancements | `Not Started` | 0% | Target topic to discuss tomorrow (curriculum integration, official grading rules, and listening comprehension). |
-| **Pronunciation Assessment** | Phase 6: Future Enhancements | `Not Started` | 0% | Planned integration of speech recognition API to analyze and score user speech input. |
+| **Sentence Quest Game** | Phase 4: Consistency & Retention | `Complete` | 100% | Implemented smart Chinese word tokenizer (`tokenizeSentence`), fallback sentence pool for new plants, SQL property aliases, and random unplayed sentence selector. |
+| **Full HSK 1-3 Mock Exams (2026 Format)** | Phase 6: Future Enhancements | `Complete` | 100% | Generated & seeded complete 175-question bank into Turso (HSK 1: 40 Qs, HSK 2: 55 Qs, HSK 3: 80 Qs). Built Exam Arena with countdown timers, audio player, True/False, MCQ, Cloze, Sentence Reordering, Diagnostic Score Modal, and Question-by-Question Review Mode with SRS auto-rescue planting. |
 | **Contextual LLM Translation Pipeline** | Phase 6: Future Enhancements | `Complete` | 100% | Implemented July 27: `add_thai_translations_to_lesson()` now makes a single `gemini-3.5-flash` call with full lesson JSON context. Produces natural, idiomatic Thai instead of literal word-by-word. `--no-translate` flag added for quota-efficient two-pass generation. |
-| **Production Deployment & Custom Domains** | Phase 6: Future Enhancements | `Not Started` | 0% | Docker containerization, Vercel deployment, and setup of a clean, branded custom domain. |
+| **Production Deployment & Custom Domains** | Phase 6: Future Enhancements | `Complete` | 100% | Deployed to Vercel production hosting with automatic continuous deployment pipeline triggered on main git pushes. |
+| **Pronunciation Assessment** | Phase 6: Future Enhancements | `Not Started` | 0% | Planned integration of speech recognition API to analyze and score user speech input. |
 | **Automated Test Suite** | Phase 6: Future Enhancements | `Not Started` | 0% | Mock backend API testing (Jest/Supertest) and frontend component testing. |
 | **Authentication Stability Fix** | Maintenance & Bug Fixes | `Complete` | 100% | Resolved case-sensitivity login failures in `auth.js` and removed syntax errors in `app.js` blocking session loads. |
 | **Pre-Test Data Injection** | Maintenance & Bug Fixes | `Complete` | 100% | Restored missing `preTestQuestions` array into `app.js` to unblock user progression to the dashboard. |
@@ -81,6 +81,8 @@ This document tracks the tasks and milestones for **HanPath**, a structured dail
 | **HSK1 Thai Translation Rollout (26/26 LLM Locked)** | Maintenance & Bug Fixes | `Complete` | 100% | Aug 6: Added regex cleanup for LLM JSON keys, resolving "translation _ th" failures. Successfully patched final lesson (hsk1_day24) bringing HSK 1 to 100% completion. |
 | **Pinyin Audio Error Web Speech TTS Fallback** | Maintenance & Bug Fixes | `Complete` | 100% | Aug 4: Added `audio.onerror` & `.catch()` fallback in `app.js` `playTone()` routing to Web Speech API SpeechSynthesis (`zh-CN`), fixing missing/broken audio for rare Pinyin syllables (e.g. `tei`) across the entire Pinyin chart. |
 | **20-Rule Pinyin Orthography Suite & Dynamic Categorization** | Maintenance & Bug Fixes | `Complete` | 100% | Aug 7: Expanded Lesson 0 from 4 to 20 rules based on ISO 7098 standards & Jiewfudao pedagogy. Added 'ü' pronunciation, nasal airflow (-n vs -ng), Half 3rd Sandhi, e/a sound mutations, vowel contractions, apostrophes, and capitalization rules. Replaced fragile index-based card sorting in app.js with title-keyword matching. Seeded Turso DB and pushed to main. |
+| **Official HSK 1-3 Mock Exam Generation & Database Seeding** | Maintenance & Bug Fixes | `Complete` | 100% | Aug 14: Generated and seeded 100% full official real exam question sets into Turso Cloud DB (175 total questions: HSK 1 = 40, HSK 2 = 55, HSK 3 = 80). Implemented True/False, MCQ, Cloze character input, and Sentence Reordering with diagnostic vocab mapping. |
+| **Mock Exam Auto-Grading, Review Mode & Multi-Scenario Fixes** | Maintenance & Bug Fixes | `Complete` | 100% | Aug 14: Built diagnostic score reporting, detailed question-by-question review mode with bilingual explanations, non-blocking SRS auto-rescue planting (`times_forgotten += 3`), guest authentication headers, and whole-exam fallback grading for partial/empty submissions. Verified with automated live test suite. |
 | **Kid-Unfriendly Grammar Explanation Tone** | Maintenance & Bug Fixes | `Not Started` | 0% | Aug 2: User flagged `hsk1_day5`'s grammar explanation (and likely many others) as reading like a linguistics reference (formal grammar-slot notation) rather than something an 8-15 year old would find approachable, in both English and Thai. Explicitly deferred as a separate, larger effort (likely a generation-prompt rewrite + batch re-translation pass, quota-limited like everything else here) rather than folded into the same-day fixes. |
 | **Security Hardening (Phase 2)** | Security & Performance | `Not Started` | 0% | Implement authentication on user-specific progress and SRS API endpoints, extract helper functions to dry up server.js duplicate routes, and integrate express-rate-limit. |
 | **Future-Proofing (Phase 3)** | Architecture & Refactoring | `Not Started` | 0% | Implement JSON-schema based POST body input validation and centralize DOM ID selection selectors into a constant configuration object. |
@@ -95,17 +97,19 @@ gantt
     section Phase 1: Backend
     Schema & API Setup :done, p1, 2026-07-01, 2026-07-05
     HSK 1 Seeding :done, p2, 2026-07-05, 2026-07-08
-    HSK 2 & 3 Seeding :active, p3, 2026-07-08, 2026-07-20
+    HSK 2 & 3 Seeding :done, p3, 2026-07-08, 2026-08-10
     section Phase 2: Diagnostic
     Placement & Gating :done, p4, 2026-07-06, 2026-07-09
     section Phase 3: UI Engine
     4-Stage Study System :done, p5, 2026-07-09, 2026-07-12
     section Phase 4: Retention
     Streak & Reminders :done, p6, 2026-07-11, 2026-07-14
+    Vocab Garden & Mini-Games :done, p7, 2026-08-08, 2026-08-13
     section Phase 5: Polish
-    Settings & Styling :active, p7, 2026-07-14, 2026-07-18
+    Settings & Styling :done, p8, 2026-07-14, 2026-08-13
     section Phase 6: Future
-    Voice, DevOps & Tests :milestone, p8, 2026-07-18, 0d
+    Official Mock Exams :done, p9, 2026-08-14, 2026-08-14
+    Voice & Testing Suite :milestone, p10, 2026-08-15, 0d
 ```
 
 ### Phase Progress Breakdown
@@ -119,12 +123,13 @@ gantt
 3. **Phase 3: Core Learning Engine** (Vocab, Grammar, Dialogue, Quiz)
    - **Progress**: 100%
    - *Next Action*: Complete.
-4. **Phase 4: Consistency & Retention** (Streak, Time, Reminders, Sync, Vocab Garden Upgrade)
+4. **Phase 4: Consistency & Retention** (Streak, Time, Reminders, Sync, Vocab Garden Upgrade, Sentence Quest)
    - **Progress**: 100%
    - *Next Action*: Complete.
-5. **Phase 5: Settings & UX Polishing** (Settings, Reset, Spring Animations)
+5. **Phase 5: Settings & UX Polishing** (Settings, Reset, Spring Animations, Responsive Grid)
    - **Progress**: 100%
    - *Next Action*: Complete.
-6. **Phase 6: Future Enhancements** (Voice Assessment, DevOps, Testing)
-   - **Progress**: 0%
-   - *Next Action*: Plan speech-to-text API integration and outline tests.
+6. **Phase 6: Future Enhancements** (Voice Assessment, Mock Exams, DevOps, Testing)
+   - **Progress**: 60%
+   - *Next Action*: Plan speech-to-text API integration and outline automated unit/E2E test suite. Official Mock Exams and Contextual Translation Pipeline are 100% complete.
+

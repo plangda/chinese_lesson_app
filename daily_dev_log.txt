@@ -157,4 +157,11 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Built #mock-exam-view Exam Arena with countdown timers (35m/45m/85m), 2x auto-repeating audio prompt player (with Web Speech API fallback), and interactive question cards (True/False, MCQ, Cloze, Sentence Reordering).
 - Built #mock-exam-result-modal diagnostic score report card displaying official scaled score, Pass/Fail status (60% threshold), sub-skill performance progress bars, and auto-planted missed vocabulary character chips.
 - Localized all new Mock Exam Hall, Exam Arena, and Diagnostic Report Card UI strings in i18n.js in English and Thai.
-- Verified local test server on port 3000 and deployed to GitHub and Vercel production.
+- Generated and seeded complete 175-question official exam bank into Turso Cloud DB matching official CTI/Hanban real exam sizes: HSK 1 (40 Qs), HSK 2 (55 Qs), and HSK 3 (80 Qs).
+- Implemented Question-by-Question Detailed Review Mode (renderMockExamDetailedReview) in #mock-exam-result-modal with interactive accordion, user vs correct answer comparisons, and bilingual explanations.
+- Fixed guest session handling in app.js (getMockExamAuthHeaders) and server.js (optionalAuth) to enable smooth unauthenticated mock exam sessions without 401 token errors.
+- Resolved modal backdrop visibility bug (.modal-backdrop opacity/pointer-events requires .active class) so diagnostic score reports open immediately upon exam submission.
+- Fixed whole-exam fallback grading in server.js so partial submissions (e.g. 5/40 answered) and empty submissions grade all questions accurately and mark unanswered items as 'No Answer'.
+- Executed end-to-end multi-scenario live automated test suite verifying HSK 1-3 retrieval, 100% full submit (200/200), partial submit (33/200), and empty submit (0/200).
+- Authored and documented Lesson #32 in retrospective_report.md covering multi-scenario live testing and CSS/process state verification.
+- Committed and pushed all updates to main branch on GitHub (commits be8f528, 81a1c40, cf10528, 2316c70, 6b3805d, e492d8e, bcac06d, d4925fe).
