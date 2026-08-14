@@ -173,4 +173,25 @@ As the HanPath team progresses through the development phases, this document ser
 - **Issue:** Repeating full action buttons (e.g. `✓ Done (Re-learn)`) and verbose descriptions on every row of a list creates heavy visual noise, clutters narrow mobile viewports, and makes the UI feel text-heavy.
 - **Prevention:** Split title structures into small, styled sub-labels (e.g., `Day 5 • Numbers`) and bold headings. Replace repetitive completed action buttons with simple status icons (`✅`) and make the row itself interactive (clickable card with hover effects), drastically saving screen space and improving mobile readability.
 
+## 32. Multi-Scenario Live System Testing & CSS/Process State Verification ("Syntax-Passing != Feature-Working")
+**The Error:** Features and bug fixes were reported as working (e.g. "submit exam works", "result modal is ready"), but when tested by the user on the screen:
+1. The exam submit button was unclickable or did nothing.
+2. The score report modal failed to appear on screen upon submission.
+3. The countdown timer appeared frozen.
+
+**The Causes:**
+1. **The "Syntax-Passing != Feature-Working" Fallacy:** Relying on `node --check app.js` or `node -c server.js` only proves there are no JavaScript parse errors. It proves *nothing* about visual presentation, CSS opacity, DOM event handling, or client-server state.
+2. **CSS Class Contract & Invisibility Bug:** `.modal-backdrop` in `style.css` defines `opacity: 0; pointer-events: none;` by default, transitioning to `opacity: 1; pointer-events: auto;` only when the `.active` class is present. The JavaScript only set `display: flex` and removed `.hidden` without adding `.active` or setting opacity, causing the modal to render completely invisible and unclickable on the screen.
+3. **Orphaned Background Process on Windows:** An older `node server.js` process held port 3000 in the background on Windows. Requests were silently handled by stale backend code rather than newly updated endpoints.
+4. **Happy-Path Testing Bias & Missing Cold-Start Testing:** The submit flow was initially tested only with complete answers and valid tokens, failing when unauthenticated guests sent `Authorization: Bearer null` (triggering 401) or when users submitted early with partial/empty answers (triggering 400).
+
+**Prevention:**
+1. **Mandatory Multi-Scenario Live System Testing:** Before declaring any user-facing feature or bug fix complete, developers must execute a live automated test suite against the running server covering all 3 standard scenarios:
+   - **Full Path:** All questions answered, valid submission.
+   - **Partial/Edge Path:** Incomplete answers, empty submit, timer run-out (graded accurately with unanswered marked as `No Answer`).
+   - **Cold/Guest Path:** Fresh browser session without authentication tokens.
+2. **CSS Computed-State Cross-Checking:** When creating or modifying modals, overlays, or UI views, developers must inspect `style.css` for `opacity`, `z-index`, `pointer-events`, `visibility`, and required state classes (`.active`, `.hidden`), ensuring DOM elements are physically visible and interactive.
+3. **Port & Process Sanitization on Restarts:** When restarting local servers, explicitly inspect `netstat` or process tables to terminate orphaned PIDs before launching fresh instances.
+4. **Evidence-Based Reporting:** When presenting a completed fix, provide the actual terminal execution output log from the running system proving that the fix passed all live test cases.
+
 
