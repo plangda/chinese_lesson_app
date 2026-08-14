@@ -108,9 +108,39 @@ function speakText(text) {
 // HanziWriter instance
 let writer = null;
 
+// Global authenticated fetch helper with 401 interceptor
+async function fetchWithAuth(url, options = {}) {
+  const token = localStorage.getItem("hanpath_token");
+  options.headers = options.headers || {};
+  if (!(options.body instanceof FormData) && !options.headers["Content-Type"]) {
+    options.headers["Content-Type"] = "application/json";
+  }
+  if (token && token !== "null" && token !== "undefined") {
+    options.headers["Authorization"] = "Bearer " + token;
+  }
+
+  try {
+    const response = await fetch(url, options);
+    if (response.status === 401) {
+      console.warn("Session expired or invalid (401). Redirecting to login view.");
+      localStorage.removeItem("hanpath_token");
+      localStorage.removeItem("hanpath_data_v2");
+      switchView("auth-view");
+      const errorDiv = document.getElementById("auth-error");
+      if (errorDiv) {
+        errorDiv.textContent = "Your session has expired. Please log in again.";
+        errorDiv.classList.remove("hidden");
+      }
+    }
+    return response;
+  } catch (err) {
+    throw err;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("hanpath_token");
-  if (!token) {
+  if (!token || token === "null" || token === "undefined") {
     switchView("auth-view");
   } else {
     loadProgress();
@@ -135,14 +165,15 @@ function loadProgress() {
   }
   
   const token = localStorage.getItem("hanpath_token");
-  if (!token) return;
+  if (!token || token === "null" || token === "undefined") {
+    switchView("auth-view");
+    return;
+  }
 
-  // Fetch from server to sync
-  fetch("/api/progress", {
-    headers: { "Authorization": "Bearer " + token }
-  })
+  // Fetch from server to sync using fetchWithAuth
+  fetchWithAuth("/api/progress")
     .then(response => {
-      if (response.ok) return response.json();
+      if (response && response.ok) return response.json();
       throw new Error("Server response not ok");
     })
     .then(serverData => {
@@ -279,15 +310,11 @@ function saveProgress() {
   localStorage.setItem("hanpath_data_v2", JSON.stringify(dataToSave));
   
   const token = localStorage.getItem("hanpath_token");
-  if (!token) return;
+  if (!token || token === "null" || token === "undefined") return;
 
-  // Send to server
-  fetch("/api/progress", {
+  // Send to server via fetchWithAuth
+  fetchWithAuth("/api/progress", {
     method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
-    },
     body: JSON.stringify(dataToSave)
   }).catch(err => {
     console.error("Failed to sync progress with server:", err);
@@ -403,51 +430,293 @@ function setupEventListeners() {
       });
     }
 
-  // Auth Form Listeners
-  let isLogin = true;
-  const toggleLink = document.getElementById("auth-toggle-link");
-  if (toggleLink) {
-    toggleLink.addEventListener("click", (e) => {
+  // Auth View Controller (Login, Sign-Up, and Password Recovery)
+  let authMode = 'login'; // 'login' | 'signup' | 'recovery'
+  let currentResetToken = null;
+  let currentRecoveryUsername = null;
+
+  const authTitle = document.getElementById("auth-title");
+  const authSubtitle = document.getElementById("auth-subtitle");
+  const authSubmitBtn = document.getElementById("auth-submit-btn");
+  const authForm = document.getElementById("auth-form");
+  const signupExtraFields = document.getElementById("signup-extra-fields");
+  const authRecoveryContainer = document.getElementById("auth-recovery-container");
+  const recoveryStep1 = document.getElementById("recovery-step-1");
+  const recoveryStep2 = document.getElementById("recovery-step-2");
+  const authError = document.getElementById("auth-error");
+  const authSuccess = document.getElementById("auth-success");
+
+  const authToggleContainer = document.getElementById("auth-toggle-container");
+  const authForgotContainer = document.getElementById("auth-forgot-container");
+  const authBackLoginContainer = document.getElementById("auth-back-login-container");
+  const authToggleLink = document.getElementById("auth-toggle-link");
+  const authForgotLink = document.getElementById("auth-forgot-link");
+  const authBackLoginLink = document.getElementById("auth-back-login-link");
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    if (authError) authError.classList.add("hidden");
+    if (authSuccess) authSuccess.classList.add("hidden");
+
+    if (mode === 'login') {
+      if (authTitle) authTitle.setAttribute("data-i18n", "login_title");
+      if (authSubtitle) authSubtitle.setAttribute("data-i18n", "auth_subtitle_login");
+      if (authSubmitBtn) authSubmitBtn.setAttribute("data-i18n", "btn_login");
+      if (document.getElementById("auth-identifier-lbl")) document.getElementById("auth-identifier-lbl").setAttribute("data-i18n", "lbl_username_or_email");
+      if (document.getElementById("auth-toggle-text")) document.getElementById("auth-toggle-text").setAttribute("data-i18n", "auth_no_account");
+      if (authToggleLink) authToggleLink.setAttribute("data-i18n", "auth_sign_up");
+
+      if (authForm) authForm.classList.remove("hidden");
+      if (signupExtraFields) signupExtraFields.classList.add("hidden");
+      if (authRecoveryContainer) authRecoveryContainer.classList.add("hidden");
+
+      if (authToggleContainer) authToggleContainer.classList.remove("hidden");
+      if (authForgotContainer) authForgotContainer.classList.remove("hidden");
+      if (authBackLoginContainer) authBackLoginContainer.classList.add("hidden");
+    } else if (mode === 'signup') {
+      if (authTitle) authTitle.setAttribute("data-i18n", "signup_title");
+      if (authSubtitle) authSubtitle.setAttribute("data-i18n", "auth_subtitle_signup");
+      if (authSubmitBtn) authSubmitBtn.setAttribute("data-i18n", "btn_signup");
+      if (document.getElementById("auth-identifier-lbl")) document.getElementById("auth-identifier-lbl").setAttribute("data-i18n", "placeholder_username_recovery");
+      if (document.getElementById("auth-toggle-text")) document.getElementById("auth-toggle-text").setAttribute("data-i18n", "auth_have_account");
+      if (authToggleLink) authToggleLink.setAttribute("data-i18n", "btn_login");
+
+      if (authForm) authForm.classList.remove("hidden");
+      if (signupExtraFields) signupExtraFields.classList.remove("hidden");
+      if (authRecoveryContainer) authRecoveryContainer.classList.add("hidden");
+
+      if (authToggleContainer) authToggleContainer.classList.remove("hidden");
+      if (authForgotContainer) authForgotContainer.classList.add("hidden");
+      if (authBackLoginContainer) authBackLoginContainer.classList.add("hidden");
+    } else if (mode === 'recovery') {
+      if (authTitle) authTitle.setAttribute("data-i18n", "auth_forgot_password");
+      if (authSubtitle) authSubtitle.setAttribute("data-i18n", "auth_subtitle_recovery");
+
+      if (authForm) authForm.classList.add("hidden");
+      if (authRecoveryContainer) authRecoveryContainer.classList.remove("hidden");
+      if (recoveryStep1) recoveryStep1.classList.remove("hidden");
+      if (recoveryStep2) recoveryStep2.classList.add("hidden");
+
+      if (authToggleContainer) authToggleContainer.classList.add("hidden");
+      if (authForgotContainer) authForgotContainer.classList.add("hidden");
+      if (authBackLoginContainer) authBackLoginContainer.classList.remove("hidden");
+    }
+    translateUI();
+  }
+
+  if (authToggleLink) {
+    authToggleLink.addEventListener("click", (e) => {
       e.preventDefault();
-      isLogin = !isLogin;
-      document.getElementById("auth-title").setAttribute("data-i18n", isLogin ? "login_title" : "signup_title");
-      document.getElementById("auth-submit-btn").setAttribute("data-i18n", isLogin ? "btn_login" : "btn_signup");
-      document.getElementById("auth-toggle-text").setAttribute("data-i18n", isLogin ? "auth_no_account" : "auth_have_account");
-      translateUI();
-      toggleLink.textContent = isLogin ? "Sign Up" : "Login";
-      isLogin ? document.getElementById("auth-name").classList.add('hidden') : document.getElementById("auth-name").classList.remove('hidden');
-      document.getElementById("auth-error").classList.add('hidden');
+      setAuthMode(authMode === 'login' ? 'signup' : 'login');
     });
   }
 
-  const authForm = document.getElementById("auth-form");
+  if (authForgotLink) {
+    authForgotLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      setAuthMode('recovery');
+    });
+  }
+
+  if (authBackLoginLink) {
+    authBackLoginLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      setAuthMode('login');
+    });
+  }
+
+  // Handle Login & Signup Form Submission
   if (authForm) {
     authForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = document.getElementById("auth-email").value;
-      const password = document.getElementById("auth-password").value;
-      const name = document.getElementById("auth-name").value;
-      const errorDiv = document.getElementById("auth-error");
-      
-      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
+      if (authError) authError.classList.add("hidden");
+      if (authSuccess) authSuccess.classList.add("hidden");
+
+      const identifier = (document.getElementById("auth-identifier").value || "").trim();
+      const password = (document.getElementById("auth-password").value || "").trim();
+
+      if (authMode === 'login') {
+        try {
+          const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ identifier, password })
+          });
+          const data = await res.json();
+          if (data.success) {
+            localStorage.setItem("hanpath_token", data.token);
+            loadProgress();
+          } else {
+            if (authError) {
+              authError.textContent = data.error || t('error_network');
+              authError.classList.remove("hidden");
+            }
+          }
+        } catch (err) {
+          if (authError) {
+            authError.textContent = t('error_network');
+            authError.classList.remove("hidden");
+          }
+        }
+      } else if (authMode === 'signup') {
+        const securityQuestion = document.getElementById("auth-security-question").value;
+        const securityAnswer = (document.getElementById("auth-security-answer").value || "").trim();
+        const optionalEmail = (document.getElementById("auth-optional-email").value || "").trim();
+
+        if (!securityAnswer) {
+          if (authError) {
+            authError.textContent = "Please provide an answer to your security recovery question.";
+            authError.classList.remove("hidden");
+          }
+          return;
+        }
+
+        try {
+          const res = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: identifier,
+              password,
+              securityQuestion,
+              securityAnswer,
+              email: optionalEmail || undefined
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            localStorage.setItem("hanpath_token", data.token);
+            loadProgress();
+          } else {
+            if (authError) {
+              authError.textContent = data.error || t('error_network');
+              authError.classList.remove("hidden");
+            }
+          }
+        } catch (err) {
+          if (authError) {
+            authError.textContent = t('error_network');
+            authError.classList.remove("hidden");
+          }
+        }
+      }
+    });
+  }
+
+  // Recovery Step 1: Find Account Question
+  const recoveryFindBtn = document.getElementById("recovery-find-btn");
+  if (recoveryFindBtn) {
+    recoveryFindBtn.addEventListener("click", async () => {
+      const identifier = (document.getElementById("recovery-identifier").value || "").trim();
+      if (!identifier) {
+        if (authError) {
+          authError.textContent = "Please enter your username.";
+          authError.classList.remove("hidden");
+        }
+        return;
+      }
+      if (authError) authError.classList.add("hidden");
+
       try {
-        const res = await fetch(endpoint, {
+        const res = await fetch("/api/auth/forgot-password/get-question", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, name })
+          body: JSON.stringify({ identifier })
         });
         const data = await res.json();
-        
         if (data.success) {
-          localStorage.setItem("hanpath_token", data.token);
-          loadProgress();
+          currentRecoveryUsername = data.username;
+          const questionDisplay = document.getElementById("recovery-question-display");
+          if (questionDisplay) {
+            const questionText = t(data.securityQuestion) || data.securityQuestion;
+            questionDisplay.textContent = questionText;
+          }
+          if (recoveryStep1) recoveryStep1.classList.add("hidden");
+          if (recoveryStep2) recoveryStep2.classList.remove("hidden");
         } else {
-        errorDiv.textContent = data.error || t('error_network');
-          errorDiv.classList.remove('hidden');
+          if (authError) {
+            authError.textContent = data.error || "Account not found.";
+            authError.classList.remove("hidden");
+          }
         }
       } catch (err) {
-        errorDiv.textContent = t('error_network');
-        errorDiv.classList.remove('hidden');
+        if (authError) {
+          authError.textContent = t('error_network');
+          authError.classList.remove("hidden");
+        }
+      }
+    });
+  }
+
+  // Recovery Step 2: Answer Question & Set New Password
+  const recoverySubmitBtn = document.getElementById("recovery-submit-btn");
+  if (recoverySubmitBtn) {
+    recoverySubmitBtn.addEventListener("click", async () => {
+      const answer = (document.getElementById("recovery-answer-input").value || "").trim();
+      const newPassword = (document.getElementById("recovery-new-password").value || "").trim();
+
+      if (!answer || !newPassword) {
+        if (authError) {
+          authError.textContent = "Please provide your answer and new password.";
+          authError.classList.remove("hidden");
+        }
+        return;
+      }
+
+      if (newPassword.length < 4) {
+        if (authError) {
+          authError.textContent = "New password must be at least 4 characters long.";
+          authError.classList.remove("hidden");
+        }
+        return;
+      }
+
+      if (authError) authError.classList.add("hidden");
+
+      try {
+        // Step 2A: Verify Answer and obtain 5-min resetToken
+        const verifyRes = await fetch("/api/auth/forgot-password/verify-answer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier: currentRecoveryUsername, answer })
+        });
+        const verifyData = await verifyRes.json();
+        if (!verifyData.success) {
+          if (authError) {
+            authError.textContent = verifyData.error || "Incorrect answer.";
+            authError.classList.remove("hidden");
+          }
+          return;
+        }
+
+        // Step 2B: Submit new password with resetToken
+        const resetRes = await fetch("/api/auth/forgot-password/set-new-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ resetToken: verifyData.resetToken, newPassword })
+        });
+        const resetData = await resetRes.json();
+
+        if (resetData.success) {
+          if (authSuccess) {
+            authSuccess.textContent = "🎉 Password reset successfully! Logging you in...";
+            authSuccess.classList.remove("hidden");
+          }
+          localStorage.setItem("hanpath_token", resetData.token);
+          setTimeout(() => {
+            loadProgress();
+          }, 800);
+        } else {
+          if (authError) {
+            authError.textContent = resetData.error || "Failed to update password.";
+            authError.classList.remove("hidden");
+          }
+        }
+      } catch (err) {
+        if (authError) {
+          authError.textContent = t('error_network');
+          authError.classList.remove("hidden");
+        }
       }
     });
   }
@@ -2464,10 +2733,8 @@ function showConfirmModal(i18nKeyTitle, i18nKeyMsg, onConfirm) {
 
 async function renderVocabGardenWidget() {
   try {
-    const token = localStorage.getItem("hanpath_token");
-    const res = await fetch('/api/srs/garden', {
-      headers: { "Authorization": "Bearer " + token }
-    });
+    const res = await fetchWithAuth('/api/srs/garden');
+    if (!res || !res.ok) return;
     const data = await res.json();
     state.lastGardenPlants = data.plants || [];
 
@@ -2655,13 +2922,10 @@ async function startSrsSession(mode = 'normal') {
   try {
     let cards;
 
-    const token = localStorage.getItem("hanpath_token");
     if (mode === 'full') {
       // Full review: fetch ALL planted words from the garden (not just due ones)
-      const res = await fetch('/api/srs/garden', {
-        headers: { "Authorization": "Bearer " + token }
-      });
-      if (!res.ok) return;
+      const res = await fetchWithAuth('/api/srs/garden');
+      if (!res || !res.ok) return;
       const gardenData = await res.json();
       // The garden endpoint returns { plants: [...] } — reshape each plant into the card format
       // that the SRS engine expects (same fields as /api/srs/due cards)
@@ -2687,11 +2951,10 @@ async function startSrsSession(mode = 'normal') {
       }));
     } else {
       // Normal or rescue mode: fetch only due cards
-      const res = await fetch(`/api/srs/due?mode=${mode}`, {
-        headers: { "Authorization": "Bearer " + token }
-      });
-      if (!res.ok) return;
-      cards = await res.json();
+      const res = await fetchWithAuth(`/api/srs/due?mode=${mode}`);
+      if (!res || !res.ok) return;
+      const json = await res.json();
+      cards = json.cards || json;
     }
 
     if (!cards || cards.length === 0) {
@@ -3082,13 +3345,8 @@ function submitSrsWatering(vocabId, attemptsCount, hintsUsed, isCorrect) {
       state.score += (calculated.xpEarned || 10);
       saveProgress();
 
-      const token = localStorage.getItem("hanpath_token");
-      fetch('/api/srs/water', {
+      fetchWithAuth('/api/srs/water', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + token
-        },
         body: JSON.stringify({ 
           vocabId, 
           attemptsCount, 
@@ -3096,7 +3354,7 @@ function submitSrsWatering(vocabId, attemptsCount, hintsUsed, isCorrect) {
           grade: engineResult.systemGrade 
         })
       }).then(async res => {
-        if (res.ok) {
+        if (res && res.ok) {
           const data = await res.json();
           if (data.xpEarned && data.xpEarned !== calculated.xpEarned) {
             state.score += (data.xpEarned - calculated.xpEarned);
@@ -3117,13 +3375,8 @@ window.submitSrsWatering = submitSrsWatering;
 
 async function plantLessonSrs(lessonId) {
   try {
-    const token = localStorage.getItem("hanpath_token");
-    await fetch('/api/srs/plant-lesson', {
+    await fetchWithAuth('/api/srs/plant-lesson', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
       body: JSON.stringify({ lessonId })
     });
   } catch (err) {
@@ -3139,14 +3392,9 @@ let activeAnchor = null;
 
 window.initActiveRadicalLab = async function() {
   try {
-    const token = localStorage.getItem("hanpath_token");
-    const res = await fetch('/api/srs/fusion/anchors', {
-      headers: { "Authorization": "Bearer " + token }
-    });
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("Anchors fetch failed:", res.status, errText);
-      document.getElementById('radical-tabs-container').innerHTML = `<div style="color: #ff4757; font-weight: bold; padding: 1rem;">Failed to load anchors. Please check console for details. ${res.status}: ${res.statusText}</div>`;
+    const res = await fetchWithAuth('/api/srs/fusion/anchors');
+    if (!res || !res.ok) {
+      document.getElementById('radical-tabs-container').innerHTML = `<div style="color: #ff4757; font-weight: bold; padding: 1rem;">Failed to load anchors. Please log in or refresh.</div>`;
       return;
     }
     const data = await res.json();
@@ -3161,14 +3409,15 @@ window.initActiveRadicalLab = async function() {
     document.getElementById('fusion-seed-pool').innerHTML = '';
     
     if (anchors.length === 0) {
-      tabsContainer.innerHTML = `<div style="color: var(--text-secondary);">No anchors available yet.</div>`;
+      tabsContainer.innerHTML = `<div style="padding: 1rem; color: var(--text-muted);">No radical anchors unlocked yet. Complete more lessons!</div>`;
       return;
     }
-    
+
     let html = '';
     let firstEligibleAnchor = null;
     
     anchors.forEach((a, i) => {
+      const isComplete = a.user_discovered >= a.total_discoveries && a.total_discoveries > 0;
       const localizedName = state.currentLanguage === 'th' ? (a.name_th || a.name_en) : a.name_en;
       
       if (a.user_learned > 0) {
@@ -3230,15 +3479,10 @@ window.selectRadicalAnchor = async function(id, symbol, name, total, userDiscove
   
   // Fetch components
   try {
-    const token = localStorage.getItem("hanpath_token");
     const levelStr = state.userLevel || 'hsk1';
-    const res = await fetch(`/api/srs/fusion/components?anchor=${encodeURIComponent(id)}&level=${levelStr}`, {
-      headers: { "Authorization": "Bearer " + token }
-    });
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("Components fetch failed:", res.status, errText);
-      document.getElementById('fusion-seed-pool').innerHTML = `<div style="color: #ff4757; font-weight: bold; padding: 1rem;">Failed to load components. ${res.status}: ${res.statusText}</div>`;
+    const res = await fetchWithAuth(`/api/srs/fusion/components?anchor=${encodeURIComponent(id)}&level=${levelStr}`);
+    if (!res || !res.ok) {
+      document.getElementById('fusion-seed-pool').innerHTML = `<div style="color: #ff4757; font-weight: bold; padding: 1rem;">Failed to load components.</div>`;
       return;
     }
     const data = await res.json();
@@ -3280,17 +3524,12 @@ window.fuseComponent = async function(formulaId) {
   resultArea.innerHTML = `<span style="color: var(--accent); animation: pulse 1s infinite;">⚡ Synthesizing... ⚡</span>`;
   
   try {
-    const token = localStorage.getItem("hanpath_token");
-    const res = await fetch('/api/srs/fusion/combine', {
+    const res = await fetchWithAuth('/api/srs/fusion/combine', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
       body: JSON.stringify({ formula_id: formulaId })
     });
     
-    if (!res.ok) {
+    if (!res || !res.ok) {
       resultArea.innerHTML = `<span style="color: var(--danger);">Server connection error.</span>`;
       return;
     }

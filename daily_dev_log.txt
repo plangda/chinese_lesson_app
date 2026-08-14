@@ -165,3 +165,12 @@ File: daily_dev_log.txt(This file should be left empty initially. The Coding Age
 - Executed end-to-end multi-scenario live automated test suite verifying HSK 1-3 retrieval, 100% full submit (200/200), partial submit (33/200), and empty submit (0/200).
 - Authored and documented Lesson #32 in retrospective_report.md covering multi-scenario live testing and CSS/process state verification.
 - Committed and pushed all updates to main branch on GitHub (commits be8f528, 81a1c40, cf10528, 2316c70, 6b3805d, e492d8e, bcac06d, d4925fe).
+- Executed Auth & Security Hardening (Phase 2): migrated Turso Cloud DB schema to support username and optional email with case-insensitive unique indexes (COLLATE NOCASE), backfilled existing user accounts with deterministic unique usernames, and made email column nullable.
+- Overhauled auth.js with transactional registration (db.transaction() creating user + user_progress atomically), flexible username or email login, and 100% free self-service secret question password recovery (issuing 5-minute JWT reset_tokens).
+- Added rate limiting on recovery attempts (max 5 attempts / 15 mins) and normalized security answers (trimmed & lowercased) to eliminate whitespace and casing recovery friction.
+- Hardened server.js: enforced strict requireAuth on all private user endpoints (/api/progress, /api/srs/*, /api/mock-exams/submit) and eliminated all insecure req.body.userId / req.query.userId fallbacks, ensuring user identity is derived strictly from verified req.user.id.
+- Optimized mock exam submission auto-planting in server.js with batch SQL queries (SELECT ... WHERE id IN (...)) to eliminate sequential N+1 network roundtrips.
+- Redesigned #auth-view in index.html with kid-friendly 3-mode interface (Login, Sign-Up with 4 secret question choices, and Self-Service Forgot Password Recovery).
+- Added global 401 response interceptor in app.js (fetchWithAuth) to automatically clear expired tokens and smoothly redirect to the login view without crashing.
+- Registered all new authentication, secret question, and password recovery strings in i18n.js in English and Thai.
+- Created and executed live automated test suite (test_auth_live_verification.js) verifying 10 critical scenarios: registration, login by username & email, duplicate collision rejection, secret question lookup, answer verification, password reset, login with new password, 401 unauthorized rejection, SRS multi-user data isolation, and mock exam user binding (10/10 tests passed).

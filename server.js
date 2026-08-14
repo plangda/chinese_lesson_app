@@ -631,18 +631,75 @@ app.get('/api/srs/due', requireAuth, async (req, res) => {
 // POST /api/srs/water - Process student review game result & update SM-2 parameters
 app.post('/api/srs/water', requireAuth, async (req, res) => {
   try {
-    const userId = req.body.userId || (req.user ? req.user.id : 1);
-    const { vocabId, attemptsCount = 1, hintsUsed = false } = req.body;
+    const userId = req.user.id;
+    const { vocabId, attemptsCount = 1, hintsUsed = false, results } = req.body;
 
+    // Support batch results array if sent
+    if (Array.isArray(results) && results.length > 0) {
+      const updatedCards = [];
+      for (const item of results) {
+        const { srsId, vocabId: itemVocabId, rating } = item;
+        let srsRecord = null;
+        if (srsId) {
+          srsRecord = await db.get('SELECT * FROM user_vocab_srs WHERE id = ? AND user_id = ?', [srsId, userId]);
+        } else if (itemVocabId) {
+          srsRecord = await db.get('SELECT * FROM user_vocab_srs WHERE vocab_id = ? AND user_id = ?', [itemVocabId, userId]);
+        }
+        if (!srsRecord) continue;
+
+        let { mastery_stage, ease_factor, interval_days, repetitions, times_forgotten, total_reviews } = srsRecord;
+        if (rating === 'MISSED') {
+          mastery_stage = 1;
+          interval_days = 1;
+          repetitions = 0;
+          times_forgotten = (times_forgotten || 0) + 1;
+          ease_factor = Math.max(1.3, ease_factor - 0.2);
+        } else if (rating === 'GOT_IT') {
+          repetitions = (repetitions || 0) + 1;
+          if (repetitions === 1) interval_days = 1;
+          else if (repetitions === 2) interval_days = 3;
+          else interval_days = Math.round(interval_days * ease_factor);
+          if (interval_days >= 21) mastery_stage = 4;
+          else if (interval_days >= 7) mastery_stage = 3;
+          else if (interval_days >= 3) mastery_stage = 2;
+          else mastery_stage = 1;
+        } else {
+          repetitions = (repetitions || 0) + 1;
+          ease_factor = Math.min(2.8, ease_factor + 0.15);
+          if (repetitions === 1) interval_days = 2;
+          else if (repetitions === 2) interval_days = 5;
+          else interval_days = Math.round(interval_days * ease_factor * 1.2);
+          if (interval_days >= 21) mastery_stage = 4;
+          else if (interval_days >= 7) mastery_stage = 3;
+          else if (interval_days >= 3) mastery_stage = 2;
+          else mastery_stage = 1;
+        }
+
+        total_reviews = (total_reviews || 0) + 1;
+        const nextReviewDate = getBkkDateString(interval_days);
+        const nowStr = new Date().toISOString();
+
+        await db.run(`
+          UPDATE user_vocab_srs
+          SET mastery_stage = ?, ease_factor = ?, interval_days = ?, repetitions = ?,
+              next_review_date = ?, last_reviewed_at = ?, total_reviews = ?, times_forgotten = ?
+          WHERE id = ?
+        `, [mastery_stage, ease_factor, interval_days, repetitions, nextReviewDate, nowStr, total_reviews, times_forgotten, srsRecord.id]);
+
+        updatedCards.push({ srsId: srsRecord.id, vocabId: srsRecord.vocab_id, character: srsRecord.character, masteryStage: mastery_stage, nextReviewDate, intervalDays: interval_days });
+      }
+      return res.json({ success: true, count: updatedCards.length, updatedCards });
+    }
+
+    // Single card watering logic
     if (!vocabId) {
       return res.status(400).json({ error: 'vocabId is required' });
     }
 
-    // Fetch existing SRS record
     let row = await db.get('SELECT * FROM user_vocab_srs WHERE user_id = ? AND vocab_id = ?', [userId, vocabId]);
     if (!row) {
       const vocabRow = await db.get('SELECT lesson_id, character FROM vocab WHERE id = ?', [vocabId]);
-      if (!vocabRow) return res.status(444).json({ error: 'Vocab not found' });
+      if (!vocabRow) return res.status(404).json({ error: 'Vocab not found' });
       await db.run(`
         INSERT INTO user_vocab_srs (user_id, vocab_id, lesson_id, character, mastery_stage, interval_days, next_review_date)
         VALUES (?, ?, ?, ?, 1, 1, ?)
@@ -650,14 +707,11 @@ app.post('/api/srs/water', requireAuth, async (req, res) => {
       row = await db.get('SELECT * FROM user_vocab_srs WHERE user_id = ? AND vocab_id = ?', [userId, vocabId]);
     }
 
-    // Evaluate system grade
-    let systemGrade;
+    let systemGrade = 'MISSED';
     if (attemptsCount === 1 && !hintsUsed) {
       systemGrade = 'PERFECT';
     } else if (attemptsCount === 2 || hintsUsed) {
       systemGrade = 'GOT_IT';
-    } else {
-      systemGrade = 'MISSED';
     }
 
     let newStage = row.mastery_stage || 1;
@@ -716,7 +770,7 @@ app.post('/api/srs/water', requireAuth, async (req, res) => {
 // POST /api/srs/plant-lesson - Auto-plant all words from a completed daily lesson
 app.post('/api/srs/plant-lesson', requireAuth, async (req, res) => {
   try {
-    const userId = req.body.userId || (req.user ? req.user.id : 1);
+    const userId = req.user.id;
     const { lessonId } = req.body;
 
     if (!lessonId) {
@@ -745,7 +799,7 @@ app.post('/api/srs/plant-lesson', requireAuth, async (req, res) => {
 // GET /api/srs/fusion/anchors — Returns the list of available anchor radicals
 app.get('/api/srs/fusion/anchors', requireAuth, async (req, res) => {
   try {
-    const userId = req.user ? req.user.id : 1;
+    const userId = req.user.id;
     const levelStr = req.query.level || '1';
     const level = parseInt(levelStr.replace('hsk', ''), 10) || 1;
     
@@ -788,7 +842,7 @@ app.get('/api/srs/fusion/anchors', requireAuth, async (req, res) => {
 // GET /api/srs/fusion/components — Returns valid components for an anchor
 app.get('/api/srs/fusion/components', requireAuth, async (req, res) => {
   try {
-    const userId = req.user ? req.user.id : 1;
+    const userId = req.user.id;
     const { anchor } = req.query;
     if (!anchor) return res.status(400).json({ error: 'anchor query param is required' });
 
@@ -818,7 +872,7 @@ app.get('/api/srs/fusion/components', requireAuth, async (req, res) => {
 // POST /api/srs/fusion/combine - Attempt to fuse
 app.post('/api/srs/fusion/combine', requireAuth, async (req, res) => {
   try {
-    const userId = req.body.userId || (req.user ? req.user.id : 1);
+    const userId = req.user.id;
     const { formula_id } = req.body;
 
     if (!formula_id) {
@@ -1012,22 +1066,24 @@ app.post('/api/mock-exams/submit', optionalAuth, async (req, res) => {
     const uniqueMissedVocabIds = Array.from(new Set(missedVocabIds));
     if (uniqueMissedVocabIds.length > 0) {
       const tomorrowStr = getBkkDateString(1);
-      for (const vId of uniqueMissedVocabIds) {
-        const vocab = await db.get('SELECT id, character, lesson_id FROM vocab WHERE id = ?', [vId]);
-        if (vocab) {
-          const existing = await db.get('SELECT id, times_forgotten FROM user_vocab_srs WHERE user_id = ? AND vocab_id = ?', [userId, vId]);
-          if (existing) {
-            await db.run(`
-              UPDATE user_vocab_srs 
-              SET times_forgotten = times_forgotten + 3, next_review_date = ?, mastery_stage = 1
-              WHERE id = ?
-            `, [tomorrowStr, existing.id]);
-          } else {
-            await db.run(`
-              INSERT INTO user_vocab_srs (user_id, vocab_id, lesson_id, character, mastery_stage, interval_days, next_review_date, times_forgotten)
-              VALUES (?, ?, ?, ?, 1, 1, ?, 3)
-            `, [userId, vocab.id, vocab.lesson_id, vocab.character, tomorrowStr]);
-          }
+      const vPlaceholders = uniqueMissedVocabIds.map(() => '?').join(',');
+      const vocabRows = await db.all(`SELECT id, character, lesson_id FROM vocab WHERE id IN (${vPlaceholders})`, uniqueMissedVocabIds);
+      const existingRows = await db.all(`SELECT id, vocab_id, times_forgotten FROM user_vocab_srs WHERE user_id = ? AND vocab_id IN (${vPlaceholders})`, [userId, ...uniqueMissedVocabIds]);
+      const existingMap = new Map(existingRows.map(r => [r.vocab_id, r]));
+
+      for (const vocab of vocabRows) {
+        const existing = existingMap.get(vocab.id);
+        if (existing) {
+          await db.run(`
+            UPDATE user_vocab_srs 
+            SET times_forgotten = times_forgotten + 3, next_review_date = ?, mastery_stage = 1
+            WHERE id = ?
+          `, [tomorrowStr, existing.id]);
+        } else {
+          await db.run(`
+            INSERT INTO user_vocab_srs (user_id, vocab_id, lesson_id, character, mastery_stage, interval_days, next_review_date, times_forgotten)
+            VALUES (?, ?, ?, ?, 1, 1, ?, 3)
+          `, [userId, vocab.id, vocab.lesson_id, vocab.character, tomorrowStr]);
         }
       }
     }

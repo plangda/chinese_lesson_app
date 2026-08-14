@@ -54,19 +54,115 @@
     
     <!-- AUTH VIEW -->
     <section id="auth-view" class="view-section active">
-      <div class="glass-panel congrats-card" style="max-width: 450px; margin: 4rem auto; text-align: left;">
-        <h2 id="auth-title" style="font-size: 2rem; margin-bottom: 1.5rem; font-family: var(--font-serif); text-align: center; color: var(--primary);"><span data-i18n="login_title">Login to HanPath</span></h2>
-        <form id="auth-form" style="display: flex; flex-direction: column; gap: 1rem;">
-          <input type="email" id="auth-email" placeholder="Email Address" data-i18n="placeholder_email" required class="quiz-q-text" style="padding: 0.75rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
-          <input type="password" id="auth-password" placeholder="Password" data-i18n="placeholder_password" required class="quiz-q-text" style="padding: 0.75rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
-          <input type="text" id="auth-name" placeholder="Your Name (Optional)" data-i18n="placeholder_name" class="quiz-q-text hidden"  style="padding: 0.75rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
-          <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="margin-top: 1rem; padding: 0.75rem;" data-i18n="btn_login">Login</button>
+      <div class="glass-panel congrats-card" style="max-width: 460px; margin: 3.5rem auto; text-align: left; padding: 2.25rem; border-radius: 24px;">
+        
+        <!-- Auth Header Title -->
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <div style="font-size: 3rem; margin-bottom: 0.25rem;">🐼</div>
+          <h2 id="auth-title" style="font-size: 1.85rem; font-family: var(--font-serif); color: var(--primary); margin: 0;">
+            <span data-i18n="login_title">Login to HanPath</span>
+          </h2>
+          <p id="auth-subtitle" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;" data-i18n="auth_subtitle_login">
+            Enter your username or email to continue learning
+          </p>
+        </div>
+
+        <!-- Mode 1 & 2: LOGIN / SIGN UP FORM -->
+        <form id="auth-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <div>
+            <label id="auth-identifier-lbl" style="font-size: 0.8rem; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;" data-i18n="lbl_username_or_email">Username or Email</label>
+            <input type="text" id="auth-identifier" placeholder="e.g. panda_hero" data-i18n="placeholder_username_login" required class="quiz-q-text" style="padding: 0.75rem 1rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
+          </div>
+
+          <div>
+            <label id="auth-password-lbl" style="font-size: 0.8rem; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;" data-i18n="lbl_password">Password</label>
+            <input type="password" id="auth-password" placeholder="••••••••" data-i18n="placeholder_password" required class="quiz-q-text" style="padding: 0.75rem 1rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
+          </div>
+
+          <!-- Sign-Up Specific Fields (Hidden during Login) -->
+          <div id="signup-extra-fields" class="hidden" style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div>
+              <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;" data-i18n="lbl_security_question">Secret Recovery Question (For Password Reset)</label>
+              <select id="auth-security-question" class="quiz-q-text" style="padding: 0.75rem 1rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.9); font-size: 0.92rem; width: 100%; box-sizing: border-box; outline: none; cursor: pointer;">
+                <option value="favorite_animal" data-i18n="sec_q_animal">🐾 What is your favorite animal? (e.g. Panda)</option>
+                <option value="favorite_color" data-i18n="sec_q_color">🎨 What is your favorite color? (e.g. Blue)</option>
+                <option value="favorite_food" data-i18n="sec_q_food">🍜 What is your favorite food? (e.g. Noodles)</option>
+                <option value="best_friend" data-i18n="sec_q_friend">🌟 What is your best friend's name?</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;" data-i18n="lbl_security_answer">Your Secret Answer</label>
+              <input type="text" id="auth-security-answer" placeholder="e.g. Panda" data-i18n="placeholder_security_answer" class="quiz-q-text" style="padding: 0.75rem 1rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 0.35rem;" data-i18n="lbl_optional_email">Email (Optional - for extra recovery)</label>
+              <input type="email" id="auth-optional-email" placeholder="you@example.com (Optional)" data-i18n="placeholder_optional_email" class="quiz-q-text" style="padding: 0.75rem 1rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 0.92rem; width: 100%; box-sizing: border-box; outline: none;">
+            </div>
+          </div>
+
+          <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="margin-top: 0.5rem; padding: 0.85rem; font-weight: bold; font-size: 1.05rem;" data-i18n="btn_login">
+            Login
+          </button>
         </form>
-        <div id="auth-error" class="hidden" style="color: #ff6b6b; font-size: 0.9rem; margin-top: 1rem; text-align: center;"></div>
-        <p style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem;">
-          <span id="auth-toggle-text" data-i18n="auth_no_account">Don't have an account?</span> 
-          <a href="#" id="auth-toggle-link" style="color: var(--primary); font-weight: bold; text-decoration: none;" data-i18n="auth_sign_up">Sign Up</a>
-        </p>
+
+        <!-- Mode 3: FORGOT PASSWORD RECOVERY CONTAINER (Hidden by default) -->
+        <div id="auth-recovery-container" class="hidden">
+          <!-- Recovery Step 1: Identifier Input -->
+          <div id="recovery-step-1" style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 0.5rem 0;" data-i18n="recovery_step1_desc">
+              Enter your username to look up your secret question:
+            </p>
+            <input type="text" id="recovery-identifier" placeholder="Your Username" data-i18n="placeholder_username_recovery" class="quiz-q-text" style="padding: 0.75rem 1rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
+            <button type="button" id="recovery-find-btn" class="btn btn-primary" style="padding: 0.8rem;" data-i18n="btn_find_account">
+              🔍 Find Account
+            </button>
+          </div>
+
+          <!-- Recovery Step 2: Answer Question & Set New Password -->
+          <div id="recovery-step-2" class="hidden" style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div class="glass-panel" style="padding: 0.85rem; border-radius: 12px; background: rgba(0,245,212,0.1); border: 1px solid rgba(0,245,212,0.3);">
+              <span style="font-size: 0.75rem; font-weight: bold; color: var(--accent); text-transform: uppercase;" data-i18n="lbl_your_secret_question">Your Secret Question:</span>
+              <div id="recovery-question-display" style="font-weight: bold; color: var(--text-primary); font-size: 0.95rem; margin-top: 0.2rem;"></div>
+            </div>
+
+            <div>
+              <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;" data-i18n="lbl_enter_secret_answer">Enter Your Answer</label>
+              <input type="text" id="recovery-answer-input" placeholder="Secret Answer" data-i18n="placeholder_recovery_answer" class="quiz-q-text" style="padding: 0.75rem 1rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-secondary); display: block; margin-bottom: 0.35rem;" data-i18n="lbl_new_password">New Password</label>
+              <input type="password" id="recovery-new-password" placeholder="At least 4 characters" data-i18n="placeholder_new_password" class="quiz-q-text" style="padding: 0.75rem 1rem; border: 2px solid var(--glass-border); border-radius: 12px; background: rgba(255,255,255,0.7); font-size: 1rem; width: 100%; box-sizing: border-box; outline: none;">
+            </div>
+
+            <button type="button" id="recovery-submit-btn" class="btn btn-primary" style="padding: 0.85rem; font-weight: bold;" data-i18n="btn_reset_password">
+              ✨ Reset Password & Log In
+            </button>
+          </div>
+        </div>
+
+        <!-- Auth Status / Error Banner -->
+        <div id="auth-error" class="hidden" style="color: #ff6b6b; font-size: 0.88rem; margin-top: 1rem; text-align: center; background: rgba(255, 107, 107, 0.12); padding: 0.6rem; border-radius: 10px; border: 1px solid rgba(255, 107, 107, 0.25);"></div>
+        <div id="auth-success" class="hidden" style="color: var(--success); font-size: 0.88rem; margin-top: 1rem; text-align: center; background: rgba(0, 245, 212, 0.12); padding: 0.6rem; border-radius: 10px; border: 1px solid rgba(0, 245, 212, 0.25);"></div>
+
+        <!-- Bottom Navigation Switchers -->
+        <div style="margin-top: 1.5rem; text-align: center; font-size: 0.88rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+          <div id="auth-toggle-container">
+            <span id="auth-toggle-text" style="color: var(--text-secondary);" data-i18n="auth_no_account">Don't have an account?</span> 
+            <a href="#" id="auth-toggle-link" style="color: var(--primary); font-weight: bold; text-decoration: none; margin-left: 0.25rem;" data-i18n="auth_sign_up">Sign Up</a>
+          </div>
+
+          <div id="auth-forgot-container">
+            <a href="#" id="auth-forgot-link" style="color: var(--accent); font-size: 0.82rem; text-decoration: none;" data-i18n="auth_forgot_password">🔑 Forgot Username or Password?</a>
+          </div>
+
+          <div id="auth-back-login-container" class="hidden">
+            <a href="#" id="auth-back-login-link" style="color: var(--primary); font-weight: bold; font-size: 0.88rem; text-decoration: none;" data-i18n="auth_back_to_login">⬅️ Back to Login</a>
+          </div>
+        </div>
+
       </div>
     </section>
 
