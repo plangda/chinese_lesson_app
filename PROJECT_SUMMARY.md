@@ -174,16 +174,19 @@ Because of point 4 above, a targeted string-replacement patch to a `_th` field i
 - ✅ **Pinyin Rules (Lesson 0) Seeded into Turso DB (Aug 4):** Updated `insert_pinyin_rules.js` with bilingual (`_en`/`_th`) columns for 4 core Pinyin rules (The Four Tones, Third Tone Sandhi, Tone Change for Yi/Bu, and the 'ü' Rule) and seeded `hsk1_day0` into Turso DB using 0 LLM API quota.
 - ✅ **Visual 5-Tab Pinyin Suite & Pedagogical Redesign (Aug 5):** Refactored Pinyin suite into 5 categorized tabs (`📊 Syllable Matrix`, `👄 Mouth & Airflow Guide`, `🎵 Tone & General Rules`, `🎧 Tone Pairs Practice`, `⌨️ Pinyin Typing Game`). Added Language Purity Guardrail in `insert_pinyin_rules.js` (0% EN-TH mixing), implemented 0ms memory caching in `app.js` (`state.pinyinLessonData`) for instant TH-EN toggles, and redesigned Pinyin Typing Simulator game loop (prompt -> type pinyin -> IME candidate pick -> Hanzi reveal + TTS).
 - ✅ **Self-Hosted Open Pinyin Audio & Native Hanzi Fallback (Aug 5):** Self-hosted human MP3 audio files (`public/audio/pinyin/a1.mp3` - `a4.mp3`, `e1.mp3` - `e4.mp3`) directly inside the project repository to eliminate third-party commercial CDN dependencies and HTTP 404 failovers. Updated `playTone()` fallback to map ASCII Pinyin strings (`ā, á, ǎ, à`, `zhi1`) directly to Chinese Hanzi characters (`啊`, `知`, `吃`, `诗`, `日`), forcing browser SpeechSynthesis to activate native Mandarin voice engines instead of reading ASCII letters ("zhi-one").
+- ✅ **Sentence Quest Game Implementation (Aug 13):** Implemented Chinese sentence builder mini-game utilizing mastered Stage 4 SRS vocabulary, smart tokenizer (`tokenizeSentence`), fallback sentence pool for new plants, SQL property aliases, and random unplayed sentence selector.
+- ✅ **Official HSK 1-3 Mock Exam System & 175-Question Bank (Aug 14):** Generated and seeded complete 100% full official real exam question sets into Turso Cloud DB (HSK 1: 40 Qs, HSK 2: 55 Qs, HSK 3: 80 Qs). Built the Exam Arena with countdown timers (35m/45m/85m), 2x audio player with Web Speech fallback, True/False, MCQ, Cloze character input, and Sentence Reordering. Implemented diagnostic score reporting modal, Question-by-Question Review Mode accordion with bilingual explanations, non-blocking SRS auto-rescue planting (`times_forgotten += 3`), guest authentication headers, and whole-exam fallback grading for partial/empty submissions.
 - ✅ **Universal Web Speech API TTS Fallback for Pinyin Chart (Aug 4):** Updated `playTone()` in `app.js` with an `audio.onerror` listener and `.catch()` fallback routing through native Web Speech API `SpeechSynthesis` (`lang: 'zh-CN'`), resolving broken/missing audio for rare Pinyin syllables (e.g. `tei`) across the entire Pinyin chart.
 
 **Pending / Next Steps:**
-- ⏳ **UX/UI Responsive Brainstorm Feedback (to discuss tomorrow):** Gather user feedback on the newly updated mobile and desktop responsive views.
-- ⏳ **Sentence Quest Builder (to discuss tomorrow):** Discuss structural mechanics and drag-and-drop slots UI for the newly planned mastered SRS words mini-game.
-- ⏳ **Full HSK 1-3 Mock Exams (to discuss tomorrow):** Discuss HSK 3.0 mock testing rules, official exam pacing, listening audio pipelines, and scoring.
-- ⏳ **HSK 2 Days 18–21:** Generate 4 remaining lessons (quota allows ~20 req/day; use `--no-translate` flag to save quota for separate patch pass).
-- ⏳ **Thai Translation Rollout for HSK2 (all 17 days) — After HSK1 completes:** Re-run the "content-quality audit" methodology from Aug 2 after rollout completes.
+- ⏳ **Authorization & Security Hardening (Phase 2):**
+  - Enforce JWT authentication on all user-specific progress and SRS API endpoints (`/api/progress`, `/api/srs/garden`, `/api/srs/water`, `/api/srs/fuse`) with clean guest-mode fallbacks.
+  - Implement API rate limiting using `express-rate-limit` across auth, AI generation, and exam submission endpoints to prevent brute-force attacks and DDoS.
+  - Implement JSON-schema based request body validation and input sanitization across all `POST`/`PUT` routes in `server.js`.
+  - Secure token storage, expiration checks, and seamless auto-refresh/re-authentication flows.
+- ⏳ **UX/UI Responsive Feedback:** Gather user feedback on the newly updated mobile and desktop responsive views.
 - ⏳ **HSK 4, 5 & 6 Seeding:** Advanced content generation and database seeding for higher proficiency levels.
-- ⏳ **Phase 6: Future Enhancements:** Pronunciation Assessment API, Multi-Character Writing Pad, DevOps & Custom Domains, and Automated Testing.
+- ⏳ **Phase 6: Future Enhancements:** Pronunciation Assessment API (speech recognition), Multi-Character Writing Pad, and Automated Unit/E2E Test Suite.
 
 ---
 
