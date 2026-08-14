@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const { getDb } = require('./database');
-const { router: authRouter, requireAuth } = require('./auth');
+const { router: authRouter, requireAuth, optionalAuth } = require('./auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -878,20 +878,20 @@ app.post('/api/srs/fusion/combine', requireAuth, async (req, res) => {
 // ==========================================
 
 // GET /api/mock-exams/summary - Get level availability & user's best scores
-app.get('/api/mock-exams/summary', requireAuth, async (req, res) => {
+app.get('/api/mock-exams/summary', optionalAuth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user ? req.user.id : null;
     const stats = await db.all(`
       SELECT hsk_level, COUNT(id) as total_questions 
       FROM mock_exam_questions 
       GROUP BY hsk_level
     `);
-    const history = await db.all(`
+    const history = userId ? await db.all(`
       SELECT hsk_level, MAX(total_score) as best_score, MAX(passed) as has_passed, MAX(created_at) as last_taken
       FROM user_exam_results
       WHERE user_id = ?
       GROUP BY hsk_level
-    `, [userId]);
+    `, [userId]) : [];
 
     const levelMap = {
       hsk1: { level: 'hsk1', name: 'HSK 1', questionsTarget: 40, timeLimitMinutes: 35, maxScore: 200, passScore: 120 },
@@ -919,7 +919,7 @@ app.get('/api/mock-exams/summary', requireAuth, async (req, res) => {
 });
 
 // GET /api/mock-exams/:level - Fetch questions for an exam session
-app.get('/api/mock-exams/:level', requireAuth, async (req, res) => {
+app.get('/api/mock-exams/:level', optionalAuth, async (req, res) => {
   try {
     const level = req.params.level;
     const questions = await db.all(`
@@ -947,9 +947,9 @@ app.get('/api/mock-exams/:level', requireAuth, async (req, res) => {
 });
 
 // POST /api/mock-exams/submit - Submit answers, grade, auto-plant missed words, and return report card
-app.post('/api/mock-exams/submit', requireAuth, async (req, res) => {
+app.post('/api/mock-exams/submit', optionalAuth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user ? req.user.id : 1;
     const { hskLevel, timeSpentSeconds, answers } = req.body;
 
     if (!hskLevel || !answers) {

@@ -97,6 +97,10 @@ const requireAuth = (req, res, next) => {
   }
   
   const token = authHeader.split(' ')[1];
+  if (!token || token === 'null' || token === 'undefined') {
+    return res.status(401).json({ error: 'Unauthorized, invalid token' });
+  }
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
@@ -106,4 +110,20 @@ const requireAuth = (req, res, next) => {
   }
 };
 
-module.exports = { router, requireAuth };
+// Optional Auth Middleware (Allows guest access while attaching user if token present)
+const optionalAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ') && JWT_SECRET) {
+    const token = authHeader.split(' ')[1];
+    if (token && token !== 'null' && token !== 'undefined') {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = decoded;
+      } catch (e) {}
+    }
+  }
+  next();
+};
+
+module.exports = { router, requireAuth, optionalAuth };
+

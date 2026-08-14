@@ -3704,8 +3704,14 @@ function renderMockExamQuestion() {
 
   let html = `<div class="glass-panel" style="padding: 1.75rem; border-radius: 16px; background: rgba(0,0,0,0.15); margin-bottom: 1rem;">`;
 
-  // 1. If Listening question, render Audio Player button (transcript hidden during exam)
+  // 1. If Listening question, render Audio Player button (transcript hidden, prompt/question displayed)
   if (isListening) {
+    let questionText = '';
+    if (q.prompt_cn.includes('问：') || q.prompt_cn.includes('问:')) {
+      const parts = q.prompt_cn.split(/问[：:]/);
+      questionText = '问：' + parts[parts.length - 1].trim();
+    }
+
     html += `
       <div style="margin-bottom: 1.5rem; text-align: center; background: rgba(255, 51, 102, 0.08); padding: 1.5rem; border-radius: 16px; border: 1px solid rgba(255, 51, 102, 0.25);">
         <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Official HSK Listening Prompt (Plays 2 Times)</div>
@@ -3714,8 +3720,25 @@ function renderMockExamQuestion() {
         </button>
       </div>
     `;
+
     if (q.image_url) {
       html += `<div style="margin-bottom: 1.25rem; text-align: center;"><img src="${q.image_url}" alt="Exam Illustration" style="max-height: 140px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);" onerror="this.style.display='none'" /></div>`;
+    }
+
+    if (q.question_type === 'TRUE_FALSE') {
+      html += `
+        <div style="text-align: center; margin-bottom: 1.25rem;">
+          <div style="font-size: 1rem; color: var(--text-secondary); font-weight: 500;">
+            🎧 Listen to the statement and judge if it is True or False:
+          </div>
+        </div>
+      `;
+    } else if (questionText) {
+      html += `
+        <div style="text-align: center; margin-bottom: 1.25rem;">
+          <div style="font-size: 1.35rem; font-weight: bold; color: var(--text-primary); margin-bottom: 0.25rem;">${questionText}</div>
+        </div>
+      `;
     }
   } else {
     // Reading or Writing section prompt
