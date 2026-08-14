@@ -4004,8 +4004,77 @@ function showMockExamResultModal(report) {
     }
   }
 
+  // Populate Question-by-Question detailed review cards
+  renderMockExamDetailedReview(report);
+
   modal.style.display = 'flex';
   modal.classList.remove('hidden');
+}
+
+function toggleMockExamReview() {
+  const container = document.getElementById('mock-exam-review-container');
+  const chevron = document.getElementById('mock-exam-review-chevron');
+  if (!container) return;
+  const isHidden = container.classList.contains('hidden');
+  if (isHidden) {
+    container.classList.remove('hidden');
+    if (chevron) chevron.textContent = '▲';
+  } else {
+    container.classList.add('hidden');
+    if (chevron) chevron.textContent = '▼';
+  }
+}
+window.toggleMockExamReview = toggleMockExamReview;
+
+function renderMockExamDetailedReview(report) {
+  const container = document.getElementById('mock-exam-review-container');
+  if (!container) return;
+  const reviews = report.detailedReview || [];
+  if (reviews.length === 0) {
+    container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">No detailed review data returned.</div>`;
+    return;
+  }
+
+  container.innerHTML = reviews.map((q, idx) => {
+    const isCorrect = q.isCorrect;
+    const localizedPrompt = state.currentLanguage === 'th' ? (q.promptTh || q.promptEn) : (q.promptEn || q.promptTh);
+    const localizedExplanation = state.currentLanguage === 'th' ? (q.explanationTh || q.explanationEn) : (q.explanationEn || q.explanationTh);
+    const secBadge = q.section === 'listening' ? '🎧 Listening' : (q.section === 'writing' ? '✍️ Writing' : '📖 Reading');
+
+    return `
+      <div class="glass-panel" style="padding: 1rem; border-radius: 12px; background: rgba(0,0,0,0.3); border: 1px solid ${isCorrect ? 'rgba(0, 245, 212, 0.35)' : 'rgba(255, 51, 102, 0.35)'}; margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">${secBadge} - Q${idx + 1}</span>
+          <span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border-radius: 6px; background: ${isCorrect ? 'rgba(0, 245, 212, 0.15)' : 'rgba(255, 51, 102, 0.15)'}; color: ${isCorrect ? 'var(--success)' : 'var(--primary)'};">
+            ${isCorrect ? '✓ Correct' : '✗ Incorrect'}
+          </span>
+        </div>
+
+        <div style="font-size: 1.2rem; font-weight: bold; font-family: var(--font-serif); margin-bottom: 0.2rem; color: var(--text-primary);">
+          ${q.promptCn}
+        </div>
+        ${q.promptPy ? `<div style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.25rem;">${q.promptPy}</div>` : ''}
+        ${localizedPrompt ? `<div style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.6rem;">${localizedPrompt}</div>` : ''}
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.85rem; background: rgba(255,255,255,0.03); padding: 0.6rem; border-radius: 8px; margin-bottom: 0.5rem;">
+          <div>
+            <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">Your Answer:</span>
+            <div style="font-weight: bold; color: ${isCorrect ? 'var(--success)' : 'var(--primary)'}; font-size: 0.95rem;">${q.userAnswer}</div>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">Correct Answer:</span>
+            <div style="font-weight: bold; color: var(--success); font-size: 0.95rem;">${q.correctAnswer}</div>
+          </div>
+        </div>
+
+        ${localizedExplanation ? `
+          <div style="font-size: 0.82rem; color: var(--text-secondary); border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 0.5rem;">
+            💡 <strong>Explanation:</strong> ${localizedExplanation}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
 }
 
 function exitMockExamEarly() {

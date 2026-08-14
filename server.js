@@ -1072,6 +1072,26 @@ app.post('/api/mock-exams/submit', optionalAuth, async (req, res) => {
       }));
     }
 
+    const detailedReview = dbQuestions.map(q => {
+      const userAns = (answers[q.id] || '').trim();
+      const isCorrect = userAns.toLowerCase() === (q.correct_answer || '').trim().toLowerCase();
+      return {
+        id: q.id,
+        section: q.section,
+        questionType: q.question_type,
+        promptCn: q.prompt_cn,
+        promptPy: q.prompt_py,
+        promptEn: q.prompt_en,
+        promptTh: q.prompt_th,
+        options: JSON.parse(q.options_json || '[]'),
+        userAnswer: userAns || '(No Answer)',
+        correctAnswer: q.correct_answer,
+        isCorrect,
+        explanationEn: q.explanation_en,
+        explanationTh: q.explanation_th
+      };
+    });
+
     res.json({
       passed: passed === 1,
       totalScore,
@@ -1082,7 +1102,8 @@ app.post('/api/mock-exams/submit', optionalAuth, async (req, res) => {
       writingScore: isHsk3 ? writingScore : null,
       weaknessSummary,
       missedVocabWords,
-      plantedCount: uniqueMissedVocabIds.length
+      plantedCount: uniqueMissedVocabIds.length,
+      detailedReview
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
