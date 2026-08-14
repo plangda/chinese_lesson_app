@@ -3573,11 +3573,19 @@ let currentMockExamSession = {
   totalTimeSeconds: 0
 };
 
+function getMockExamAuthHeaders() {
+  const token = localStorage.getItem("hanpath_token");
+  const headers = { 'Content-Type': 'application/json' };
+  if (token && token !== 'null' && token !== 'undefined') {
+    headers['Authorization'] = 'Bearer ' + token;
+  }
+  return headers;
+}
+
 async function loadMockExamSummary() {
   try {
-    const token = localStorage.getItem("hanpath_token");
     const res = await fetch('/api/mock-exams/summary', {
-      headers: { "Authorization": "Bearer " + token }
+      headers: getMockExamAuthHeaders()
     });
     if (!res.ok) return;
     const data = await res.json();
@@ -3602,9 +3610,8 @@ window.loadMockExamSummary = loadMockExamSummary;
 
 async function startMockExamSession(level) {
   try {
-    const token = localStorage.getItem("hanpath_token");
     const res = await fetch(`/api/mock-exams/${level}`, {
-      headers: { "Authorization": "Bearer " + token }
+      headers: getMockExamAuthHeaders()
     });
     if (!res.ok) {
       alert("Failed to load mock exam questions. Please try again.");
@@ -3624,6 +3631,10 @@ async function startMockExamSession(level) {
     };
     const totalTime = timeLimits[level] || 35 * 60;
 
+    if (currentMockExamSession && currentMockExamSession.timerInterval) {
+      clearInterval(currentMockExamSession.timerInterval);
+    }
+
     currentMockExamSession = {
       hskLevel: level,
       questions: questions,
@@ -3635,32 +3646,35 @@ async function startMockExamSession(level) {
       totalTimeSeconds: totalTime
     };
 
-    // Start countdown timer
-    clearInterval(currentMockExamSession.timerInterval);
-    currentMockExamSession.timerInterval = setInterval(() => {
-      currentMockExamSession.secondsRemaining--;
-      updateMockExamTimerDisplay();
-      if (currentMockExamSession.secondsRemaining <= 0) {
-        clearInterval(currentMockExamSession.timerInterval);
-        alert("Time is up! Submitting your exam automatically...");
-        submitMockExam();
-      }
-    }, 1000);
-
-    // Switch view
+    // Switch view to arena and initialize display
     switchView('mock-exam-view');
     updateMockExamTimerDisplay();
     renderMockExamQuestion();
+
+    // Start countdown timer
+    currentMockExamSession.timerInterval = setInterval(() => {
+      if (!currentMockExamSession || currentMockExamSession.secondsRemaining <= 0) {
+        if (currentMockExamSession && currentMockExamSession.timerInterval) {
+          clearInterval(currentMockExamSession.timerInterval);
+        }
+        alert("Time is up! Submitting your exam automatically...");
+        submitMockExam();
+        return;
+      }
+      currentMockExamSession.secondsRemaining--;
+      updateMockExamTimerDisplay();
+    }, 1000);
+
   } catch (err) {
     console.error("Failed to start mock exam session:", err);
-    alert("Error launching mock exam session.");
+    alert("Error launching mock exam session: " + err.message);
   }
 }
 window.startMockExamSession = startMockExamSession;
 
 function updateMockExamTimerDisplay() {
   const display = document.getElementById('mock-exam-timer-display');
-  if (!display) return;
+  if (!display || !currentMockExamSession) return;
   const secs = Math.max(0, currentMockExamSession.secondsRemaining);
   const m = Math.floor(secs / 60);
   const s = secs % 60;
@@ -3903,34 +3917,44 @@ function speakTwice(text) {
 }
 
 async function submitMockExam() {
-  clearInterval(currentMockExamSession.timerInterval);
-  const timeSpent = currentMockExamSession.totalTimeSeconds - currentMockExamSession.secondsRemaining;
+  if (!currentMockExamSession) return;
+  if (currentMockExamSession.timerInterval) {
+    clearInterval(currentMockExamSession.timerInterval);
+  }
+
+  const submitBtn = document.getElementById('mock-exam-submit-btn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⏳ Submitting...';
+  }
+
+  const timeSpent = Math.max(1, (currentMockExamSession.totalTimeSeconds || 0) - (currentMockExamSession.secondsRemaining || 0));
   
   try {
-    const token = localStorage.getItem("hanpath_token");
     const res = await fetch('/api/mock-exams/submit', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
+      headers: getMockExamAuthHeaders(),
       body: JSON.stringify({
         hskLevel: currentMockExamSession.hskLevel,
         timeSpentSeconds: timeSpent,
-        answers: currentMockExamSession.userAnswers
+        answers: currentMockExamSession.userAnswers || {}
       })
     });
 
     if (!res.ok) {
-      alert("Failed to submit exam results.");
-      return;
+      throw new Error(`Server responded with status ${res.status}`);
     }
 
     const report = await res.json();
     showMockExamResultModal(report);
   } catch (err) {
     console.error("Failed to submit mock exam:", err);
-    alert("Network error submitting exam.");
+    alert("Error submitting exam: " + err.message);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '📝 Submit Exam';
+    }
   }
 }
 window.submitMockExam = submitMockExam;

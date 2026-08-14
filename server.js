@@ -952,21 +952,22 @@ app.post('/api/mock-exams/submit', optionalAuth, async (req, res) => {
     const userId = req.user ? req.user.id : 1;
     const { hskLevel, timeSpentSeconds, answers } = req.body;
 
-    if (!hskLevel || !answers) {
-      return res.status(400).json({ error: 'Missing required exam data' });
+    if (!hskLevel) {
+      return res.status(400).json({ error: 'Missing required exam level' });
     }
 
-    const questionIds = Object.keys(answers);
-    if (questionIds.length === 0) {
-      return res.status(400).json({ error: 'No answers submitted' });
-    }
+    const safeAnswers = answers || {};
 
-    const placeholders = questionIds.map(() => '?').join(',');
     const dbQuestions = await db.all(`
-      SELECT id, hsk_level, section, correct_answer, target_vocab_ids, target_grammar_ids, explanation_en, explanation_th
+      SELECT id, hsk_level, section, question_type, prompt_cn, prompt_py, prompt_en, prompt_th, options_json, correct_answer, target_vocab_ids, target_grammar_ids, explanation_en, explanation_th
       FROM mock_exam_questions
-      WHERE id IN (${placeholders})
-    `, questionIds);
+      WHERE hsk_level = ?
+      ORDER BY section ASC, id ASC
+    `, [hskLevel]);
+
+    if (!dbQuestions || dbQuestions.length === 0) {
+      return res.status(404).json({ error: 'No exam questions found for this level' });
+    }
 
     let listeningCorrect = 0, listeningTotal = 0;
     let readingCorrect = 0, readingTotal = 0;
@@ -975,8 +976,8 @@ app.post('/api/mock-exams/submit', optionalAuth, async (req, res) => {
     const missedGrammarIds = [];
 
     dbQuestions.forEach(q => {
-      const userAns = (answers[q.id] || '').trim();
-      const isCorrect = userAns.toLowerCase() === (q.correct_answer || '').trim().toLowerCase();
+      const userAns = (safeAnswers[q.id] || '').trim();
+      const isCorrect = userAns.length > 0 && userAns.toLowerCase() === (q.correct_answer || '').trim().toLowerCase();
       
       if (q.section === 'listening') {
         listeningTotal++;
